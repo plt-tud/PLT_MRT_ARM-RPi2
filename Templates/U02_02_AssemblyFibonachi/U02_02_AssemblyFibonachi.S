@@ -1,7 +1,7 @@
-# this directive allows the linker to see the "main" label which is our entry point
+// this directive allows the linker to see the "main" label which is our entry point
 .globl main
 
-# this directive allows the eclipse gdb to see a function called "main"
+// this directive allows the eclipse gdb to see a function called "main"
 .func main
 
 main:
