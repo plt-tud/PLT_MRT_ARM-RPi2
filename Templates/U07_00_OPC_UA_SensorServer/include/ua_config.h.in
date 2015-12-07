@@ -1,0 +1,111 @@
+#ifndef UA_CONFIG_H_
+#define UA_CONFIG_H_
+
+#ifndef _XOPEN_SOURCE
+# define _XOPEN_SOURCE 500
+#endif
+
+#define UA_LOGLEVEL ${UA_LOGLEVEL}
+#cmakedefine UA_MULTITHREADING
+#cmakedefine ENABLE_METHODCALLS
+#cmakedefine ENABLE_SUBSCRIPTIONS
+#cmakedefine ENABLE_TYPEINTROSPECTION
+#cmakedefine UA_EMBEDDED_LIBC
+
+/* Function Export */
+#ifdef _WIN32
+# ifdef UA_DYNAMIC_LINKING
+#  ifdef __GNUC__
+#   define UA_EXPORT __attribute__ ((dllexport))
+#  else
+#   define UA_EXPORT __declspec(dllexport)
+#  endif
+# else
+#  ifdef __GNUC__
+#   define UA_EXPORT __attribute__ ((dllexport))
+#  else
+#   define UA_EXPORT __declspec(dllimport)
+#  endif
+# endif
+#else
+# if __GNUC__ || __clang__
+#  define UA_EXPORT __attribute__ ((visibility ("default")))
+# else
+#  define UA_EXPORT
+# endif
+#endif
+
+/* Endianness */
+#if defined(__linux__) || defined(__APPLE__)
+#  ifndef __QNX__
+#    if defined(__APPLE__) || defined(__MACH__)
+#     include <machine/endian.h>
+#    else
+#     include <endian.h>
+#    endif
+#  endif
+# if ( __BYTE_ORDER != __LITTLE_ENDIAN )
+#  define UA_NON_LITTLEENDIAN_ARCHITECTURE
+# endif
+#endif
+
+/* Force non-little endian manually by setting the following. */
+// #define UA_NON_LITTLEENDIAN_ARCHITECTURE
+// #define htole16(x) {...}(x)
+// #define htole32(x) {...}(x)
+// #define htole64(x) {...}(x)
+// #define le16toh(x) {...}(x)
+// #define le32toh(x) {...}(x)
+// #define le64toh(x) {...}(x)
+
+/* Mixed Endian */
+#ifdef __ARM_ARCH_4T__
+# define UA_MIXED_ENDIAN
+# define UA_NON_LITTLEENDIAN_ARCHITECTURE
+#endif
+
+/* Aligned Memory Access */
+#if defined(__arm__) && !defined(__ARM_FEATURE_UNALIGNED)
+# define UA_ALIGNED_MEMORY_ACCESS
+#endif
+
+/* Inline Functions */
+#ifdef _MSC_VER
+# define UA_INLINE __inline
+#else
+# define UA_INLINE inline
+#endif
+
+/* Define non-aliasing pointers */
+#ifdef _MSC_VER
+# define UA_RESTRICT __restrict
+#elif defined(__GNUC__)
+# define UA_RESTRICT __restrict__
+#else
+# define UA_RESTRICT restrict
+#endif
+
+/* Function attributes */
+#ifdef __GNUC__
+# define UA_FUNC_ATTR_MALLOC __attribute__((malloc))
+# define UA_FUNC_ATTR_PURE __attribute__ ((pure))
+# define UA_FUNC_ATTR_CONST __attribute__((const))
+# define UA_FUNC_ATTR_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+#else
+# define UA_FUNC_ATTR_MALLOC
+# define UA_FUNC_ATTR_PURE
+# define UA_FUNC_ATTR_CONST
+# define UA_FUNC_ATTR_WARN_UNUSED_RESULT
+#endif
+
+#include <stddef.h>
+#ifdef UA_EMBEDDED_LIBC
+  void *memcpy(void *UA_RESTRICT dest, const void *UA_RESTRICT src, size_t n);
+  void *memset(void *dest, int c, size_t n);
+  size_t strlen(const char *s);
+  int memcmp(const void *vl, const void *vr, size_t n);
+#else
+# include <string.h>
+#endif
+
+#endif /* UA_CONFIG_H_ */
