@@ -2,6 +2,14 @@
 #include "bcm2835.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "sys/utsname.h"
+#include "ua_types.h"
+#include <dirent.h> 
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 
 /**
  * @brief Get an ADC Value (as Voltage) from a SPI connected MCP2008 ADC
@@ -145,7 +153,199 @@ UA_StatusCode clrGPIO(const UA_NodeId objectId, const UA_Variant *input, UA_Vari
   
   return UA_STATUSCODE_GOOD;
 }
+
+static int readline(int file, char **buffer, unsigned int maxlength) { 
+  *buffer = (char *) malloc(maxlength);
+  memset(*buffer, 0, maxlength);
+  char buf = 0;
+  unsigned int pos = 0;
+  int r;
+  while (pos<maxlength && (r = read(file, &buf, 1))) {
+    (*buffer)[pos++] = buf;
+    if(buf == '\n') break;;
+  }
+  if (pos != maxlength && pos > 0) {
+    (*buffer)[--pos] = 0; // remove the newline
+  }
+  realloc(*buffer, pos);
   
+  // return -1 at EOF, 0 if we really have a zero length string
+  return (r==0) ? -1 : pos;
+}
+
+static UA_String *getMACofDevice(char *deviceName) {
+  int addressFile;
+  char *addressFileName = (char *) malloc(strlen(deviceName) + 14 + 10);
+  UA_String *address = UA_String_new();
+  strcpy(addressFileName, "/sys/class/net/");
+  strcpy(&addressFileName[15], deviceName);
+  strcpy(&addressFileName[15+strlen(deviceName)], "/address");
+  
+  if((addressFile = open(addressFileName, O_RDONLY))) { // Read MAC address from file
+    address->length = readline(addressFile, (char **) &address->data, 126);
+    close(addressFile);
+  }
+  realloc(address->data, address->length);
+  free(addressFileName );
+  
+  return address;
+}
+
+UA_StatusCode UA_Servernamespace_init_device(UA_Server *server, UA_NodeId *virtualRootNodeId) {
+  UA_StatusCode retval = UA_STATUSCODE_GOOD;
+  
+  struct utsname sysinfo;
+  if(!uname(&sysinfo)) {
+    UA_VariableAttributes attr;
+    UA_VariableAttributes_init(&attr);
+    UA_QualifiedName browsename;
+    UA_String  varContent;
+    
+    for(int i = 0; i<6; i++) {
+      switch(i) {
+        case 0: 
+          attr.displayName = UA_LOCALIZEDTEXT("en_US", "nodename");
+          attr.description = UA_LOCALIZEDTEXT("en_US", "nodename");
+          browsename = UA_QUALIFIEDNAME(1, "nodename");
+          varContent = UA_String_fromChars((char*) &sysinfo.nodename);
+          break;
+        case 1: 
+          attr.displayName = UA_LOCALIZEDTEXT("en_US", "release");
+          attr.description = UA_LOCALIZEDTEXT("en_US", "release");
+          browsename = UA_QUALIFIEDNAME(1, "release");
+          varContent = UA_String_fromChars((char*) &sysinfo.release);
+          break;
+        break;
+        case 2: 
+          attr.displayName = UA_LOCALIZEDTEXT("en_US", "sysname");
+          attr.description = UA_LOCALIZEDTEXT("en_US", "sysname");
+          browsename = UA_QUALIFIEDNAME(1, "sysname");
+          varContent = UA_String_fromChars((char*) &sysinfo.sysname);
+          break;
+        break;
+        case 3: 
+          attr.displayName = UA_LOCALIZEDTEXT("en_US", "domainname");
+          attr.description = UA_LOCALIZEDTEXT("en_US", "domainname");
+          browsename = UA_QUALIFIEDNAME(1, "domainname");
+          # ifdef __USE_GNU
+            varContent = UA_String_fromChars((char*) &sysinfo.domainname);
+          #else
+            varContent = UA_String_fromChars("");
+          #endif
+          break;
+        break;
+        case 4: 
+          attr.displayName = UA_LOCALIZEDTEXT("en_US", "machine");
+          attr.description = UA_LOCALIZEDTEXT("en_US", "machine");
+          browsename = UA_QUALIFIEDNAME(1, "machine");
+          varContent = UA_String_fromChars((char*) &sysinfo.machine);
+          break;
+        break;
+        case 5: 
+          attr.displayName = UA_LOCALIZEDTEXT("en_US", "version");
+          attr.description = UA_LOCALIZEDTEXT("en_US", "version");
+          browsename = UA_QUALIFIEDNAME(1, "version");
+          varContent = UA_String_fromChars((char*) &sysinfo.version);
+          break;
+        default:
+          attr.displayName = UA_LOCALIZEDTEXT("en_US", "");
+          attr.description = UA_LOCALIZEDTEXT("en_US", "");
+          browsename = UA_QUALIFIEDNAME(1, "");
+          varContent = UA_String_fromChars("");
+          break;
+      }
+      UA_Variant_setScalarCopy(&attr.value, &varContent, &UA_TYPES[UA_TYPES_STRING]);
+      retval |= UA_Server_addVariableNode(server, UA_NODEID_NUMERIC(1,0),
+                                          *virtualRootNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                                          browsename, UA_NODEID_NULL,
+                                          attr, NULL);
+      UA_String_deleteMembers(&varContent);
+    }
+  }
+  
+  // Create a network adapter node
+  UA_ObjectAttributes   oAttributes;
+  UA_VariableAttributes vAttributes;
+  UA_ObjectAttributes_init(&oAttributes);
+  UA_VariableAttributes_init(&vAttributes);
+  
+  UA_NodeId *netNode = UA_NodeId_new();
+  oAttributes.description = UA_LOCALIZEDTEXT("en_US", "Networking adapters and cards information");
+  oAttributes.displayName = UA_LOCALIZEDTEXT("en_US", "Networking");
+  retval = UA_Server_addObjectNode(server, UA_NODEID_NUMERIC(1,0),
+                                    *virtualRootNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                                    UA_QUALIFIEDNAME(1, "NetDevices"), UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE),
+                                    oAttributes, netNode);
+  UA_NodeId *netDevNode = UA_NodeId_new();
+  if (retval == UA_STATUSCODE_GOOD) {
+    DIR *classNetDir;
+    struct dirent *classNetDirEnt;
+    classNetDir = opendir("/sys/class/net");
+    if (classNetDir) {
+      // For each adapter listed
+      while ((classNetDirEnt = readdir(classNetDir)) != NULL) {
+        if(strncmp(classNetDirEnt->d_name, ".", 1)) { // Filter "." and ".." directories
+          oAttributes.description = UA_LOCALIZEDTEXT("en_US", classNetDirEnt->d_name);
+          oAttributes.displayName = UA_LOCALIZEDTEXT("en_US", classNetDirEnt->d_name);
+          retval = UA_Server_addObjectNode(server, UA_NODEID_NUMERIC(1,0),
+                                           *netNode, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                                           UA_QUALIFIEDNAME(1, classNetDirEnt->d_name), UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE),
+                                           oAttributes, netDevNode);
+          // Read this devices MAC address
+          vAttributes.displayName = UA_LOCALIZEDTEXT("en_US", "MAC");
+          vAttributes.description = UA_LOCALIZEDTEXT("en_US", "Media Access Controller address of this device.");
+          
+          // We need to read /sys/class/net/<deviceName>/address
+          UA_String *address = getMACofDevice(classNetDirEnt->d_name);
+          UA_Variant_setScalarCopy(&vAttributes.value, address, &UA_TYPES[UA_TYPES_STRING]);
+          retval = UA_Server_addVariableNode( server, UA_NODEID_NUMERIC(1,0),
+                                              *netDevNode, UA_NODEID_NUMERIC(0, UA_NS0ID_HASPROPERTY),
+                                              UA_QUALIFIEDNAME(1, "MAC Address"), UA_NODEID_NULL,
+                                              vAttributes, NULL);
+          
+          UA_String_delete(address);
+        }
+      }
+      closedir(classNetDir);
+    }
+  }
+  UA_NodeId_delete(netDevNode);
+  UA_NodeId_delete(netNode);
+  
+  // Create a cpu info node
+  UA_NodeId *cpuNode = UA_NodeId_new();
+  oAttributes.description = UA_LOCALIZEDTEXT("en_US", "CPU information");
+  oAttributes.displayName = UA_LOCALIZEDTEXT("en_US", "CPU");
+  retval = UA_Server_addObjectNode(server, UA_NODEID_NUMERIC(1,0),
+                                   *virtualRootNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                                   UA_QUALIFIEDNAME(1, "CPU"), UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE),
+                                   oAttributes, cpuNode);
+  char *cpuInfoLine = NULL;
+  int  cpuInfoFile;
+  vAttributes.displayName = UA_LOCALIZEDTEXT("en_US", "CPU Serial");
+  vAttributes.description = UA_LOCALIZEDTEXT("en_US", "Serial number of the processor/SoC");
+  if((cpuInfoFile = open("/proc/cpuinfo", O_RDONLY))) {
+    while(readline(cpuInfoFile, &cpuInfoLine, 255) >= 0) {
+      if (cpuInfoLine == NULL) continue;
+      if(!strncmp(cpuInfoLine, "Serial", 6)) {
+        int pos=7;
+        while ((cpuInfoLine[pos] == ' ' || cpuInfoLine[pos] == '\t' || cpuInfoLine[pos] == ':') && pos < strlen(cpuInfoLine)) pos++;
+        
+        UA_String tmp = UA_String_fromChars((char *) &cpuInfoLine[pos]);
+        UA_Variant_setScalarCopy(&vAttributes.value, &tmp, &UA_TYPES[UA_TYPES_STRING]);
+        retval |= UA_Server_addVariableNode(server, UA_NODEID_NUMERIC(1,0),
+                                            *cpuNode, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                                            UA_QUALIFIEDNAME(1, "CPUSerial"), UA_NODEID_NULL,
+                                            vAttributes, NULL);
+        break;
+      }
+    }
+    close(cpuInfoFile);
+  }
+  UA_NodeId_delete(cpuNode);
+  return retval;
+}
+
 UA_StatusCode UA_Servernamespace_init_GPIOs(UA_Server *server, UA_NodeId *virtualRootNodeId) {
   UA_StatusCode retval = UA_STATUSCODE_GOOD;
   UA_ObjectAttributes oAttributes;
@@ -276,7 +476,7 @@ UA_StatusCode UA_Servernamespace_init(UA_Server *server) {
       UA_NodeId_delete(deviceRootNodeId);
       return -1;
   }
-
+  UA_NodeId *NewNodeId = UA_NodeId_new();
   
   UA_VariableAttributes vAttributes;
   UA_VariableAttributes_init(&vAttributes);    
@@ -284,15 +484,13 @@ UA_StatusCode UA_Servernamespace_init(UA_Server *server) {
   // Create a human readable device description
   UA_LocalizedText tmpLoclizedText = UA_LOCALIZEDTEXT("en_US", "Raspberry Pi 2 B");
   UA_Variant_setScalarCopy(&vAttributes.value, &tmpLoclizedText, &UA_TYPES[UA_TYPES_LOCALIZEDTEXT]);
-  vAttributes.description = UA_LOCALIZEDTEXT("en_US", "Device type");
-  vAttributes.displayName = UA_LOCALIZEDTEXT("en_US", "DeviceType");
+  vAttributes.description = UA_LOCALIZEDTEXT("en_US", "OS System and host information");
+  vAttributes.displayName = UA_LOCALIZEDTEXT("en_US", "System");
   retval |= UA_Server_addVariableNode(server, UA_NODEID_NUMERIC(1,0),
 			    *deviceRootNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
 			    UA_QUALIFIEDNAME(1, "DeviceType"), UA_NODEID_NULL,
-			    vAttributes, NULL);
-  
-  // Create a series of nodes for GPIOs
-  UA_NodeId *NewNodeId = UA_NodeId_new();
+                            vAttributes, NewNodeId);
+  UA_Servernamespace_init_device(server, NewNodeId);
   
   // Create a new root node for GPIOs
   oAttributes.description = UA_LOCALIZEDTEXT("en_US", "General Purpose input/output pins");
