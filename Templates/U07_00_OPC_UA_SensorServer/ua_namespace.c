@@ -129,7 +129,7 @@ static UA_StatusCode readGPIOfsel(void *handle, const UA_NodeId nodeid, UA_Boole
   // Warn: this is a pointer to a 32 bit word... do not use ((gpioNo/10)) << 2 --> *4byte is implicit
   volatile uint32_t* fseladdr = (uint32_t*) (bcm2835_regbase(BCM2835_REGBASE_GPIO) + BCM2835_GPFSEL0 + (gpioNo/10)); // << 2) );
   gpioFSEL = bcm2835_peri_read(fseladdr);
-  gpioFSEL = (gpioFSEL >> ((int) *((int *) handle))%10) && 0x07;
+  gpioFSEL = (gpioFSEL >> ( ((int) *((int *) handle))%10 ) * 3  ) & 0x07
   
   UA_Variant_setScalarCopy(&dataValue->value, &gpioFSEL, &UA_TYPES[UA_TYPES_INT32]);
   dataValue->hasValue = UA_TRUE;
