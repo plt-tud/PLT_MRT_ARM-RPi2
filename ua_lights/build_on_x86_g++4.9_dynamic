@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#compiling
+g++-4.9 -std=c++0x -g -c -o ./objects/main.o ./scr/main.cpp -I ./include -lpthread
+g++-4.9 -std=c++0x -g -c -o ./objects/PedestrianLight.o ./scr/PedestrianLight.cpp -I ./include -lpthread
+g++-4.9 -std=c++0x -g -c -o ./objects/TrafficLight.o ./scr/TrafficLight.cpp -I ./include -lpthread
+g++-4.9 -std=c++0x -g -c -o ./objects/Light.o ./scr/Light.cpp -I ./include -lpthread
+g++-4.9 -std=c++0x -g -c -o ./objects/ThreadedSensor.o ./scr/ThreadedSensor.cpp -lpthread -I ./include
+g++-4.9 -std=c++0x -g -c -o ./objects/setLight.o ./scr/setLight.c -I ./include
+g++-4.9 -std=c++0x -g -c -o ./objects/Opc_ua.o ./scr/Opc_ua.cpp -I ./include -lpthread
+echo "compiling finished"
+
+#linking:
+#g++ -std=c++11 -Wall -o ./build/lights ./lib/libbcm2835.a ./objects/setLight.o ./objects/ThreadedSensor.o ./objects/main.o ./objects/PedestrianLight.o ./objects/TrafficLight.o ./objects/Light.o -pthread
+g++-4.9 -std=c++0x -Wall -Wl,-rpath=./lib -g -o ./build/lights ./objects/Opc_ua.o ./objects/setLight.o ./objects/ThreadedSensor.o ./objects/main.o ./objects/PedestrianLight.o ./objects/TrafficLight.o ./objects/Light.o -lpthread -L ./lib/
+echo "linking finished"
+
