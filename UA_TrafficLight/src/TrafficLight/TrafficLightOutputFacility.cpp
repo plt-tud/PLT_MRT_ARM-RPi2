@@ -131,6 +131,7 @@ UA_StatusCode TrafficLightOutputFacility::ua_mapSelfToNamespace() {
 
 void TrafficLightOutputFacility::printState() 
 {
+  cout << "\x1B[2J\x1B[H"; // ANSI Console only... clear screen, move cursor to first position
   if(this->hasSignal) {
     cout << "+-+" << endl;
     cout << "|"; 

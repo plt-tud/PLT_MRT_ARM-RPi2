@@ -16,40 +16,35 @@ static void SigHandler_Int(int sign) {
 
 bool fakeSensor_trigger = false;
 const bool readFakeSensor() {
+#ifdef BUILD_RPI
+  return (bcm2835_gpio_lev(RPI_GPIO_PB) == 1);
+#else
   if (fakeSensor_trigger) {
     fakeSensor_trigger = false;
     return true;
   }
-  
+#endif
   return false;
 }
 
 const void setFakeOutput(bool red, bool yellow, bool green) {
   #ifdef BUILD_RPI
-  if (red)
-    bcm2835_gpio_set(RPI_GPIO_RED);
-  else
-    bcm2835_gpio_clr(RPI_GPIO_RED);
+  if (red)    bcm2835_gpio_set(RPI_GPIO_RED);
+  else        bcm2835_gpio_clr(RPI_GPIO_RED);
   
-  if (yellow)
-    bcm2835_gpio_set(RPI_GPIO_YELLOW);
-  else
-    bcm2835_gpio_clr(RPI_GPIO_YELLOW);
+  if (yellow) bcm2835_gpio_set(RPI_GPIO_YELLOW);
+  else        bcm2835_gpio_clr(RPI_GPIO_YELLOW);
   
-  if (green)
-    bcm2835_gpio_set(RPI_GPIO_GREEN);
-  else
-    bcm2835_gpio_clr(RPI_GPIO_GREEN);
+  if (green)  bcm2835_gpio_set(RPI_GPIO_GREEN);
+  else        bcm2835_gpio_clr(RPI_GPIO_GREEN);
   #endif
   return;
 }
 
 const void setFakeSignal(bool signal) {
   #ifdef BUILD_RPI
-  if (signal)
-    bcm2835_gpio_set(RPI_GPIO_SIGNAL);
-  else
-    bcm2835_gpio_clr(RPI_GPIO_SIGNAL);
+  if (signal)   bcm2835_gpio_set(RPI_GPIO_SIGNAL);
+  else          bcm2835_gpio_clr(RPI_GPIO_SIGNAL);
   #endif
   return;
 }
@@ -73,9 +68,14 @@ int main(int argc, char *argv[]){
   bcm2835_gpio_fsel(RPI_GPIO_YELLOW, BCM2835_GPIO_FSEL_OUTP);
   bcm2835_gpio_fsel(RPI_GPIO_GREEN,  BCM2835_GPIO_FSEL_OUTP);
   bcm2835_gpio_fsel(RPI_GPIO_SIGNAL, BCM2835_GPIO_FSEL_OUTP);
+  
+  bcm2835_gpio_fsel(14,              BCM2835_GPIO_FSEL_INPT); // Cosmetic - GPIO14 is usually high after boot
+  bcm2835_gpio_fsel(RPI_GPIO_PB,     BCM2835_GPIO_FSEL_INPT);
+  bcm2835_gpio_set_pud(RPI_GPIO_PB,  BCM2835_GPIO_PUD_DOWN);
   #endif
   
   controlledTrafficLight->doRun();
+  /* The following code would cause the traffic light to cycle once in supervised mode
   sleep(5);
   controlledTrafficLight->setHasController(true);
   controlledTrafficLight->setNeedsController(true);
@@ -87,7 +87,7 @@ int main(int argc, char *argv[]){
   controlledTrafficLight->setControllerRequestedMode(RQM_GREEN);
   sleep(8);
   controlledTrafficLight->setControllerRequestedMode(RQM_RED);
-  //controlledTrafficLight->setHasController(false);
+  */
   while(controlledTrafficLight->isRunning()) {}
 
   #ifdef BUILD_RPI

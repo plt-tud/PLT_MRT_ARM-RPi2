@@ -45,13 +45,23 @@ void bh_sensorUpdate(const AutomatonElement& ae, const string& action)
     if(tl->sensor != nullptr)
       retval = tl->sensor->readValue();
     if(tl->output != nullptr) {
-      if (retval && tl->output->getHasSignal() && tl->getAutonomousSensorAcknowledge() && !tl->output->getSignal()) {
+      if (tl->output->getHasSignal() && tl->getAutonomousSensorAcknowledge() && !tl->output->getSignal()) {
         tl->output->setSignal(retval);
         tl->output->printState();
       }
     }
   }
 }
+
+void bh_sensClrLatch(const AutomatonElement& ae, const string& action)
+{
+  TrafficLight *tl = static_cast<TrafficLight*>(ae.getHandle());
+  if (tl != nullptr) {
+    if(tl->sensor != nullptr)
+      tl->sensor->clearLatch();
+  }
+}
+
 
 void bh_warnProblem(const AutomatonElement& ae, const string& action)
 {
@@ -94,6 +104,7 @@ void bh_gr(const AutomatonElement& ae, const string& action)
 {
   TrafficLight *tl = static_cast<TrafficLight*>(ae.getHandle());
   if (tl != nullptr) {
+    tl->setControllerRequestedMode(RQM_UNSPECIFIED);
     if (tl->output != nullptr) {
       tl->output->setOutput(false, false, true);
       tl->output->printState();

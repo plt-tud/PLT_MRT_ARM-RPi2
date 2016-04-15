@@ -3,10 +3,10 @@
 
 #define DEFAULT_TRAFFICLIGHT_TICK 100000 // Default automaton tick speed in us
 
-#define RPI_GPIO_RED    5
-#define RPI_GPIO_YELLOW 2
-#define RPI_GPIO_GREEN  4
-#define RPI_GPIO_SIGNAL 27
-
+#define RPI_GPIO_RED    2
+#define RPI_GPIO_YELLOW 4
+#define RPI_GPIO_GREEN  5
+#define RPI_GPIO_SIGNAL 15
+#define RPI_GPIO_PB     27
 
 #endif

@@ -22,7 +22,7 @@ set(otherSources  ${CMAKE_SOURCE_DIR}/src/Automaton/AutomatonElement.cpp
                   ${CMAKE_SOURCE_DIR}/src/TrafficLight/TrafficLightOutputFacility.cpp
 )
 
-link_directories(${CMAKE_SOURCE_DIR}/lib)
+link_directories(${PROJECT_BINARY_DIR})
 
 # Options
 option(ENABLE_STATICBUILD     "Enable compilation of static binaries." OFF)
@@ -52,13 +52,13 @@ endif()
 
 if(BUILD_RPI)
   add_definitions(-DBUILD_RPI)
-  configure_file(${PROJECT_SOURCE_DIR}/lib/libopen62541_arm-eabi.so ${PROJECT_SOURCE_DIR}/lib/libopen62541.so COPYONLY)
-  configure_file(${PROJECT_SOURCE_DIR}/lib/libopen62541_arm-eabi.a  ${PROJECT_SOURCE_DIR}/lib/libopen62541.a COPYONLY)
-  configure_file(${PROJECT_SOURCE_DIR}/lib/libbcm2835_arm-eabi.so   ${PROJECT_SOURCE_DIR}/lib/libbcm2835.so   COPYONLY)
-  configure_file(${PROJECT_SOURCE_DIR}/lib/libbcm2835_arm-eabi.a    ${PROJECT_SOURCE_DIR}/lib/libbcm2835.a   COPYONLY)
+  configure_file(${PROJECT_SOURCE_DIR}/lib/libopen62541_arm-eabi.so ${PROJECT_BINARY_DIR}/libopen62541.so COPYONLY)
+  configure_file(${PROJECT_SOURCE_DIR}/lib/libopen62541_arm-eabi.a  ${PROJECT_BINARY_DIR}/libopen62541.a COPYONLY)
+  configure_file(${PROJECT_SOURCE_DIR}/lib/libbcm2835_arm-eabi.so   ${PROJECT_BINARY_DIR}/libbcm2835.so   COPYONLY)
+  configure_file(${PROJECT_SOURCE_DIR}/lib/libbcm2835_arm-eabi.a    ${PROJECT_BINARY_DIR}/libbcm2835.a   COPYONLY)
 else()
-  configure_file(${PROJECT_SOURCE_DIR}/lib/libopen62541_x86_64-eabi.so ${PROJECT_SOURCE_DIR}/lib/libopen62541.so COPYONLY)
-  configure_file(${PROJECT_SOURCE_DIR}/lib/libopen62541_x86_64-eabi.a  ${PROJECT_SOURCE_DIR}/lib/libopen62541.a COPYONLY)
+  configure_file(${PROJECT_SOURCE_DIR}/lib/libopen62541_x86_64-eabi.so ${PROJECT_BINARY_DIR}/libopen62541.so COPYONLY)
+  configure_file(${PROJECT_SOURCE_DIR}/lib/libopen62541_x86_64-eabi.a  ${PROJECT_BINARY_DIR}/libopen62541.a COPYONLY)
 endif()
 
 if(BUILD_STATIC_ANALYSIS)

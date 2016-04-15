@@ -32,6 +32,7 @@
 #include "AutomatonElement.h"
 
 void bh_sensorUpdate(const AutomatonElement& ae, const string& action);
+void bh_sensClrLatch(const AutomatonElement& ae, const string& action);
 void emt_updateTransitionTimestamp(const AutomatonElement& ae, const string& action);
 
 void bh_warnProblem(const AutomatonElement& ae, const string& action);

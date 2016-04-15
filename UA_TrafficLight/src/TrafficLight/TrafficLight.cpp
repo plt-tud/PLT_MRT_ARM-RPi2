@@ -109,7 +109,7 @@ void TrafficLight::construct_uaserver()
 Automaton *TrafficLight::constructStateMachine() {
   /* State map:                             Id             enter             stay             exit             handle
    ********************************************************************************************************************/
-  this->states["red"]          = new State("red",          bh_rd,             bh_sensorUpdate, defaultBehavior, this);
+  this->states["red"]          = new State("red",          bh_rd,             bh_sensorUpdate, bh_sensClrLatch, this);
   this->states["red_yellow"]   = new State("red_yellow",   bh_rd_yl,          defaultBehavior, defaultBehavior, this);
   this->states["green"]        = new State("green",        bh_gr,             defaultBehavior, defaultBehavior, this);
   this->states["green_yellow"] = new State("green_yellow", bh_gr_yl,          defaultBehavior, defaultBehavior, this); 
