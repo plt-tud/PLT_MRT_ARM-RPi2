@@ -106,6 +106,9 @@ public:
   time_t getWarnBlinkInterval();
   void   setWarnBlinkInterval(time_t t);
   
+  bool getSignal();
+  void setSignal(bool b);
+  
   bool getAutonomousGreenPhase();
   void setAutonomousGreenPhase(bool b);
   bool getAutonomousSensorAcknowledge();

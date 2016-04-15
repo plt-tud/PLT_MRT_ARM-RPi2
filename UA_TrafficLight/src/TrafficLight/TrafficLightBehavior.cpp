@@ -81,6 +81,7 @@ void bh_rd(const AutomatonElement& ae, const string& action)
 {
   TrafficLight *tl = static_cast<TrafficLight*>(ae.getHandle());
   if (tl != nullptr) {
+    tl->setControllerRequestedMode(RQM_UNSPECIFIED);
     if (tl->output != nullptr) {
       tl->output->setOutput(true, false, false);
       tl->output->printState();

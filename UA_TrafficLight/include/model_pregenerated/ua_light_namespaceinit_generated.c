@@ -27,11 +27,6 @@ UA_VariableAttributes attr;
 UA_VariableAttributes_init(&attr);
 attr.displayName = UA_LOCALIZEDTEXT("", "EnumStrings");
 attr.description = UA_LOCALIZEDTEXT("", "");
-UA_LocalizedText opcua_node_variable_t_ns_1_i_6010_variant_DataContents[3];
-opcua_node_variable_t_ns_1_i_6010_variant_DataContents[0] = UA_LOCALIZEDTEXT_ALLOC("en_US", "RQM_UNSPECIFIED");
-opcua_node_variable_t_ns_1_i_6010_variant_DataContents[1] = UA_LOCALIZEDTEXT_ALLOC("en_US", "RQM_RED");
-opcua_node_variable_t_ns_1_i_6010_variant_DataContents[2] = UA_LOCALIZEDTEXT_ALLOC("en_US", "RQM_GREEN");
-UA_Variant_setArray( &attr.value, &opcua_node_variable_t_ns_1_i_6010_variant_DataContents, (UA_Int32) 3, &UA_TYPES[UA_TYPES_LOCALIZEDTEXT]);
 UA_NodeId nodeId = UA_NODEID_NUMERIC(1, 6010);
 UA_NodeId typeDefinition = UA_NODEID_NULL;
 UA_NodeId parentNodeId = UA_NODEID_NUMERIC(1, 3001);
@@ -388,6 +383,26 @@ UA_Server_addVariableNode(server, nodeId, parentNodeId, parentReferenceNodeId, n
 // This node has the following references that can be created:
 UA_Server_addReference(server, UA_NODEID_NUMERIC(1, 6009), UA_NODEID_NUMERIC(0, 40), UA_EXPANDEDNODEID_NUMERIC(0, 63), true);
 UA_Server_addReference(server, UA_NODEID_NUMERIC(1, 6009), UA_NODEID_NUMERIC(0, 37), UA_EXPANDEDNODEID_NUMERIC(0, 78), true);
+} while(0);
+
+do {
+// Referencing node found and declared as parent: ns=1;i=1001/1:TrafficLightType using i=47/HasComponent
+// Node: opcua_node_variable_t(ns=1;i=6008), 1:sensorAck
+UA_VariableAttributes attr;
+UA_VariableAttributes_init(&attr);
+attr.displayName = UA_LOCALIZEDTEXT("", "sensorAck");
+attr.description = UA_LOCALIZEDTEXT("", "");
+UA_NodeId nodeId = UA_NODEID_NUMERIC(1, 6008);
+UA_NodeId typeDefinition = UA_NODEID_NULL;
+UA_NodeId parentNodeId = UA_NODEID_NUMERIC(1, 1001);
+UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, 47);
+UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "sensorAck");
+UA_Server_addVariableNode(server, nodeId, parentNodeId, parentReferenceNodeId, nodeName
+       , typeDefinition
+       , attr, NULL, NULL);
+// This node has the following references that can be created:
+UA_Server_addReference(server, UA_NODEID_NUMERIC(1, 6008), UA_NODEID_NUMERIC(0, 40), UA_EXPANDEDNODEID_NUMERIC(0, 63), true);
+UA_Server_addReference(server, UA_NODEID_NUMERIC(1, 6008), UA_NODEID_NUMERIC(0, 37), UA_EXPANDEDNODEID_NUMERIC(0, 78), true);
 } while(0);
 
 do {

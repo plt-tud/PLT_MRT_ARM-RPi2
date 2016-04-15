@@ -208,6 +208,24 @@ bool TrafficLight::getAutonomousSensorAcknowledge()       { return this->autonom
 UA_WRPROXY_BOOL(TrafficLight, setAutonomousSensorAcknowledge);
 void TrafficLight::setAutonomousSensorAcknowledge(bool b) { this->autonomous_sensorAcknowledge = b;}
 
+UA_RDPROXY_BOOL(TrafficLight, getSignal);
+bool TrafficLight::getSignal() { 
+  if (this->output != nullptr ) {
+    return (this->output->getHasSignal() && this->output->getSignal());
+  }
+  return false;
+}
+UA_WRPROXY_BOOL(TrafficLight, setSignal);
+void TrafficLight::setSignal(bool b) { 
+  if (this->output != nullptr ) {
+    this->output->setSignal(b);
+    if (!b)
+      if (this->sensor != nullptr) this->sensor->clearLatch();
+  }
+  return;
+}
+
+
 UA_RDPROXY_UINT32(TrafficLight, getYellowPhaseLength);
 time_t TrafficLight::getYellowPhaseLength()         { return this->yellowPhaseLength; }
 UA_WRPROXY_UINT32(TrafficLight, setYellowPhaseLength);
@@ -272,6 +290,7 @@ UA_StatusCode TrafficLight::ua_mapSelfToNamespace() {
   mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(1, 6003), .read=UA_RDPROXY_NAME(TrafficLight, getAutonomousGreenPhaseLength),  .write=UA_WRPROXY_NAME(TrafficLight, setAutonomousGreenPhaseLength)});
   mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(1, 6001), .read=UA_RDPROXY_NAME(TrafficLight, getWarnBlinkInterval),           .write=UA_WRPROXY_NAME(TrafficLight, setWarnBlinkInterval)});
   mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(1, 6009), .read=UA_RDPROXY_NAME(TrafficLight, getControllerRequestedMode),     .write=UA_WRPROXY_NAME(TrafficLight, setControllerRequestedMode)});
+  mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(1, 6008), .read=UA_RDPROXY_NAME(TrafficLight, getSignal),                      .write=UA_WRPROXY_NAME(TrafficLight, setSignal)});
   
   ua_callProxy_mapDataSources(this->mappedServer, this->ownedNodes, &mapDs, (void *) this);
   

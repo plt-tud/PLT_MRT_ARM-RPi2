@@ -15,7 +15,7 @@
     </Aliases>
     <Extensions>
         <Extension>
-            <ModelInfo Tool="UaModeler" Hash="yM53qdtRu/YFEecFRxpJkg==" Version="1.3.4"/>
+            <ModelInfo Tool="UaModeler" Hash="XCsYMAhu/ZCUrjYKFZlzBQ==" Version="1.3.4"/>
         </Extension>
     </Extensions>
     <UADataType NodeId="ns=1;i=3001" BrowseName="1:TrafficLightRequestMode">
@@ -39,17 +39,17 @@
             <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
         </References>
         <Value>
-            <ListOfLocalizedText>
-                <LocalizedText>
-                    <Text>RQM_UNSPECIFIED</Text>
-                </LocalizedText>
-                <LocalizedText>
-                    <Text>RQM_RED</Text>
-                </LocalizedText>
-                <LocalizedText>
-                    <Text>RQM_GREEN</Text>
-                </LocalizedText>
-            </ListOfLocalizedText>
+            <uax:ListOfLocalizedText>
+                <uax:LocalizedText>
+                    <uax:Text>RQM_UNSPECIFIED</uax:Text>
+                </uax:LocalizedText>
+                <uax:LocalizedText>
+                    <uax:Text>RQM_RED</uax:Text>
+                </uax:LocalizedText>
+                <uax:LocalizedText>
+                    <uax:Text>RQM_GREEN</uax:Text>
+                </uax:LocalizedText>
+            </uax:ListOfLocalizedText>
         </Value>
     </UAVariable>
     <UAObjectType NodeId="ns=1;i=1002" BrowseName="1:BinarySensorType">
@@ -65,8 +65,8 @@
         <DisplayName>latchValue</DisplayName>
         <References>
             <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
-            <Reference ReferenceType="HasModellingRule">i=78</Reference>
             <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1002</Reference>
+            <Reference ReferenceType="HasModellingRule">i=78</Reference>
         </References>
     </UAVariable>
     <UAVariable DataType="Boolean" ParentNodeId="ns=1;i=1002" NodeId="ns=1;i=6011" BrowseName="1:senseValue" UserAccessLevel="3" AccessLevel="3">
@@ -93,16 +93,16 @@
         <DisplayName>hasSignal</DisplayName>
         <References>
             <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
-            <Reference ReferenceType="HasModellingRule">i=78</Reference>
             <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1003</Reference>
+            <Reference ReferenceType="HasModellingRule">i=78</Reference>
         </References>
     </UAVariable>
     <UAVariable DataType="Boolean" ParentNodeId="ns=1;i=1003" NodeId="ns=1;i=6017" BrowseName="1:hasYellow" UserAccessLevel="3" AccessLevel="3">
         <DisplayName>hasYellow</DisplayName>
         <References>
             <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
-            <Reference ReferenceType="HasModellingRule">i=78</Reference>
             <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1003</Reference>
+            <Reference ReferenceType="HasModellingRule">i=78</Reference>
         </References>
     </UAVariable>
     <UAVariable DataType="Boolean" ParentNodeId="ns=1;i=1003" NodeId="ns=1;i=6015" BrowseName="1:statusGreen" UserAccessLevel="3" AccessLevel="3">
@@ -148,6 +148,7 @@
             <Reference ReferenceType="HasComponent">ns=1;i=6007</Reference>
             <Reference ReferenceType="HasComponent">ns=1;i=6006</Reference>
             <Reference ReferenceType="HasComponent">ns=1;i=6009</Reference>
+            <Reference ReferenceType="HasComponent">ns=1;i=6008</Reference>
             <Reference ReferenceType="HasSubtype" IsForward="false">i=58</Reference>
             <Reference ReferenceType="HasComponent">ns=1;i=6001</Reference>
         </References>
@@ -202,6 +203,14 @@
     </UAVariable>
     <UAVariable DataType="TrafficLightRequestMode" ParentNodeId="ns=1;i=1001" NodeId="ns=1;i=6009" BrowseName="1:requestState" UserAccessLevel="3" AccessLevel="3">
         <DisplayName>requestState</DisplayName>
+        <References>
+            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+            <Reference ReferenceType="HasModellingRule">i=78</Reference>
+            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+        </References>
+    </UAVariable>
+    <UAVariable DataType="Boolean" ParentNodeId="ns=1;i=1001" NodeId="ns=1;i=6008" BrowseName="1:sensorAck" UserAccessLevel="3" AccessLevel="3">
+        <DisplayName>sensorAck</DisplayName>
         <References>
             <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
             <Reference ReferenceType="HasModellingRule">i=78</Reference>

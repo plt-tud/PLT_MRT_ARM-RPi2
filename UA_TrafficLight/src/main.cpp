@@ -91,7 +91,9 @@ int main(int argc, char *argv[]){
   while(controlledTrafficLight->isRunning()) {}
 
   #ifdef BUILD_RPI
-  bcm2835_init();
+  setFakeOutput(false, false, false);
+  setFakeSignal(false);
+  bcm2835_close();
   #endif  
   
   return 0;
