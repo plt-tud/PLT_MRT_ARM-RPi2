@@ -57,8 +57,13 @@ if(BUILD_RPI)
   configure_file(${PROJECT_SOURCE_DIR}/lib/libbcm2835_arm-eabi.so   ${PROJECT_BINARY_DIR}/libbcm2835.so   COPYONLY)
   configure_file(${PROJECT_SOURCE_DIR}/lib/libbcm2835_arm-eabi.a    ${PROJECT_BINARY_DIR}/libbcm2835.a   COPYONLY)
 else()
-  configure_file(${PROJECT_SOURCE_DIR}/lib/libopen62541_x86_64-eabi.so ${PROJECT_BINARY_DIR}/libopen62541.so COPYONLY)
-  configure_file(${PROJECT_SOURCE_DIR}/lib/libopen62541_x86_64-eabi.a  ${PROJECT_BINARY_DIR}/libopen62541.a COPYONLY)
+  if(WIN32)
+    configure_file(${PROJECT_SOURCE_DIR}/lib/libopen62541_w32.dll ${PROJECT_BINARY_DIR}/libopen62541.dll COPYONLY)
+    configure_file(${PROJECT_SOURCE_DIR}/lib/libopen62541_w32.a  ${PROJECT_BINARY_DIR}/libopen62541.a COPYONLY)
+  else()
+    configure_file(${PROJECT_SOURCE_DIR}/lib/libopen62541_x86_64-eabi.so ${PROJECT_BINARY_DIR}/libopen62541.so COPYONLY)
+    configure_file(${PROJECT_SOURCE_DIR}/lib/libopen62541_x86_64-eabi.a  ${PROJECT_BINARY_DIR}/libopen62541.a COPYONLY)
+  endif()
 endif()
 
 if(BUILD_STATIC_ANALYSIS)
@@ -131,8 +136,8 @@ endif()
 # Prepare: Place all object files into the same directory and reuse
 add_library(ua_lights-object OBJECT ${otherSources})
 
-# Build: Aggregating Server Executable
-add_executable(ua_lights ${PROJECT_SOURCE_DIR}/src/main.cpp $<TARGET_OBJECTS:ua_lights-object>)
+# Build: Server Executable
+add_executable(ua_lights ${PROJECT_SOURCE_DIR}/src/ua_lights.cpp $<TARGET_OBJECTS:ua_lights-object>)
 target_link_libraries(ua_lights open62541 pthread rt)
 if(ENABLE_COVERAGE)
   target_link_libraries(ua_lights gcov )
@@ -151,9 +156,29 @@ if(ENABLE_LINTING)
                       COMMENT "Running CppCheck on all CPP Sources" VERBATIM)
 endif()
 
+# Build: Dummy Client Executable
+add_executable(ua_lights_controller ${PROJECT_SOURCE_DIR}/src/ua_lights_controller.cpp $<TARGET_OBJECTS:ua_lights-object>)
+target_link_libraries(ua_lights_controller open62541 pthread rt)
+if(ENABLE_COVERAGE)
+  target_link_libraries(ua_lights_controller gcov )
+endif()
+if(ENABLE_MULTITHREADING)
+  target_link_libraries(ua_lights_controller urcu-cds urcu urcu-common)
+endif()
+if(BUILD_RPI)
+  target_link_libraries(ua_lights_controller bcm2835)
+endif()
+if(ENABLE_LINTING)
+  add_custom_command( TARGET ua_lights_controller
+                      PRE_BUILD
+                      COMMAND ${CPPCHECK_BINARY} --std=c++11 --inline-suppr --enable=all ${otherSources}
+                      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                      COMMENT "Running CppCheck on all CPP Sources" VERBATIM)
+endif()
+
 # Build: static executable
 if(ENABLE_STATICBUILD)
-  add_executable(ua_lights_static ${PROJECT_SOURCE_DIR}/src/main.cpp $<TARGET_OBJECTS:ua_lights-object>)
+  add_executable(ua_lights_static ${PROJECT_SOURCE_DIR}/src/ua_lights.cpp $<TARGET_OBJECTS:ua_lights-object>)
   set_target_properties(ua_lights_static PROPERTIES COMPILE_FLAGS "-static-libstdc++ -static" )
   target_link_libraries(ua_lights_static pthread)
   if(ENABLE_COVERAGE)
