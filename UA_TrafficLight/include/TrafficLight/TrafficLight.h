@@ -41,9 +41,9 @@
 #include "ua_mapped_class.h"
 
 typedef enum {
-  RQM_UNSPECIFIED,
-  RQM_RED,
-  RQM_GREEN
+  RQM_UNSPECIFIED=0,
+  RQM_RED=1,
+  RQM_GREEN=2
 } requestedMode_t;
 
 class TrafficLight : ua_mapped_class
@@ -114,8 +114,8 @@ public:
   bool getAutonomousSensorAcknowledge();
   void setAutonomousSensorAcknowledge(bool b);
   
-  requestedMode_t getControllerRequestedMode();
-  void            setControllerRequestedMode(requestedMode_t m);
+  uint32_t getControllerRequestedMode();
+  void     setControllerRequestedMode(uint32_t m);
 };
 
 #endif // TRAFFICLIGHT_H

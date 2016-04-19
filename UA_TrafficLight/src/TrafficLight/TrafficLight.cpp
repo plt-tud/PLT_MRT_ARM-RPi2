@@ -245,9 +245,11 @@ void TrafficLight::updateLastTransitionTimestamp()  { this->last_transition_time
 time_t TrafficLight::getLastTransitionTimestamp()   { return this->last_transition_timestamp; }
 
 UA_RDPROXY_UINT32(TrafficLight, getControllerRequestedMode);
-requestedMode_t TrafficLight::getControllerRequestedMode()                  {return this->controllerRequestedMode;}
+uint32_t TrafficLight::getControllerRequestedMode()                  {return static_cast<uint32_t>(this->controllerRequestedMode);}
 UA_WRPROXY_UINT32(TrafficLight, setControllerRequestedMode);
-void            TrafficLight::setControllerRequestedMode(requestedMode_t m) {this->controllerRequestedMode = m;}
+void            TrafficLight::setControllerRequestedMode(uint32_t m) {
+  this->controllerRequestedMode = static_cast<requestedMode_t>(m); // Cast required for CLang++ (being rather stubborn about implicit conversion to int)
+}
 
 bool TrafficLight::readSensor()
 { 
