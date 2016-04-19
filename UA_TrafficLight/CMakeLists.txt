@@ -2,9 +2,10 @@ cmake_minimum_required(VERSION 2.8)
 project(ualights)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_C_FLAGS   "-std=c99")
 set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath -Wl,$ORIGIN")
 
-add_definitions(-std=c++11 )
 add_definitions(-fpermissive) 
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
