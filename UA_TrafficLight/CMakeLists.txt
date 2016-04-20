@@ -21,6 +21,7 @@ set(otherSources  ${CMAKE_SOURCE_DIR}/src/Automaton/AutomatonElement.cpp
                   ${CMAKE_SOURCE_DIR}/src/TrafficLight/TrafficLight.cpp
                   ${CMAKE_SOURCE_DIR}/src/TrafficLight/BinarySensor.cpp
                   ${CMAKE_SOURCE_DIR}/src/TrafficLight/TrafficLightOutputFacility.cpp
+                  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class/ua_remoteobject.cpp
 )
 
 link_directories(${PROJECT_BINARY_DIR})
