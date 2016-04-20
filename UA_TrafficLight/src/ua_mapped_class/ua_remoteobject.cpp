@@ -254,10 +254,10 @@ void ua_remoteObject::lifeCycleThread()
 {
   UA_StatusCode retval;
   
-  this->mtx_clientAccess.lock();
   this->mappedClient = UA_Client_new(UA_ClientConfig_standard, Logger_Stdout);
   this->thr_alive = true;
   while(this->thr_run) {
+    this->mtx_clientAccess.lock();
     switch(this->mappedClientState) {
       case STATE_DISCONNECTED:
         if((retval = UA_Client_connect(this->mappedClient, UA_ClientConnectionTCP, (const char*) this->serverURI.c_str())) == UA_STATUSCODE_GOOD) {
@@ -289,7 +289,7 @@ void ua_remoteObject::lifeCycleThread()
     this->mtx_clientAccess.unlock();
     usleep(100000); // FIXME: This should be configurable...
   }
-  
+  this->thr_alive = false;
   if (this->mappedClientState == STATE_CONNECTED)
     UA_Client_disconnect(this->mappedClient);
   UA_Client_delete(this->mappedClient);
