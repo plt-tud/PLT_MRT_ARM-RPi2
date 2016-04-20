@@ -60,7 +60,7 @@ ua_mapped_class::ua_mapped_class(UA_Server *server, UA_NodeId baseNodeId)
 
 ua_mapped_class::~ua_mapped_class()
 {
-  cout << "ua mapped class being detroyed...";
+  cout << "ua mapped class being destroyed...";
   this->ua_unmapSelfFromNamespace();
   this->mappedServer = nullptr;
   this->mappedClient = nullptr;
