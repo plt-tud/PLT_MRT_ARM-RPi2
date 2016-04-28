@@ -153,7 +153,7 @@ UA_Client_readNodeIdAttribute(UA_Client *client, UA_NodeId nodeId, UA_NodeId *ou
 static UA_INLINE UA_StatusCode
 UA_Client_readNodeClassAttribute(UA_Client *client, UA_NodeId nodeId, UA_NodeClass *outNodeClass) {
     return __UA_Client_readAttribute(client, nodeId, UA_ATTRIBUTEID_NODECLASS,
-                                     outNodeClass, &UA_TYPES[UA_TYPES_NODECLASS]); }
+                                     outNodeClass, &UA_TYPES[UA_TYPES_INT32]); }
 
 static UA_INLINE UA_StatusCode
 UA_Client_readBrowseNameAttribute(UA_Client *client, UA_NodeId nodeId, UA_QualifiedName *outBrowseName) {

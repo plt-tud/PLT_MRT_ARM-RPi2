@@ -153,6 +153,13 @@ bool ua_remoteObject::mapRemoteNodes(UA_NodeId objectBaseId) {
   UA_NodeId hasProperty  = UA_NODEID_NUMERIC(0, UA_NS0ID_HASPROPERTY);
   UA_NodeId organizes    = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
   
+  // Ensure target is an object
+  UA_NodeClass targetObjectClass;
+  UA_Client_readNodeClassAttribute(this->mappedClient, objectBaseId, &targetObjectClass);
+  if (targetObjectClass != UA_NODECLASS_OBJECT) {
+    return false;
+  }
+  
   UA_BrowseRequest bReq;
   UA_BrowseRequest_init(&bReq);
   bReq.requestedMaxReferencesPerNode = 0;
@@ -266,8 +273,11 @@ void ua_remoteObject::lifeCycleThread()
         }
         break;;
       case STATE_CONNECTED:
-        this->mapRemoteNodes(this->baseNodeId);
-        this->mappedClientState = STATE_IDLE;
+        if(!this->mapRemoteNodes(this->baseNodeId)) {
+          this->mappedClientState = STATE_FATALERROR;
+        }
+        else
+          this->mappedClientState = STATE_IDLE;
         break;;
       case STATE_IDLE:
         if(UA_Client_manuallyRenewSecureChannel(this->mappedClient) != UA_STATUSCODE_GOOD) 
@@ -283,6 +293,10 @@ void ua_remoteObject::lifeCycleThread()
         this->mappedClient = UA_Client_new(UA_ClientConfig_standard, Logger_Stdout);
         this->mappedClientState = STATE_DISCONNECTED;
         break;;
+      case  STATE_FATALERROR:
+        // Stop our client, stop attempting to connect to the target
+        this->thr_run = false;
+        UA_Client_disconnect(this->mappedClient);
       default:
         this->mappedClientState = STATE_DISCONNECTED;
     }

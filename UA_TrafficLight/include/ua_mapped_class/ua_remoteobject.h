@@ -43,7 +43,8 @@ typedef enum {
   STATE_DISCONNECTED,
   STATE_CONNECTED,
   STATE_IDLE,
-  STATE_FAULTED
+  STATE_FAULTED,
+  STATE_FATALERROR
 } mappedClientState_t;
 
 typedef struct remote_nodeNameMapEntry_t {
@@ -73,14 +74,13 @@ private:
   void lifeCycleThread();
 protected:
   bool mapRemoteNodes(UA_NodeId objectBaseId);
-  mappedClientState_t getClientState();
   
 public:
   ua_remoteObject(std::string serverURI, UA_NodeId baseNodeId);
   ~ua_remoteObject();
   
+  mappedClientState_t getClientState();
   bool writeVar(std::string attributeName, void* value, const UA_DataType* dataType);
-  
   void* readVar(std::string attributeName, const UA_DataType *expectType);
 };
 

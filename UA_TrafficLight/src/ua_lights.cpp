@@ -88,7 +88,12 @@ int main(int argc, char *argv[]){
   sleep(8);
   controlledTrafficLight->setControllerRequestedMode(RQM_RED);
   */
-  while(controlledTrafficLight->isRunning()) {}
+  while(controlledTrafficLight->isRunning()) {
+    /* An dieser Stelle koennte die Ampel ueberwacht werden, etwa indem der Controller regelmaessig angepingt 
+     * wird, um dessen Anwesenheit zu bestaetigen 
+     */
+    sleep(1);
+  }
 
   #ifdef BUILD_RPI
   setFakeOutput(false, false, false);

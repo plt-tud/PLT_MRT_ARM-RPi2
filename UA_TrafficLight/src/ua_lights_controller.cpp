@@ -6,9 +6,16 @@
 using namespace std;
 
 int main(int argc, char *argv[]){
-  UA_NodeId myLight = ua_remoteObjectId_byPath("opc.tcp://10.0.53.112:16664", "/Objects/Traffic Light");
-  ua_remoteObject remoteLight("opc.tcp://10.0.53.112:16664", myLight);
-  sleep(2); // Wait for Trafficlight to connect and map...
+  mappedClientState_t clientState;
+  UA_NodeId myLight = ua_remoteObjectId_byPath("opc.tcp://127.0.0.1:16664", "/Objects/Traffic Light");
+  ua_remoteObject remoteLight("opc.tcp://127.0.0.1:16664", myLight);
+
+  // Wait for Trafficlight to connect and map...
+  while( (clientState = remoteLight.getClientState()) != STATE_IDLE) {
+    if (clientState == STATE_FAULTED || clientState == STATE_FATALERROR)
+      return -1;
+    sleep(1);
+  }
   
   UA_Boolean *Sensor = UA_Boolean_new();
   *Sensor = UA_TRUE; // Misuse for setting the autonomous_sensorAck
