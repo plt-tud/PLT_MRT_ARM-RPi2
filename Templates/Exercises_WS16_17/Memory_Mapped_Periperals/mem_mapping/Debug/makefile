@@ -22,19 +22,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: mem_mapping
+all: mem_mapping_windows
 
 # Tool invocations
-mem_mapping: $(OBJS) $(USER_OBJS)
+mem_mapping_windows: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross GCC Linker'
-	gcc  -o "mem_mapping" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-linux-gnueabihf-gcc  -o "mem_mapping_windows" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) mem_mapping
+	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) mem_mapping_windows
 	-@echo ' '
 
 .PHONY: all clean dependents
