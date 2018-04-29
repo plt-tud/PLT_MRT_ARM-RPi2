@@ -50,7 +50,7 @@ void task::terminate()
 void task::stop()
 {
     runThread = false;
-    if (running) return;
+    if (!running) return;
     
     if (t != nullptr && t->joinable())
         t->join();
@@ -71,6 +71,7 @@ void task::workerThread()
         run();
         nanosleep(&interval, NULL);
     }
+    terminate();
     running=false;
     
     return;

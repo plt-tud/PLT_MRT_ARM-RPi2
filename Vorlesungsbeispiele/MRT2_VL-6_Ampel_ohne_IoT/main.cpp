@@ -13,7 +13,7 @@
 
 bool runAmpel;
 
-void signalHandler_TERM(int signnum) {
+void signalHandler_exit(int signnum) {
   runAmpel = false;
 }
 
@@ -22,7 +22,8 @@ int main(int argc, char **argv) {
     Ampel a;
     runAmpel = true;
     
-    signal(SIGTERM, &signalHandler_TERM);
+    signal(SIGTERM, &signalHandler_exit);
+    signal(SIGINT,  &signalHandler_exit);
     
     a.addPeripheral(new ampel_peripheral_x86());
     a.addPeripheral(new ampel_peripheral_rPi(RPI_GPIO_RED, RPI_GPIO_YELLOW, RPI_GPIO_GREEN, RPI_GPIO_SIGNAL));
@@ -40,6 +41,7 @@ int main(int argc, char **argv) {
                 a.setPhaseCommand(PHASE_GREEN);
         }
     }
+    //a.stop();
     
     return 0;
 }
