@@ -37,7 +37,7 @@ set(SOURCES ${CMAKE_SOURCE_DIR}/src/Automaton.cpp
             ${CMAKE_SOURCE_DIR}/src/task.cpp
             )
 
-add_executable(ampel ${CMAKE_SOURCE_DIR}/src/main.cpp ${SOURCES})
+add_executable(ampel ${CMAKE_SOURCE_DIR}/main.cpp ${SOURCES})
 
 install(TARGETS ampel RUNTIME DESTINATION bin)
 target_link_libraries(ampel pthread )
