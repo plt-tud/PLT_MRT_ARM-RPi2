@@ -20,6 +20,10 @@ If you are using an external tool to download these projects (Git or ZIP Archive
 
 ### Settings
 
-These projects where created and tested under GNU/Linux (OpenSUSE 13.2). It is quite possible that you will have to adapt paths of the cross-compilation toolchain under Project -> Properties -> c/c++ Build. Make sure that the Prefix and the Path matches that of the cross-compilation framework on your system. Windows users should always use the SysGCC/bin path of their portable installation.
+These projects where created and tested under GNU/Linux (OpenSUSE 42.3, Debian 8/9, Ubuntu 16.04 and Raspbians based on Wheezy/Jessie). It is quite possible that you will have to adapt paths of the cross-compilation toolchain under Project -> Properties -> c/c++ Build. Make sure that the Prefix and the Path matches that of the cross-compilation framework on your system. Windows users should always use the SysGCC/bin path of their portable installation.
 
 Also make sure that the Debugging device address corresponds to your device.
+
+## Contibuting
+
+If you notice problems with the code (i.e. wrong project settings, uncompilable examples, etc.) feel free to post either an issue or a pull request with a fix. Please note that some deficiencies in the programs are on purpose and server as examples or as exercises for improvement during the lectures.
