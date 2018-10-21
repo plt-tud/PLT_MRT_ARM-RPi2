@@ -24,6 +24,6 @@ These projects where created and tested under GNU/Linux (OpenSUSE 42.3, Debian 8
 
 Also make sure that the Debugging device address corresponds to your device.
 
-## Contibuting
+## Contributing
 
 If you notice problems with the code (i.e. wrong project settings, uncompilable examples, etc.) feel free to post either an issue or a pull request with a fix. Please note that some deficiencies in the programs are on purpose and server as examples or as exercises for improvement during the lectures.
