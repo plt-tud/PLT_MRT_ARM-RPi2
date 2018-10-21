@@ -14,9 +14,8 @@ main:	stmfd sp!,{fp,lr}
 	bl puts
 
 	ldr r0,=src	@ adress of first byte of string
-	ldr r2,=len
-	add r1,r0,r2
-	sub r1,r1,#1 @ adress of last byte of string
+	ldr r2,=len-1
+	add r1,r0,r2 @ adress of last byte of string
 	bl reverse	@ reverse(first,last)
 
 	ldr r0,=src	@ print src again, hopefully reversed
