@@ -39,7 +39,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.66920900" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker"/>
 							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.1570294108" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver"/>
 							<tool id="cdt.managedbuild.tool.gnu.cross.assembler.690765932" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler">
-								<option id="gnu.both.asm.option.flags.1200006306" superClass="gnu.both.asm.option.flags" useByScannerDiscovery="false" value="-g --gstabs" valueType="string"/>
+								<option id="gnu.both.asm.option.flags.1200006306" name="Assembler flags" superClass="gnu.both.asm.option.flags" useByScannerDiscovery="false" value="-g --gstabs" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1442797992" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 						</toolChain>

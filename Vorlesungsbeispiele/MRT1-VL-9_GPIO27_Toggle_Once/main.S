@@ -1,10 +1,11 @@
+
 @ Definitionen
 // Aus Bootloader, Mapping v. physischem Speicher 0x7Exxxxx --> 0x3fxxxxxx
 .equ BCM2536_PERI_BASE,         0x3f000000
 
 // Aus BCM2536 Datenblatt, Abschnitt GPIOs
 .equ BCM2536_GPIO_BASEOFFSET,   0x00200000
-.equ BCM2536_GPIO_LASTADDRESS,  0x002000B4 
+.equ BCM2536_GPIO_LASTADDRESS,  0x002000B4
 .equ BCM2536_GPIO_MEMSIZE,      0x00001000 // Must be >=4k according to manual !
 .equ BCM2536_GPIO_BASE, BCM2536_PERI_BASE + BCM2536_GPIO_BASEOFFSET
 
@@ -48,7 +49,7 @@ main:
   mov r7, #SYSCALL_OPEN
   swi #0
   mov r9, r0
-  
+
   // mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
   // r8 = mmap(NULL, gpio_speicherbereich, PROT_READ|PROT_WRITE, MAP_SHARED)
   mov r0, #0
@@ -61,15 +62,15 @@ main:
   mov r7, #SYSCALL_MMAP2
   swi #0
   mov r8, r0                       // Von mmap bestimmte Basisadresse der Abbildung in unserem Speicher
-  
+
   /* Ab hier:
      - r8 ist Basisadresse der GPIO register
      - Basisadresse in r8 wird dynamisch, zur Laufzeit, bestimmt! (durch mmap)
      - Offset ist zu GPIOs-Zugriffen aufzuaddieren
   */
-  
+
   // ---- Anfang des GPIO-Codes
-  
+
   // GPIO 21 als Output deklarieren
   // ldr r0, [r8, #8] // R0 <- GPIO-Register GPFSEL2
   // and r0, r0, #0b11111111111111111111111111000111
@@ -88,23 +89,23 @@ main:
   // GPIO 17 setzen
   mov r0,    #0b00000000000000100000000000000000
   str r0, [r8, #28] // R0 -> GPIO-Register GPSET0
-  
+
   // GPIO 21 rücksetzen
   // mov r0, #0b00000000000100000000000000000000
   // str r0, [r8, #40] // R0 -> GPIO-Register GPCLR0
   // GPIO 17 rücksetzen
   mov r0, #0b00000000000000100000000000000000
   str r0, [r8, #40] // R0 -> GPIO-Register GPCLR0
-  
+
   // ---- Ende des GPIO-Codes
-  
+
 
   // munmap
   mov r0, r8
   mov r1, #BCM2536_GPIO_MEMSIZE
   mov r7, #SYSCALL_MUNMAP
   swi #0
-  
+
   // close
   mov r0, r9
   mov r7, #SYSCALL_CLOSE
