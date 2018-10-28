@@ -41,9 +41,8 @@
 .equ SYSCALL_MUNMAP, 91
 
 .data
-.align 4
 dev_mem_filename: 	.asciz "/dev/mem"
-.align 4
+.balign 4
 dev_mem_gpio_fd: 	.word 0	@ holds
 dev_mem_gpio_base_addr:	.word 0
 
