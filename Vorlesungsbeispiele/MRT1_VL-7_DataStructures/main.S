@@ -53,9 +53,7 @@ calcAddressWithShiftAddMult:
 
 	ldr r3, =vector				@ r3 <- base address
 	mov r2, #V2_SRC_INDEX		@ r2 <- index
-
 	rsb r4, r2, #V2_DST_INDEX	@ r4 <- #V2_DST_INDEX - r2
-
 .if V2_TYPE_SIZE==12			@ this code is valid for type size = 12 only
 	ADD R4,R4,R4,LSL #1			@ calculate distance between SRC and DST
 	LSL R4, R4, #2
@@ -73,6 +71,26 @@ calcAddressWithShiftAddMult:
 	.err
 .endif
 
+@ Mehrdimensionale Felder int[8][3]
+calcAddress2DArray:
+.equ V3_TYPE_SIZE,4				@ int
+.equ V3_DIM1,8					@ [8]
+.equ V3_DIM2,3					@ [3]
+.equ V3_DIM2_SIZE,V3_DIM2*V3_TYPE_SIZE
+.equ V3_INDEX1, 4
+.equ V3_INDEX2, 2
+	mov r0, #V3_INDEX1
+	mov r1, #V3_INDEX2
+	ldr r3, =vector
+.if V3_DIM2_SIZE==12			@ this code is valid for type size = 12 only
+	ADD R2,R0,R0,LSL #1			@ R2 <-  (index1*2 + index1)
+	ADD R2,R1,R2,LSL #2			@ R2 <- ((index1*2 + index1) * 4) + index2
+	LDR R0,[R3,R2,LSL #2]		@ R0 <- [R3 + R2*4]
+	MOV R0,#(V3_INDEX1<<4+V3_INDEX2) @ R0 <- 0x0<index1><index2>
+	STR R0,[R3,R2,LSL #2]		@ R0 -> [R3 + R2*4]
+.else
+	.err
+.endif
 
 
 
