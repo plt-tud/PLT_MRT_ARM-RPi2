@@ -1,10 +1,11 @@
 @ Header
-.globl BCM2536_GPIO_Open, BCM2536_GPIO_Close, BCM2536_GPIO_PinSelFun, BCM2536_GPIO_PinSet, BCM2536_GPIO_PinClr
+.globl BCM2536_GPIO_Open, BCM2536_GPIO_Close, BCM2536_GPIO_PinSelFun, BCM2536_GPIO_PinSet, BCM2536_GPIO_PinClr, BCM2536_GPIO_PinSelDump
 .type BCM2536_GPIO_Init,%function
 .type BCM2536_GPIO_Close,%function
 .type BCM2536_GPIO_PinSelFun,%function
 .type BCM2536_GPIO_PinSet,%function
 .type BCM2536_GPIO_PinClr,%function
+.type BCM2536_GPIO_PinSelDump,%function
 
 @ Definitionen
 // Aus Bootloader, Mapping v. physischem Speicher 0x7Exxxxx --> 0x3fxxxxxx
@@ -20,31 +21,17 @@
 .equ BCM2536_GPSET_OFFSET, 0x1C
 .equ BCM2536_GPCLR_OFFSET, 0x28
 
-// /usr/include/arm-linux-gnueabihf/bits/fcntl-linux.h:# define O_SYNC            04010000
-// /usr/include/arm-linux-gnueabihf/bits/fcntl-linux.h: #define O_RDWR                  02
-.equ OPEN_PARAMETER_SYNC_RDWR, 0x40100002
-
-// /usr/include/arm-linux-gnueabihf/bits/mman-linux.h:#define MAP_SHARED   0x01
-.equ MMAP_PARAMETER_MAP_SHARED, 0x01
-// /usr/include/arm-linux-gnueabihf/bits/mman-linux.h:#define PROT_READ   0x01
-// /usr/include/arm-linux-gnueabihf/bits/mman-linux.h:#define PROT_WRITE  0x2
-.equ MMAP_PARAMETER_PROT_READ_WRITE, 0x03
-
-
-// /usr/arm-linux-gnueabihf/include/asm/unistd.h: #define __NR_open (__NR_SYSCALL_BASE+5)
-.equ SYSCALL_OPEN, 5
-// /usr/arm-linux-gnueabihf/include/asm/unistd.h: #define __NR_close (__NR_SYSCALL_BASE+6)
-.equ SYSCALL_CLOSE, 6
-// /usr/arm-linux-gnueabihf/include/asm/unistd.h: #define __NR_mmap2 (__NR_SYSCALL_BASE+192)
-.equ SYSCALL_MMAP2, 192
-// /usr/arm-linux-gnueabihf/include/asm/unistd.h: #define __NR_munmap (__NR_SYSCALL_BASE+91)
-.equ SYSCALL_MUNMAP, 91
+.include "SYSCALL.h"
 
 .data
+.balign 4
 dev_mem_filename: 	.asciz "/dev/mem"
 .balign 4
-dev_mem_gpio_fd: 	.word 0	@ holds
+dev_mem_gpio_fd: 	.word 0	@ holds fd to /dev/mem
 dev_mem_gpio_base_addr:	.word 0
+.balign 4
+hex_char: 	.asciz "0123456789ABCDEF"
+nl_char: 	.asciz "\n"
 
 .text
 .align 4
@@ -61,6 +48,8 @@ BCM2536_GPIO_Open:
   swi #0
   ldr r1,=dev_mem_gpio_fd	@ save file-handle at =dev_mem_gpio_fd
   str r0,[r1]
+  cmp r0,#0
+  ble exit
 
   // mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
   // dev_mem_gpio_base_addr = mmap(NULL, gpio_speicherbereich, PROT_READ|PROT_WRITE, MAP_SHARED)
@@ -75,35 +64,39 @@ BCM2536_GPIO_Open:
   swi #0
   ldr r1,=dev_mem_gpio_base_addr	// save address at =dev_mem_gpio_addr
   str r0,[r1]
-
-  pop {r4-r7,fp,lr}	// restore saved registers
-  bx lr
+  cmp r0,#0
+  movne r0,#0
+exit:
+  pop {r4-r7,fp,pc}					// restore saved registers
 
 @ BCM2536_GPIO_PinSelFun(GPIO-Pin, FunctionSelection)
 BCM2536_GPIO_PinSelFun:
 	push {r4,r5,fp,lr} // safe 4 registers
 	add fp,sp,#((4-1)*4)
 
-	// Calcuate Offset into GPFSEL-Register in r2 and hold remainder in r0
+	// r2 <- Index of GPFSELn register; r0 <- 10⁰ remainder of pin number
 	mov r2,#0
 loop:
-	cmp r0,#10
-	blt done
-	add r2,r2,#4
-	sub r0,r0,#10
-	bal loop
-done:
-	add r0,r0,r0,lsl #1	// R0 <- R0 * 3
+	cmp r0,#10			// while ( r0 < 10)
+	blt done			// {
+	add r2,r2,#1		//   r2 <- r2 + 1
+	sub r0,r0,#10		//   r0 <- r0 - 10
+	bal loop			// }
+
+done: add r0,r0,r0,lsl #1	// R0 <- R0 * 3
 
 	ldr r3,=dev_mem_gpio_base_addr
 	ldr r3,[r3]		// R3 <- address of gpio_base
-	ldr r4,[r3,r2] 	// R4 <- GPFSELn
+
+	ldr r4,[r3,r2,LSL #2] 	// R4 <- [ GPFSEL<r2> ]
+
 	mov r5,#0b111
 	bic r4,r4,r5,LSL R0	// R4 <- R4 AND NOT ( 0b111 << R0)
-	orr r4,r4,r1,LSL R0
-	str r4,[r3,r2]
+	orr r4,r4,r1,LSL R0 // R4 <- R4 ORR R1
 
-	pop {r4,r5,fp,pc}	// restore saved registers and return
+	str r4,[r3,r2,LSL #2]	// R4 -> [ GPFSEL<r2> ]
+
+	pop {r4,r5,fp,pc}	// restore and return
 
 @ void BCM2536_GPIO_PinSet(GPIO_Pin)
 BCM2536_GPIO_PinSet:
@@ -134,8 +127,8 @@ BCM2536_GPIO_PinClr:
 	push {fp,lr}		// safe registers
 	add fp,sp,#((2-1)*4)	// set frame pointer to lr at bottom of stack
 
-	// r1 <- Offset to GPSET0 or GPSET1
-	mov r1,#BCM2536_GPSET_OFFSET
+	// r1 <- Offset to GPCLR0 or GPCLR1
+	mov r1,#BCM2536_GPCLR_OFFSET
 	cmp r0,#31		@ if (R0 > 31)
 	addgt r1,r1,#4	@	R1 <- R1 + 4
 
@@ -171,3 +164,60 @@ BCM2536_GPIO_Close:
 	swi #0
 
 	pop {r4,r7,fp,pc} // restore & return
+
+BCM2536_GPIO_PinSelDump:
+	push {r4-r7,fp,lr} // safe 6 registers
+	add fp,sp,#((6-1)*4)
+
+	mov r4,#0						// R4 <- number of register
+	ldr r5,=dev_mem_gpio_base_addr 	// R5 <- address of gpio_base
+	ldr r5,[r5]
+1:
+	cmp r4,#6						// while ( r4 < 6 ) {
+	bge 4f
+
+	ldr r6,[r5,r4,LSL #2] 			// 	R6 <- [ GPFSEL<r4> ]
+
+	mov r7,#0						//  while ( r7 < 10 ) {
+2:	cmp r7,#10
+	bge 3f
+
+	add r1,r7,r7,LSL #1				// 		r1 <- 3 * r7
+	mov r2,#0b111
+	and r0,r6,r2,LSL R1				// 		R0 <- R6 AND ( 0b111 << R1)
+	lsr r0,r0,r1					// 		R0 <- R0 >> R2
+	bl BCM2536_PrintHex
+	add r7,r7,#1					// r4 <- r4 + 1
+	bal 2b
+
+3:	bl BCM2536_PrintNL
+	add r4,r4,#1
+	bal 1b
+4:	bl BCM2536_PrintNL
+	pop {r4-r7,fp,pc}	// restore and return
+
+@ void BCM2536_GPIO_PinSelPrintHex(int oct_pattern)
+BCM2536_PrintHex:
+	push {r6,r7,fp,lr}
+	add fp,sp,#(4-1)*4
+
+	ldr r1,=hex_char	// hexchar-string - each one byte
+	add r1,r1,r0		// add pattern
+	mov r0,#1			// stdout
+	mov	r2,#1			// length = 1
+	mov r7,#SYSCALL_WRITE
+	swi #0
+	pop {r6,r7,fp,pc}
+
+@ void BCM2536_PrintNL()
+BCM2536_PrintNL:
+	push {r6,r7,fp,lr}
+	add fp,sp,#(4-1)*4
+
+	mov r0,#1			// stdout
+	ldr r1,=nl_char		// hexchar-string - each one byte
+	mov	r2,#1			// length = 1
+	mov r7,#SYSCALL_WRITE
+	swi #0
+
+	pop {r6,r7,fp,pc}
