@@ -29,9 +29,6 @@ dev_mem_filename: 	.asciz "/dev/mem"
 .balign 4
 dev_mem_gpio_fd: 	.word 0	@ holds fd to /dev/mem
 dev_mem_gpio_base_addr:	.word 0
-.balign 4
-hex_char: 	.asciz "0123456789ABCDEF"
-nl_char: 	.asciz "\n"
 
 .text
 .align 4
@@ -169,55 +166,30 @@ BCM2536_GPIO_PinSelDump:
 	push {r4-r7,fp,lr} // safe 6 registers
 	add fp,sp,#((6-1)*4)
 
-	mov r4,#0						// R4 <- number of register
 	ldr r5,=dev_mem_gpio_base_addr 	// R5 <- address of gpio_base
 	ldr r5,[r5]
-1:
-	cmp r4,#6						// while ( r4 < 6 ) {
-	bge 4f
 
-	ldr r6,[r5,r4,LSL #2] 			// 	R6 <- [ GPFSEL<r4> ]
+	mov r4,#0	@ for (r4 <- 0;r4 < 6; r4 <- ++) {
+l_reg: cmp r4,#6
+	bge e_reg
 
-	mov r7,#0						//  while ( r7 < 10 ) {
-2:	cmp r7,#10
-	bge 3f
+	ldr r6,[r5,r4,LSL #2]	@ r6 <- [ GPFSEL<r4> ]
+	mov r7,#0	@ for (r7=0;r7<10;r7++) {
+l_oct:	cmp r7,#10
+	bge e_oct
 
-	add r1,r7,r7,LSL #1				// 		r1 <- 3 * r7
+	add r1,r7,r7,LSL #1 @ r1 <- 3 * r7
 	mov r2,#0b111
-	and r0,r6,r2,LSL R1				// 		R0 <- R6 AND ( 0b111 << R1)
-	lsr r0,r0,r1					// 		R0 <- R0 >> R2
-	bl BCM2536_PrintHex
-	add r7,r7,#1					// r4 <- r4 + 1
-	bal 2b
-
-3:	bl BCM2536_PrintNL
+	and r0,r6,r2,LSL R1	@ R0 <- R6 AND ( 0b111 << R1)
+	lsr r0,r0,r1	@ R0 <- R0 >> R2
+	bl PrintHex
+	add r7,r7,#1	@ r4 <- r4 + 1
+	bal l_oct
+e_oct:	mov r0,#10	@ r0 <- newline
+	bl PrintChar
 	add r4,r4,#1
-	bal 1b
-4:	bl BCM2536_PrintNL
+	bal l_reg
+e_reg:	mov r0,#10
+	bl PrintChar
 	pop {r4-r7,fp,pc}	// restore and return
 
-@ void BCM2536_GPIO_PinSelPrintHex(int oct_pattern)
-BCM2536_PrintHex:
-	push {r6,r7,fp,lr}
-	add fp,sp,#(4-1)*4
-
-	ldr r1,=hex_char	// hexchar-string - each one byte
-	add r1,r1,r0		// add pattern
-	mov r0,#1			// stdout
-	mov	r2,#1			// length = 1
-	mov r7,#SYSCALL_WRITE
-	swi #0
-	pop {r6,r7,fp,pc}
-
-@ void BCM2536_PrintNL()
-BCM2536_PrintNL:
-	push {r6,r7,fp,lr}
-	add fp,sp,#(4-1)*4
-
-	mov r0,#1			// stdout
-	ldr r1,=nl_char		// hexchar-string - each one byte
-	mov	r2,#1			// length = 1
-	mov r7,#SYSCALL_WRITE
-	swi #0
-
-	pop {r6,r7,fp,pc}

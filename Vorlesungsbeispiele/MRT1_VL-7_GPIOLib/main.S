@@ -23,7 +23,7 @@ main:
 	cmp r0,#0
 	bne err_open
 
-	@ bl BCM2536_GPIO_PinSelDump
+	bl BCM2536_GPIO_PinSelDump
 
 	mov r0,#GPIO_RED
 	mov r1,#BCM2536_GPFSEL_OUTPUT
@@ -37,7 +37,7 @@ main:
 	mov r1,#BCM2536_GPFSEL_OUTPUT
 	bl BCM2536_GPIO_PinSelFun
 
-	@ bl BCM2536_GPIO_PinSelDump
+	bl BCM2536_GPIO_PinSelDump
 
 loop: // clear all lights
 	mov r0,#GPIO_RED
