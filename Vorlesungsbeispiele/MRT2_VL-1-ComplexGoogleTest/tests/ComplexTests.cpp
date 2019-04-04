@@ -29,35 +29,43 @@ TEST_F(ComplexTests, Multiplication) {
 	EXPECT_EQ(2, r.Im()) << "c * j";
 
 	r = c * c;
-	EXPECT_EQ(3, r.Re());
-	EXPECT_EQ(4, r.Im());
+	EXPECT_EQ(3, r.Re()) << "c * c";
+	EXPECT_EQ(4, r.Im()) << "c * c";
 
 	r = c * 2;
-	EXPECT_EQ(4, r.Re());
-	EXPECT_EQ(2, r.Im());
+	EXPECT_EQ(4, r.Re()) << "c * 2";
+	EXPECT_EQ(2, r.Im()) << "c * 2";
 
 	r = 2 * c;
-	EXPECT_EQ(4, r.Re());
-	EXPECT_EQ(2, r.Im());
+	EXPECT_EQ(4, r.Re()) << "2 * c";
+	EXPECT_EQ(2, r.Im()) << "2 * c";
 }
 
 TEST_F(ComplexTests, Addition) {
 	r = c + c;
-	EXPECT_EQ(4, r.Re());
-	EXPECT_EQ(2, r.Im());
+	EXPECT_EQ(4, r.Re()) << "c + c";
+	EXPECT_EQ(2, r.Im()) << "c + c";
 
 	r = c + j;
-	EXPECT_EQ(2, r.Re());
-	EXPECT_EQ(2, r.Im());
+	EXPECT_EQ(2, r.Re()) << "c + j";
+	EXPECT_EQ(2, r.Im()) << "c + j";
 }
 
 TEST_F(ComplexTests, Division) {
 	r = c / j;
-	EXPECT_EQ(1, r.Re());
-	EXPECT_EQ(-2, r.Im());
+	EXPECT_EQ(1, r.Re()) << "c / j";
+	EXPECT_EQ(-2, r.Im()) << "c / j";
 
 	r = c / c;
-	EXPECT_EQ(1, r.Re());
-	EXPECT_EQ(0, r.Im());
+	EXPECT_EQ(1, r.Re()) << "c / c";
+	EXPECT_EQ(0, r.Im()) << "c / c";
+
+	r = c / 2;
+	EXPECT_EQ(2, r.Re()) << "c / 2";
+	EXPECT_DOUBLE_EQ(0.5, r.Im()) << "c / 2";
+
+	r = 1 / c;
+	EXPECT_DOUBLE_EQ(0.4, r.Re()) << "1 / c";
+	EXPECT_DOUBLE_EQ(0.2, r.Im()) << "1 / c";
 }
 } // end namespace
