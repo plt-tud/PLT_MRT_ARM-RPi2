@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>MRT2_VL-1-ComplexTest</name>
+	<name>MRT2_VL-1-ComplexGoogleTest</name>
 	<comment></comment>
 	<projects>
 		<project>MRT2_VL-1-FrequencyResponse</project>

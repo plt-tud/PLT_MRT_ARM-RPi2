@@ -36,6 +36,7 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.base.1889379499" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base.467467751" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base">
+								<option id="gnu.cpp.link.option.flags.190917257" superClass="gnu.cpp.link.option.flags" value="-static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.666225353" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -96,17 +97,17 @@
 	<storageModule moduleId="refreshScope"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.msvc.exe.debug.640195987;org.eclipse.cdt.msvc.exe.debug.640195987.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1248131247;cdt.managedbuild.tool.gnu.cpp.compiler.input.1821665726">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.msvc.exe.debug.640195987;org.eclipse.cdt.msvc.exe.debug.640195987.;org.eclipse.cdt.msvc.cl.c.exe.debug.1999432723;org.eclipse.cdt.msvc.cl.inputType.c.2022693769">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.msw.build.clScannerInfo"/>
-		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.msvc.exe.debug.640195987;org.eclipse.cdt.msvc.exe.debug.640195987.;org.eclipse.cdt.msvc.cl.exe.debug.906348555;org.eclipse.cdt.msvc.cl.inputType.1263117185">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.msw.build.clScannerInfo"/>
 		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.msvc.exe.debug.640195987;org.eclipse.cdt.msvc.exe.debug.640195987.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1248131247;cdt.managedbuild.tool.gnu.cpp.compiler.input.1821665726">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.msvc.exe.debug.640195987;org.eclipse.cdt.msvc.exe.debug.640195987.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1829516216;cdt.managedbuild.tool.gnu.c.compiler.input.1891786720">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.eclipse.cdt.msvc.exe.debug.640195987;org.eclipse.cdt.msvc.exe.debug.640195987.;org.eclipse.cdt.msvc.cl.c.exe.debug.1999432723;org.eclipse.cdt.msvc.cl.inputType.c.2022693769">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.msw.build.clScannerInfo"/>
 		</scannerConfigBuildInfo>
 	</storageModule>
 </cproject>
