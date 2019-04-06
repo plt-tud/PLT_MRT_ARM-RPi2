@@ -1,8 +1,15 @@
-/*
- * Complex.cpp
+/**
+ * @class Complex.cpp
  *
- *  Created on: 04.04.2016
- *      Author: Leon Urbas
+ * @brief An example for adding new types to c++
+ *
+ * This class is meant as an example and contains at least one intended
+ * bug. Please consult the projects MRT2_VL-1-ComplexTest or
+ * MRT2_VL-1-ComplexGoogleTest to locate the bug.
+ *
+ * @author uleon, leon.urbas@tu-dresden.de
+ * @date   2016/04/04
+ *
  */
 #include <iostream>
 #include "Complex.h"

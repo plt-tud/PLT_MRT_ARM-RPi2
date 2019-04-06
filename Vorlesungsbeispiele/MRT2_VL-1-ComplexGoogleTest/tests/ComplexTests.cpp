@@ -1,3 +1,12 @@
+/**
+ * @file ComplexTests.cpp
+ *
+ * @brief test cases defining the interface and behavior of the class Complex
+ *
+ * @author uleon, leon.urbas@tu-dresden.de
+ * @date   2016/04/04
+ *
+ */
 #include "Complex.h"
 #include "gtest/gtest.h"
 
