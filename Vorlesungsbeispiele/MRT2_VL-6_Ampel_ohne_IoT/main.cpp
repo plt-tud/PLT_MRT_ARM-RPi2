@@ -21,7 +21,7 @@
  */
 
 
-#define ENABLE_THREADING
+// #define ENABLE_THREADING
 
 bool runAmpel;
 
