@@ -6,10 +6,22 @@
 #include "ampel_peripheral_x86.h"
 #include "ampel_peripheral_rPi.h"
 
-#define RPI_GPIO_GREEN  5
-#define RPI_GPIO_YELLOW 4
-#define RPI_GPIO_RED    2
-#define RPI_GPIO_SIGNAL 27
+/* Grouped conveniently on LK-Linker-Kit Board  */
+#define RPI_GPIO_GREEN  5   // LK D5
+#define RPI_GPIO_YELLOW 4   // LK D4
+#define RPI_GPIO_RED    2   // LK D2
+#define RPI_GPIO_SIGNAL 12	// LK D12
+
+
+/* Alternative: Grouped conveniently on Pi Header
+#define RPI_GPIO_SIGNAL 24 // Pin 18
+#define RPI_GPIO_GREEN  17 // Pin 11
+#define RPI_GPIO_YELLOW 27 // Pin 13
+#define RPI_GPIO_RED    22 // Pin 15
+ */
+
+
+#define ENABLE_THREADING
 
 bool runAmpel;
 
@@ -28,20 +40,26 @@ int main(int argc, char **argv) {
     a.addPeripheral(new ampel_peripheral_x86());
     a.addPeripheral(new ampel_peripheral_rPi(RPI_GPIO_RED, RPI_GPIO_YELLOW, RPI_GPIO_GREEN, RPI_GPIO_SIGNAL));
     
-    //a.setController(true);
+    a.setController(true);
     
-    //a.start();
+	#ifdef ENABLE_THREADING
+    a.start();
+	#endif
     while (runAmpel) {
-        a.run();
         sleep(1);
         if ( a.getSensor()) {
-            if (a.getPhaseCommand() == PHASE_GREEN)
-                a.setPhaseCommand(PHASE_RED);
-            else
-                a.setPhaseCommand(PHASE_GREEN);
-        }
+			if (a.getPhaseCommand() == PHASE_GREEN)
+				a.setPhaseCommand(PHASE_RED);
+			else
+				a.setPhaseCommand(PHASE_GREEN);
+		}
+		#ifndef ENABLE_THREADING
+        a.run();
+		#endif
     }
-    //a.stop();
-    
+	#ifdef ENABLE_THREADING
+	a.stop();
+	#endif
+
     return 0;
 }
