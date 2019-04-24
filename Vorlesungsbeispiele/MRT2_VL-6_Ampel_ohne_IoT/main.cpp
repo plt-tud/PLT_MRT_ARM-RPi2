@@ -6,7 +6,7 @@
 #include "ampel_peripheral_x86.h"
 #include "ampel_peripheral_rPi.h"
 
-/* Grouped conveniently on LK-Linker-Kit Board  */
+/* Grouped conveniently on LK-Linker-Kit Board */
 #define RPI_GPIO_GREEN  5   // LK D5
 #define RPI_GPIO_YELLOW 4   // LK D4
 #define RPI_GPIO_RED    2   // LK D2
@@ -18,7 +18,7 @@
 #define RPI_GPIO_GREEN  17 // Pin 11
 #define RPI_GPIO_YELLOW 27 // Pin 13
 #define RPI_GPIO_RED    22 // Pin 15
- */
+*/
 
 
 // #define ENABLE_THREADING
@@ -61,5 +61,10 @@ int main(int argc, char **argv) {
 	a.stop();
 	#endif
 
+	// Make sure our traffic light signals that it is "off"
+	a.setController(false);
+	a.run();
+	a.run();
+	a.run();
     return 0;
 }
