@@ -37,11 +37,6 @@ void task::init()
     return;
 }
 
-void task::run()
-{
-    return;
-}
-
 void task::terminate()
 {
     return;
