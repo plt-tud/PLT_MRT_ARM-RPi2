@@ -6,10 +6,19 @@
 #include "ampel_peripheral_x86.h"
 #include "ampel_peripheral_rPi.h"
 
-#define RPI_GPIO_GREEN  5
-#define RPI_GPIO_YELLOW 4
-#define RPI_GPIO_RED    2
-#define RPI_GPIO_SIGNAL 27
+/* Grouped conveniently on LK-Linker-Kit Board */
+#define RPI_GPIO_GREEN  5   // LK D5
+#define RPI_GPIO_YELLOW 4   // LK D4
+#define RPI_GPIO_RED    2   // LK D2
+#define RPI_GPIO_SIGNAL 12	// LK D12
+
+
+/* Alternative: Grouped conveniently on Pi Header
+#define RPI_GPIO_SIGNAL 24 // Pin 18
+#define RPI_GPIO_GREEN  17 // Pin 11
+#define RPI_GPIO_YELLOW 27 // Pin 13
+#define RPI_GPIO_RED    22 // Pin 15
+*/
 
 bool runAmpel;
 
