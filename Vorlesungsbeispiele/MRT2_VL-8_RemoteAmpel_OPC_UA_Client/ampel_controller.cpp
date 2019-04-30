@@ -20,8 +20,10 @@ void signalHandler_exit(int signnum) {
 }
 
 int main(int argc, char **argv) {
-    //RemoteAmpel b("opc.tcp://127.0.0.1:4840");
-    RemoteAmpel b("opc.tcp://192.168.0.240:4840");
+    /* Unsere lokale IoT Ampel, die sich per OPC UA
+	   mit dem Pi verbinden wird:
+	 */
+	RemoteAmpel b("opc.tcp://192.168.0.240:4840");
     
     runAmpel = true;
     
@@ -30,8 +32,8 @@ int main(int argc, char **argv) {
     
     b.start();
     
+    // Wir setzen uns als Controller... diese Einstellung wird per OPC UA an das Pi übertragen
     b.setController(true);
-    cout << "Now Controlling our traffic light" << endl;
 
     bool sensorLatch = false;
     bool sense  = false;
@@ -53,9 +55,8 @@ int main(int argc, char **argv) {
         
         sleep(1);
     }
-    cout << "Ampel now stopping" << endl;
     
-    b.setController(false);   
+    b.setController(false);
     b.stop();
     
     return 0;
