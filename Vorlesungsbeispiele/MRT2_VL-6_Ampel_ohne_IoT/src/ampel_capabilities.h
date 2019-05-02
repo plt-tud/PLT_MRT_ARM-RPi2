@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 <copyright holder> <email>
+ * Copyright (c) 2018 Chris Paul Iatrou chris_paul.iatrou@tu-dresden.de
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -30,7 +30,7 @@
 class ampel_capabilities
 {
 protected:
-    bool redLight, greenLight, yellowLight, sensor;
+    bool redLight, yellowLight, greenLight, sensor;
     
 public:
     ampel_capabilities();
@@ -44,6 +44,7 @@ public:
     virtual void setRedLight(bool setLightOn);
     virtual void setYellowLight(bool setLightOn);
     virtual void setGreenLight(bool setLightOn);
+    virtual void setSensor(bool setSensorTriggered);
 };
 
 #endif // PERIPHERAL_H

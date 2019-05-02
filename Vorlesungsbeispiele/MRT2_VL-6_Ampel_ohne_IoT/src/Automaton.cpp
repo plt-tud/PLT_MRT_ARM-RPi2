@@ -29,7 +29,7 @@
 #include "Automaton.h"
 
 Automaton::Automaton(State& startState, std::list<Transition*> pTT)
-: pCurrentState(&startState), pTT(pTT), TTlength(TTlength), currentStateTicks(0), first(true) {
+: pCurrentState(&startState), pTT(pTT), currentStateTicks(0), first(true) {
 }
 
 void Automaton::run() {

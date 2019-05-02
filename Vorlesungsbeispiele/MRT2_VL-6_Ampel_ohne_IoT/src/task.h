@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 <copyright holder> <email>
+ * Copyright (c) 2018 Chris Paul Iatrou chris_paul.iatrou@tu-dresden.de
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -51,8 +51,8 @@ protected:
     virtual void terminate();
     
 public:
-    task(struct timespec interval) : running(false), runThread(false), interval(interval) {};
-    task() : running(false), runThread(false), interval((struct timespec) {1,0} ) {};
+    task(struct timespec interval) : runThread(false), running(false),  interval(interval) {};
+    task() : runThread(false), running(false),  interval((struct timespec) {1,0} ) {};
     virtual ~task();
     
     void start();

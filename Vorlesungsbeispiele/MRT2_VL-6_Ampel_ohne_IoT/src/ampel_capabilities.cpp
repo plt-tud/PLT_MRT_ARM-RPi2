@@ -26,7 +26,7 @@
 
 #include "ampel_capabilities.h"
 
-ampel_capabilities::ampel_capabilities() : sensor(false), redLight(false), greenLight(false), yellowLight(false)
+ampel_capabilities::ampel_capabilities() : redLight(false), yellowLight(false), greenLight(false), sensor(false)
 {};
 
 ampel_capabilities::~ampel_capabilities()
@@ -69,3 +69,9 @@ void ampel_capabilities::setGreenLight(bool setLightOn)
     greenLight = setLightOn;
     return; 
 }
+
+void ampel_capabilities::setSensor(bool setSensorTriggered)
+{
+    sensor = setSensorTriggered;
+}
+

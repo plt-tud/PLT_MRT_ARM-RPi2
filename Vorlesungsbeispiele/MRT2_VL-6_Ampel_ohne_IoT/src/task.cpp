@@ -27,12 +27,18 @@
 #include "task.h"
 #include "unistd.h"
 
+#include <iostream>
 task::~task()
 {
     stop();
 }
  
 void task::init()
+{
+    return;
+}
+
+void task::run()
 {
     return;
 }
@@ -44,8 +50,8 @@ void task::terminate()
 
 void task::stop()
 {
+    if (!running) return; // Already stopped
     runThread = false;
-    if (!running) return;
     
     if (t != nullptr && t->joinable())
         t->join();
