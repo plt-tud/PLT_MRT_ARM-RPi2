@@ -44,9 +44,6 @@ int main(int argc, char **argv) {
     b.start();
     
     while (runAmpel) {
-        if(b.getPhaseCommand() == PHASE_GREEN)
-          cout << "Gruen!" << endl;
-
         sleep(1);
     }
     cout << "Ampel now stopping" << endl;

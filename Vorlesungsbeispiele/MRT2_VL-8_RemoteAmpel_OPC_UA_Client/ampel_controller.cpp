@@ -46,10 +46,14 @@ int main(int argc, char **argv) {
         else {
           sensorLatch = sense;
           if(sensorLatch) {
-            if (b.getPhaseCommand() == PHASE_GREEN)
+            if (b.getPhaseCommand() == PHASE_GREEN) {
               b.setPhaseCommand(PHASE_RED);
-            else
+              cout << "Rot!" << endl;
+            }
+            else {
               b.setPhaseCommand(PHASE_GREEN);
+              cout << "Gruen!" << endl;
+            }
           }
         }
         
