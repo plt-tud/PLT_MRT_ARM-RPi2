@@ -176,7 +176,7 @@ void RemoteAmpel::setPhaseCommand(ampel_phaseId value)
   
   clientMutex.lock();
   if (client != nullptr && UA_Client_getState(client) != UA_CLIENTSTATE_DISCONNECTED) {
-    UA_Client_writeValueAttribute(client, UA_NODEID_STRING(1, "phaseCommand") , val);
+    UA_Client_writeValueAttribute(client, UA_NODEID_STRING(1, (char*) "phaseCommand") , val);
   }
   clientMutex.unlock();
   
@@ -191,7 +191,7 @@ ampel_phaseId RemoteAmpel::getPhaseCommand()
   
   clientMutex.lock();
   if (client != nullptr && UA_Client_getState(client) != UA_CLIENTSTATE_DISCONNECTED) {
-    UA_StatusCode retval = UA_Client_readValueAttribute(client, UA_NODEID_STRING(1, "phaseCommand"), val);
+    UA_StatusCode retval = UA_Client_readValueAttribute(client, UA_NODEID_STRING(1, (char *) "phaseCommand"), val);
     if(retval == UA_STATUSCODE_GOOD && UA_Variant_isScalar(val) && val->type == &UA_TYPES[UA_TYPES_INT32]) {
       if(*(UA_Int32*)val->data != PHASE_RED) cval = PHASE_GREEN;
     }

@@ -36,11 +36,7 @@ using namespace std;
 #include "ampel_capabilities.h"
 #include "Automaton.h"
 #include "ampel_iot_opcua.h"
-
-// More explicit, since we will need to set this over OPC UA...
-typedef enum {PHASE_RED   = 0, 
-              PHASE_GREEN = 1
-} ampel_phaseId;
+#include "Ampel_typeDefinitions.h"
 
 class Ampel : public ampel_capabilities, public task
 {

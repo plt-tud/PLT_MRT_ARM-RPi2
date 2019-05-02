@@ -24,23 +24,12 @@
  *
  */
 
-#ifndef AMPEL_BEHAVIORS_H
-#define AMPEL_BEHAVIORS_H
+#ifndef AMPEL_TYPDEDEFINITIONS_H
+#define AMPEL_TYPDEDEFINITIONS_H
 
-#include "AutomatonElement.h"
+// Definitions shared by client and server side.
+typedef enum {PHASE_RED   = 0,
+              PHASE_GREEN = 1
+} ampel_phaseId;
 
-void behavior_red(const AutomatonElement& ae, const string& ActionID);
-void behavior_redtogreen(const AutomatonElement& ae, const string& ActionID);
-void behavior_green(const AutomatonElement& ae, const string& ActionID);
-void behavior_greentored(const AutomatonElement& ae, const string& ActionID);
-
-void behavior_offline_check(const AutomatonElement& ae, const string& ActionID);
-void behavior_offline(const AutomatonElement& ae, const string& ActionID);
-
-bool guard_hasController(const AutomatonElement& ae, const string& ActionID);
-bool guard_hasNoController(const AutomatonElement& ae, const string& ActionID);
-
-bool guard_greenPhaseRequested(const AutomatonElement& ae, const string& ActionID);
-bool guard_redPhaseRequested(const AutomatonElement& ae, const string& ActionID);
-
-#endif // AMPEL_BEHAVIORS_H
+#endif // AMPEL_H

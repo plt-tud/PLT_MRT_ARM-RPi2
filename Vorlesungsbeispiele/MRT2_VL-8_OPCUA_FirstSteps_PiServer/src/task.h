@@ -51,8 +51,8 @@ protected:
     virtual void terminate();
     
 public:
-    task(struct timespec interval) : running(false), runThread(false), interval(interval) {};
-    task() : running(false), runThread(false), interval((struct timespec) {1,0} ) {};
+    task(struct timespec interval) : runThread(false), running(false), interval(interval) {};
+    task() : runThread(false), running(false), interval((struct timespec) {1,0} ) {};
     virtual ~task();
     
     void start();

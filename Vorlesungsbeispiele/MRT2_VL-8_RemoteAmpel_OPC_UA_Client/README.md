@@ -6,6 +6,8 @@ Der Ampel-Controller ist ein OPC UA Client, der als API lokal die gleichen Schni
 
 Das Programm erfüllt die selbe Funktion wie dies Vorlesungsbeispiele vorangegangener Vorlesungen: Es prüft, ob der Sensor ausgelöst wurde und wechselt die Ampelphasen von Rot auf Grün und zurück. 
 
+**NOTE:** This project only contains the used API header and sources. For the complete project, please check out the `Ampel_mit_IoT`-project.
+
 # Einstellungen für Eclipse
 
 Das Programm ist in erster Linie als PC-seitiger Client vorgesehen. 

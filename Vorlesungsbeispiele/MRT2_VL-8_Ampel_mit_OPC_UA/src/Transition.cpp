@@ -31,7 +31,7 @@
 const string Transition::myType = "trans";
 
 Transition::Transition(const State& start, const State& target, Guard guardFunc, Behavior effectFunc, void *handle) 
-: AutomatonElement(start.getID() + "->" + target.getID(), handle), start(start), target(target), guardFunc(guardFunc), effectFunc(effectFunc)
+: AutomatonElement(start.getID() + "->" + target.getID(), handle), guardFunc(guardFunc), effectFunc(effectFunc), start(start), target(target)
 {
   
 }

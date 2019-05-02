@@ -30,7 +30,6 @@ void signalHandler_exit(int signnum) {
 
 int main(int argc, char **argv) {
     Ampel a;
-    RemoteAmpel b("opc.tcp://127.0.0.1:4840");
     
     runAmpel = true;
     
@@ -41,14 +40,12 @@ int main(int argc, char **argv) {
     a.addPeripheral(new ampel_peripheral_rPi(RPI_GPIO_RED, RPI_GPIO_YELLOW, RPI_GPIO_GREEN, RPI_GPIO_SIGNAL));
     
     a.start();
-    b.start();
     
     while (runAmpel) {
         sleep(1);
     }
     cout << "Ampel now stopping" << endl;
     
-    b.stop();
     a.stop();
     
     return 0;

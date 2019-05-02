@@ -41,7 +41,6 @@ private:
   const State* pCurrentState; // veränderliche Adresse eines nicht veränderlichen Objects
   const std::list<Transition*> pTT;
   
-  const int TTlength;    // nicht veränderliche Ganzzahl
   int currentStateTicks; // Anzahl ticks in aktuellem Zustand
   bool first;
 public:

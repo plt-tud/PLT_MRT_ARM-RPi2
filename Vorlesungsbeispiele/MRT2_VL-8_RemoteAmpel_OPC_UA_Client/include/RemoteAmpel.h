@@ -30,7 +30,7 @@
 #include <string>
 #include <mutex>
 
-#include "Ampel.h"
+#include "Ampel_typeDefinitions.h"
 
 #include "task.h"
 #include "open62541.h"
@@ -38,7 +38,7 @@
 class RemoteAmpel : public task
 {
 public:
-  RemoteAmpel(std::string ampelUri) : serverURI(ampelUri), client(nullptr) {};
+  RemoteAmpel(std::string ampelUri) :  client(nullptr), serverURI(ampelUri) {};
   
   bool getRedLight();
   void setRedLight(bool setLightOn);

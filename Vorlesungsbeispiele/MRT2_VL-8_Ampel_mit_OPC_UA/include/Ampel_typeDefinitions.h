@@ -24,46 +24,12 @@
  *
  */
 
-#ifndef RPI_ACCESSOR_H
-#define RPI_ACCESSOR_H
+#ifndef AMPEL_TYPDEDEFINITIONS_H
+#define AMPEL_TYPDEDEFINITIONS_H
 
-#include <stdint.h>
-#include "bcm2835.h"
+// Definitions shared by client and server side.
+typedef enum {PHASE_RED   = 0,
+              PHASE_GREEN = 1
+} ampel_phaseId;
 
-class rPi_Accessor
-{
-private:
-    static rPi_Accessor *instance;
-
-    rPi_Accessor()  { 
-        #ifdef BUILD_RPI
-            bcm2835_init(); 
-        #endif
-    };
-    ~rPi_Accessor() { 
-        #ifdef BUILD_RPI
-            bcm2835_close(); 
-        #endif
-    };    
-    
-public:
-    rPi_Accessor(rPi_Accessor const&)   = delete;
-    void operator=(rPi_Accessor const&) = delete;
-    
-    static rPi_Accessor* getInstance()
-    {
-        if (!instance) {
-            instance = new rPi_Accessor();
-        }
-        
-        return instance;
-    };
-    
-    
-    void setGPIOOutput(uint8_t GPIO);
-    void setGPIOInput(uint8_t GPIO);
-    void setGPO(uint8_t GPIO, bool value);
-    bool getGPI(uint8_t GPIO);
-};
-
-#endif // RPI_ACCESSOR_H
+#endif // AMPEL_H

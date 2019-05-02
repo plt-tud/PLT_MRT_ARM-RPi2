@@ -6,6 +6,8 @@ Das Projekt produziert den `ampel_server`, der das RPi 2 bedient.
  
 Das Projekt verwendet die libopen62541 als OPC UA Server und Client - zur einfacheren Kompilierung und damit man per Eclipse nur ein Binary transferieren muss, liegen sowohl open62541 wie auch Automaton als Quellcode bei und werden mit dem Projekt kompiliert. Daher müssen auch C-Compiler-Optionen für open62541 eingestellt werden.
 
+**NOTE:** The src and include folder contain the entire API Code for the traffic light. If you intend to turn this API into a library... use this project!
+
 # Projeteinstellungen für  ARM/Raspberry Pi
 
 Per Rechtsklick auch das Projekt unter dem Menüpunkt "Eigenschaften" sollten die nachfolgenden Einstellungen getroffen werden.

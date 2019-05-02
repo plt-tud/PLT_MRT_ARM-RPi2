@@ -30,7 +30,7 @@
 class ampel_capabilities
 {
 protected:
-    bool redLight, greenLight, yellowLight, sensor;
+    bool redLight, yellowLight, greenLight, sensor;
     
 public:
     ampel_capabilities();

@@ -6,6 +6,7 @@ Der Client macht nichts, außer mit dem Stack verbunden zu bleiben. Er dient als
 
 Der CLient kann wahlweise local oder auf dem Pi laufen.
 
+**NOTE:** This project only contains the used API header and sources. For the complete project, please check out the `Ampel_mit_IoT`-project.
 
 # Projeteinstellungen für  ARM/Raspberry Pi
 
