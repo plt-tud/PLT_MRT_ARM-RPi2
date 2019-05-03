@@ -14,6 +14,11 @@ Per Rechtsklick auch das Projekt unter dem Menüpunkt "Eigenschaften" sollten di
 
 1. Project Properties >  C/C++ Build > Tool Chain Editor > (DropDown) Cross GCC
 
+### Cross Compiler Settings
+1. Project Properties >  C/C++ Build > Tool Chain Editor > Settings > Cross Settings 
+  1. Prefix: arm-linux-gnueabi-hf
+  1. Path: <leer lassen> (Wird durch die run-eclipse Skripte und in der VM automatisch ermittelt) 
+
 ### Dialects
 1. Project Properties >  C/C++ Build > Settings > GCC C++ Compiler > Dialect > ISO C++11
 1. Project Properties >  C/C++ Build > Settings > GCC C Compiler > Dialect > ISO C99
