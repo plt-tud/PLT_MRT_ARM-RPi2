@@ -31,7 +31,8 @@
  * und stellt die einheitlichen Definitionsheader zur Verfuegung.
  */
 
-.extern BCM2536_GPIO_Open, BCM2536_GPIO_Close, BCM2536_GPIO_PinSelFun, BCM2536_GPIO_PinSet, BCM2536_GPIO_PinClr
+.extern BCM2536_GPIO_Open, BCM2536_GPIO_Close, BCM2536_GPIO_PinSelFun, \
+		BCM2536_GPIO_PinSet, BCM2536_GPIO_PinClr
 
 // Register/Offset-Definitionen und Konstanten fuer GPIOs
 .include "BCM2536_GPIO_constants.h"

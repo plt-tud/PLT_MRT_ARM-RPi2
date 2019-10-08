@@ -74,51 +74,9 @@ main:
 	mov r1,#BCM2536_GPFSEL_OUTPUT
 	bl BCM2536_GPIO_PinSelFun
 
-	// set pin functions
-	mov r0,#7	// CE1
-	mov r1,#BCM2536_GPFSEL_ALT0
-	bl BCM2536_GPIO_PinSelFun
+	bl BCM2536_SPI0_Init
 
-	mov r0,#8	// CE0
-	mov r1,#BCM2536_GPFSEL_ALT0
-	bl BCM2536_GPIO_PinSelFun
 
-	mov r0,#9	// MISO
-	mov r1,#BCM2536_GPFSEL_ALT0
-	bl BCM2536_GPIO_PinSelFun
-
-	mov r0,#10 // MOSI
-	mov r1,#BCM2536_GPFSEL_ALT0
-	bl BCM2536_GPIO_PinSelFun
-
-	mov r0,#11 // CLK
-	mov r1,#BCM2536_GPFSEL_ALT0
-	bl BCM2536_GPIO_PinSelFun
-
-.if DEBUG>0
-	bl BCM2536_GPIO_PinSelDump
-.endif
-
-	// initialize CS
-	mov r0, #0
-	str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-	// clear fifos
-	mov r0, #BCM2835_SPI0_CS_CLEAR
-	str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-	// set CS-Polarity of cs0 and cs1 to 0
-	ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-	bic r0,r0,#BCM2835_SPI0_CS_CSPOL0
-	bic r0,r0,#BCM2835_SPI0_CS_CSPOL1
-	str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-	// set clock divider
-	mov r0,#64 // 3.9 MhZ on RPi2
-	str r0,[r4,#BCM2835_SPI0_CLK_OFFSET]
-	// set data mode to mode 0 (cpol=0, cpha=0) and select CS0 (CS=0)
-	ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-	bic r0,r0,#BCM2835_SPI0_CS_CPOL
-	bic r0,r0,#BCM2835_SPI0_CS_CPHA
-	bic r0,r0,#BCM2835_SPI0_CS_CS
-	str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 
 	mov r5,#3	// send 3 byte
 	ldr r6,=spi_msg // message

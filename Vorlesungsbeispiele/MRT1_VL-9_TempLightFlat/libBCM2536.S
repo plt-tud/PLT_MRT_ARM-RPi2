@@ -1,26 +1,45 @@
 @ Header
-.globl BCM2536_GPIO_Open, BCM2536_GPIO_Close, BCM2536_GPIO_PinSelFun, BCM2536_GPIO_PinSet, BCM2536_GPIO_PinClr, BCM2536_GPIO_PinSelDump
-.type BCM2536_GPIO_Init,%function
-.type BCM2536_GPIO_Close,%function
-.type BCM2536_GPIO_PinSelFun,%function
-.type BCM2536_GPIO_PinSet,%function
-.type BCM2536_GPIO_PinClr,%function
-.type BCM2536_GPIO_PinSelDump,%function
+.globl BCM2536_GPIO_GetBase, BCM2536_GPIO_Open, BCM2536_GPIO_Close, BCM2536_GPIO_PinSelFun, BCM2536_GPIO_PinSet, BCM2536_GPIO_PinClr, BCM2536_GPIO_PinSelDump
 
+.type  BCM2536_GPIO_Init,%function
+.type  BCM2536_GPIO_Close,%function
+.type  BCM2536_GPIO_PinSelFun,%function
+.type  BCM2536_GPIO_PinSet,%function
+.type  BCM2536_GPIO_PinClr,%function
+.type  BCM2536_GPIO_PinSelDump,%function
+.type  BCM2536_GPIO_GetBase,%function
+
+.globl BCM2536_SPI0_GetBase,BCM2536_SPI0_Init
+.type  BCM2536_SPI0_GetBase,%function
+.type  BCM2536_SPI0_Init,%function
+
+.include "SYSCALL.h"
+// We share these constants with non-library sources
 .include "BCM2536_constants.h"
 .include "BCM2536_GPIO_constants.h"
 .include "BCM2536_SPI_constants.h"
-.include "SYSCALL.h"
 
+/*********** Data ***********/
 .data
 .balign 4
 dev_mem_filename: 	.asciz "/dev/mem"
 .balign 4
-dev_mem_gpio_fd: 	.word 0	@ holds fd to /dev/mem
+dev_mem_gpio_fd: 	      .word 0	@ holds fd to /dev/mem
 dev_mem_gpio_base_addr:	.word 0
 
+
+/********** Text ************/
 .text
 .align 4
+
+/*********************
+ * GPIO Functions
+ *********************/
+
+BCM2536_GPIO_GetBase:
+  ldr r0, =dev_mem_gpio_base_addr
+  ldr r0, [r0]
+  mov pc, lr
 
 BCM2536_GPIO_Open:
   push {r4-r7,fp,lr}	// safe relevant registers (6)
@@ -174,17 +193,64 @@ e_reg:	mov r0,#10
 	bl PrintChar
 	pop {r4,r5,fp,pc}	// restore and return
 
-.globl BCM2536_GPIO_GetBase
-.type BCM2536_GPIO_GetBase,%function
-BCM2536_GPIO_GetBase:
-  	ldr r0,=dev_mem_gpio_base_addr
-  	ldr r0,[r0]
+
+/*********************
+ * SPI Functions
+ *
+ * For documentation, see BCM2835 datasheet
+ * chapter 10, page 148ff.
+ *********************/
+
+BCM2536_SPI0_GetBase:
+	ldr r0,=dev_mem_gpio_base_addr
+	ldr r0,[r0]
+	add r0,r0,#(BCM2536_SPI0_BASEOFFSET-BCM2536_GPIO_BASEOFFSET)
 	mov pc,lr
 
-.globl BCM2536_SPI0_GetBase
-.type BCM2536_SPI0_GetBase,%function
-BCM2536_SPI0_GetBase:
-  	ldr r0,=dev_mem_gpio_base_addr
-  	ldr r0,[r0]
-  	add r0,r0,#(BCM2536_SPI0_BASEOFFSET-BCM2536_GPIO_BASEOFFSET)
-	mov pc,lr
+
+BCM2536_SPI0_Init:
+  push {r4-r10,fp,lr} // Note: FP/R11 is not part of ARM EABI
+
+  // set pin functions to alternate0
+  mov r0,#7 // CE1
+  mov r1,#BCM2536_GPFSEL_ALT0
+  bl BCM2536_GPIO_PinSelFun
+
+  mov r0,#8 // CE0
+  mov r1,#BCM2536_GPFSEL_ALT0
+  bl BCM2536_GPIO_PinSelFun
+
+  mov r0,#9 // MISO
+  mov r1,#BCM2536_GPFSEL_ALT0
+  bl BCM2536_GPIO_PinSelFun
+
+  mov r0,#10 // MOSI
+  mov r1,#BCM2536_GPFSEL_ALT0
+  bl BCM2536_GPIO_PinSelFun
+
+  mov r0,#11 // CLK
+  mov r1,#BCM2536_GPFSEL_ALT0
+  bl BCM2536_GPIO_PinSelFun
+
+  // initialize CS
+  mov r0, #0
+  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+  // clear fifos
+  mov r0, #BCM2835_SPI0_CS_CLEAR
+  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+  // set CS-Polarity of cs0 and cs1 to 0
+  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+  bic r0,r0,#BCM2835_SPI0_CS_CSPOL0
+  bic r0,r0,#BCM2835_SPI0_CS_CSPOL1
+  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+  // set clock divider
+  mov r0,#64 // 3.9 MhZ on RPi2
+  str r0,[r4,#BCM2835_SPI0_CLK_OFFSET]
+  // set data mode to mode 0 (cpol=0, cpha=0) and select CS0 (CS=0)
+  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+  bic r0,r0,#BCM2835_SPI0_CS_CPOL
+  bic r0,r0,#BCM2835_SPI0_CS_CPHA
+  bic r0,r0,#BCM2835_SPI0_CS_CS
+  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+
+  pop {r4-r10,fp,pc}
