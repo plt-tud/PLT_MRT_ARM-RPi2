@@ -25,17 +25,6 @@
  * DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
  */
 
-/* @brief: Header fuer Programme, die unsere libBCM nutzen wollen.
- *
- * Der Header definiert unsere Bibliotheksfunktionen als "extern"
- * und stellt die einheitlichen Definitionsheader zur Verfuegung.
- */
-
-.extern BCM2536_GPIO_Open, BCM2536_GPIO_Close, BCM2536_GPIO_PinSelFun, BCM2536_GPIO_PinSet, BCM2536_GPIO_PinClr
-
-// Register/Offset-Definitionen und Konstanten fuer GPIOs
-.include "BCM2536_GPIO_constants.h"
-
-// Register/Offset-Definitionen und Konstanten fuer SPI
-.include "BCM2536_SPI_constants.h"
-
+// @ Definitionen
+// Aus Bootloader, Mapping v. physischem Speicher 0x7Exxxxx --> 0x3fxxxxxx
+.equ BCM2536_PERI_BASE,         0x3f000000
