@@ -1,4 +1,4 @@
-# exclude
+# Exclude compiler products
 *.m4
 *.o
 *.a
@@ -8,6 +8,10 @@
 *.gcno
 *.gcda
 *.lst
+*.d
+*.mk
+
+# Makefile and Autocond
 /autom4te.cache
 Makefile
 /config.status
@@ -18,23 +22,27 @@ config.log
 /install-sh
 /depcomp
 /ltmain.sh
+
+
 *~
 GIT_REVISION
 SVN_REVISION
 libtool
 .deps
 .libs
+
+# Coverage files
 .gcno
 .gcda
 coverage_report
-# we need the project files for eclipse
+
+# Project/IDE Environment files
+# we need these two project files for eclipse
 #.project
 #.cproject
 .pydevproject
 .kdev4
-/.settings
 .autotools
 /cmake-build*
-*mk
 Debug*
 Release*

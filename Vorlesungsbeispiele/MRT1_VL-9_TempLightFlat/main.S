@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2018 Leon Urbas <leon.urbas@tu-dresden.de>
- * Copyright (c) 2019 Chris Iatrou <chris_paul.iatrou@tu-dresden.de>
+ * Copyright (c) 2018 Leon Urbas <leon.urbas//tu-dresden.de>
+ * Copyright (c) 2019 Chris Iatrou <chris_paul.iatrou//tu-dresden.de>
  *
  * Hiermit wird unentgeltlich jeder Person, die eine Kopie der
  * Software und der zugehörigen Dokumentationen (die "Software")
@@ -25,7 +25,7 @@
  * DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
  */
 
-/* @brief: ThermalBlinker: Reacts to temperature changes by changing an LED output.
+/* //brief: ThermalBlinker: Reacts to temperature changes by changing an LED output.
  *
  * ThermalBlinker is a demo program using both SPI to sample an Analog Devices TMP35
  * Temperature sensor using anb MCP3008 ADC. The green system LED on GPIO 47 is
@@ -55,8 +55,8 @@ spi_msg: .byte 0x01, 0x80, 0x00
 .text
 .align
 main:
-	push {r4-r9,fp,lr} @ safe 8 regs
-	add fp,sp,#(8-1)*4 // fp <- lr @ stack
+	push {r4-r9,fp,lr} // safe 8 regs
+	add fp,sp,#(8-1)*4 // fp <- lr // stack
 
 	bl BCM2536_GPIO_Open
 	cmp r0,#0
@@ -74,37 +74,24 @@ main:
 	mov r1,#BCM2536_GPFSEL_OUTPUT
 	bl BCM2536_GPIO_PinSelFun
 
-.if DEBUG>0
-	bl BCM2536_GPIO_GetBase
-	bl PrintHex
-	bl PrintNL
-.endif
-
-	bl BCM2536_SPI0_GetBase
-	mov r4, r0
-.if DEBUG>0
-	bl PrintHex
-	bl PrintNL
-.endif
-
-	@ set pin functions
-	mov r0,#7	@ CE1
+	// set pin functions
+	mov r0,#7	// CE1
 	mov r1,#BCM2536_GPFSEL_ALT0
 	bl BCM2536_GPIO_PinSelFun
 
-	mov r0,#8	@ CE0
+	mov r0,#8	// CE0
 	mov r1,#BCM2536_GPFSEL_ALT0
 	bl BCM2536_GPIO_PinSelFun
 
-	mov r0,#9	@ MISO
+	mov r0,#9	// MISO
 	mov r1,#BCM2536_GPFSEL_ALT0
 	bl BCM2536_GPIO_PinSelFun
 
-	mov r0,#10 @ MOSI
+	mov r0,#10 // MOSI
 	mov r1,#BCM2536_GPFSEL_ALT0
 	bl BCM2536_GPIO_PinSelFun
 
-	mov r0,#11 @ CLK
+	mov r0,#11 // CLK
 	mov r1,#BCM2536_GPFSEL_ALT0
 	bl BCM2536_GPIO_PinSelFun
 
@@ -112,47 +99,47 @@ main:
 	bl BCM2536_GPIO_PinSelDump
 .endif
 
-	@ initialize CS
+	// initialize CS
 	mov r0, #0
 	str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-	@ clear fifos
+	// clear fifos
 	mov r0, #BCM2835_SPI0_CS_CLEAR
 	str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-	@ set CS-Polarity of cs0 and cs1 to 0
+	// set CS-Polarity of cs0 and cs1 to 0
 	ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 	bic r0,r0,#BCM2835_SPI0_CS_CSPOL0
 	bic r0,r0,#BCM2835_SPI0_CS_CSPOL1
 	str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-	@ set clock divider
-	mov r0,#64 @ 3.9 MhZ on RPi2
+	// set clock divider
+	mov r0,#64 // 3.9 MhZ on RPi2
 	str r0,[r4,#BCM2835_SPI0_CLK_OFFSET]
-	@ set data mode to mode 0 (cpol=0, cpha=0) and select CS0 (CS=0)
+	// set data mode to mode 0 (cpol=0, cpha=0) and select CS0 (CS=0)
 	ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 	bic r0,r0,#BCM2835_SPI0_CS_CPOL
 	bic r0,r0,#BCM2835_SPI0_CS_CPHA
 	bic r0,r0,#BCM2835_SPI0_CS_CS
 	str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 
-	mov r5,#3	@ send 3 byte
-	ldr r6,=spi_msg @ message
+	mov r5,#3	// send 3 byte
+	ldr r6,=spi_msg // message
 
 forever:
-	@ clear fifos and set TA
+	// clear fifos and set TA
 	ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 	orr r0,r0,#BCM2835_SPI0_CS_CLEAR
 	orr r0,r0,#BCM2835_SPI0_CS_TA
 	str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 
-	mov r2,#0   @ r2=txcnt
-	mov r3,#0   @ r3=rxcnt
-	mov r8,#0   @ r8=result
-poll: @ while (txcnt < len || rxcnt < len) {
+	mov r2,#0   // r2=txcnt
+	mov r3,#0   // r3=rxcnt
+	mov r8,#0   // r8=result
+poll: // while (txcnt < len || rxcnt < len) {
 	cmp r2,r5
 	blt send
 	cmp r3,r5
 	bge wait_for_done
 
-send: @ while (TXD & txcnt < len) {
+send: // while (TXD & txcnt < len) {
 	ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 	tst r0, #BCM2835_SPI0_CS_TXD
 	beq rcv  // fifo full -> TXD=0 -> Z=1, read
@@ -160,8 +147,8 @@ send: @ while (TXD & txcnt < len) {
 	bge rcv
 
 	ldrb r0,[r6,r2]
-	@ ldrb r0,[r7,r0] @ invert
-	str r0,[r4,#BCM2835_SPI0_FIFO_OFFSET] @ send
+	// ldrb r0,[r7,r0] // invert
+	str r0,[r4,#BCM2835_SPI0_FIFO_OFFSET] // send
 .if DEBUG>0
 	push {r0-r3}
 	bl PrintHex
@@ -169,16 +156,16 @@ send: @ while (TXD & txcnt < len) {
 	bl PrintChar
 	pop {r0-r3}
 .endif
-	add r2,r2,#1 @ advance txcnt
-	bal send @ }
-rcv: @ while (RXD & rxcnt < len) {
+	add r2,r2,#1 // advance txcnt
+	bal send // }
+rcv: // while (RXD & rxcnt < len) {
 	ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 	tst r0, #BCM2835_SPI0_CS_RXD
 	beq e_rcv // Z=1, nothing received
 	cmp r3,r5
 	bge e_rcv
 
-	ldr r0,[r4,#BCM2835_SPI0_FIFO_OFFSET] @ read
+	ldr r0,[r4,#BCM2835_SPI0_FIFO_OFFSET] // read
 .if DEBUG>0
 	push {r0-r3}
 	bl PrintHex
@@ -187,16 +174,16 @@ rcv: @ while (RXD & rxcnt < len) {
 	pop {r0-r3}
 .endif
 	and r0,r0,#0xFF
-	@ ldrb r0,[r7,r0] @ invert
-	orr r8,r0,r8,lsl #8 @ store in r8
+	// ldrb r0,[r7,r0] // invert
+	orr r8,r0,r8,lsl #8 // store in r8
 
-	add r3,r3,#1 @ advance rxcnt
-	bal rcv @ }
+	add r3,r3,#1 // advance rxcnt
+	bal rcv // }
 e_rcv:
-	bal poll @ }
+	bal poll // }
 
 wait_for_done:
-	ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET] @ wait for done
+	ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET] // wait for done
 	tst r0,#BCM2835_SPI0_CS_DONE
 	beq wait_for_done
 
@@ -208,12 +195,16 @@ wait_for_done:
 	bl PrintHex
 	bl PrintNL
 
-	@ TMP35 	V = 10 mV/°C, 0°C=0 mV
-	@ MCP3008:  D = 1024 x V / V_ref
-.equ DC_1, 2
-.equ DC_5, 10
-.equ DC_10, 20
-.equ DC_REF,0xB0 @ = 18 °C
+	/* From Analog Devices TMP35/36/37 Datasheet:
+	 * TMP35 	V = 10 mV/°C, 25°C=250 mV
+	 *
+	 * From Microchip MCP3008 datasheet:
+	 * MCP3008:  D = 1024 x V / V_ref (10-bit ADC)
+	 */
+.equ DC_1,   2
+.equ DC_5,   10
+.equ DC_10,  20
+.equ DC_REF, 0xB0 // = 18 °C
 	cmp r8,#DC_REF+DC_1
 	movlt r9,#GPIO_GREEN
 	blt light

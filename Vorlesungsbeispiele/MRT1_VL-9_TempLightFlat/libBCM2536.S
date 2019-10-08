@@ -8,6 +8,7 @@
 .type BCM2536_GPIO_PinSelDump,%function
 
 .include "BCM2536_constants.h"
+.include "BCM2536_GPIO_constants.h"
 .include "BCM2536_SPI_constants.h"
 .include "SYSCALL.h"
 
