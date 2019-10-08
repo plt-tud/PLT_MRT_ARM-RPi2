@@ -7,60 +7,8 @@
 .type BCM2536_GPIO_PinClr,%function
 .type BCM2536_GPIO_PinSelDump,%function
 
-@ Definitionen
-// Aus Bootloader, Mapping v. physischem Speicher 0x7Exxxxx --> 0x3fxxxxxx
-.equ BCM2536_PERI_BASE,         0x3f000000
-
-// Aus BCM2536 Datenblatt, Abschnitt GPIOs
-.equ BCM2536_GPIO_BASEOFFSET,   0x200000
-.equ BCM2536_GPIO_LASTADDRESS,  0x2000B4
-.equ BCM2536_GPIO_MEMSIZE,      0x4100 // Must be >=4k according to manual !
-.equ BCM2536_GPIO_BASE, BCM2536_PERI_BASE + BCM2536_GPIO_BASEOFFSET
-
-.equ BCM2536_GPFSEL_OFFSET, 0
-.equ BCM2536_GPSET_OFFSET, 0x1C
-.equ BCM2536_GPCLR_OFFSET, 0x28
-
-.equ BCM2536_SPI0_BASEOFFSET, 0x204000
-
-.set BCM2835_SPI0_CS_OFFSET, 0x00 @ SPI Master Control and Status
-.set BCM2835_SPI0_FIFO_OFFSET, 0x04 @ SPI Master TX and RX FIFOs
-.set BCM2835_SPI0_CLK_OFFSET, 0x08 @ SPI Master Clock Divider
-.set BCM2835_SPI0_DLEN_OFFSET, 0x0c @ SPI Master Data Length
-.set BCM2835_SPI0_LTOH_OFFSET, 0x10 @ SPI LOSSI mode TOH
-.set BCM2835_SPI0_DC_OFFSET, 0x14 @ SPI DMA DREQ Controls
-
-.set BCM2835_SPI0_CS_LEN_LONG_MSK, 0x02000000 /*!< Enable Long data word in Lossi mode if DMA_LEN is set */
-.set BCM2835_SPI0_CS_DMA_LEN_MSK, 0x01000000 /*!< Enable DMA mode in Lossi mode */
-.set BCM2835_SPI0_CS_CSPOL2_MSK, 0x00800000 /*!< Chip Select 2 Polarity */
-.set BCM2835_SPI0_CS_CSPOL1_MSK, 0x00400000 /*!< Chip Select 1 Polarity */
-.set BCM2835_SPI0_CS_CSPOL0_MSK, 0x00200000 /*!< Chip Select 0 Polarity */
-.set BCM2835_SPI0_CS_RXF_MSK, 0x00100000 /*!< RXF - RX FIFO Full */
-.set BCM2835_SPI0_CS_RXR_MSK, 0x00080000 /*!< RXR RX FIFO needs Reading (full) */
-.set BCM2835_SPI0_CS_TXD_MSK, 0x00040000 /*!< TXD TX FIFO can accept Data */
-.set BCM2835_SPI0_CS_RXD_MSK, 0x00020000 /*!< RXD RX FIFO contains Data */
-.set BCM2835_SPI0_CS_DONE_MSK, 0x00010000 /*!< Done transfer Done */
-.set BCM2835_SPI0_CS_TE_EN_MSK, 0x00008000 /*!< Unused */
-.set BCM2835_SPI0_CS_LMONO_MSK, 0x00004000 /*!< Unused */
-.set BCM2835_SPI0_CS_LEN_MSK, 0x00002000 /*!< LEN LoSSI enable */
-.set BCM2835_SPI0_CS_REN_MSK, 0x00001000 /*!< REN Read Enable */
-.set BCM2835_SPI0_CS_ADCS_MSK, 0x00000800 /*!< ADCS Automatically Deassert Chip Select */
-.set BCM2835_SPI0_CS_INTR_MSK, 0x00000400 /*!< INTR Interrupt on RXR */
-.set BCM2835_SPI0_CS_INTD_MSK, 0x00000200 /*!< INTD Interrupt on Done */
-.set BCM2835_SPI0_CS_DMAEN_MSK, 0x00000100 /*!< DMAEN DMA Enable */
-.set BCM2835_SPI0_CS_TA_MSK, 0x00000080 /*!< Transfer Active */
-.set BCM2835_SPI0_CS_CSPOL_MSK, 0x00000040 /*!< Chip Select Polarity */
-.set BCM2835_SPI0_CS_CLEAR_MSK, 0x00000030 /*!< Clear FIFO Clear RX and TX */
-.set BCM2835_SPI0_CS_CLEAR_RX_MSK, 0x00000020 /*!< Clear FIFO Clear RX  */
-.set BCM2835_SPI0_CS_CLEAR_TX_MSK, 0x00000010 /*!< Clear FIFO Clear TX  */
-.set BCM2835_SPI0_CS_CPOL_MSK, 0x00000008 /*!< Clock Polarity */
-.set BCM2835_SPI0_CS_CPHA_MSK, 0x00000004 /*!< Clock Phase */
-.set BCM2835_SPI0_CS_CS_MSK, 0x00000003 /*!< Chip Select */
-
-
-.equ BCM2536_SPI1_BASEOFFSET, 0x215000
-.equ BCM2536_SPI2_BASEOFFSET, 0x215080
-
+.include "BCM2536_constants.h"
+.include "BCM2536_SPI_constants.h"
 .include "SYSCALL.h"
 
 .data

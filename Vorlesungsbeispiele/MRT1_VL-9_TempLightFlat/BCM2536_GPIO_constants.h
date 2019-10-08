@@ -25,17 +25,26 @@
  * DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
  */
 
-/* @brief: Header fuer Programme, die unsere libBCM nutzen wollen.
- *
- * Der Header definiert unsere Bibliotheksfunktionen als "extern"
- * und stellt die einheitlichen Definitionsheader zur Verfuegung.
- */
+// GPFSEL Codes (BCM2835 ARM Peripherals, 2012, Table 6-1, p. 92)
+.equ BCM2536_GPFSEL_INPUT,  0b000
+.equ BCM2536_GPFSEL_OUTPUT, 0b001
+.equ BCM2536_GPFSEL_ALT0,   0b100
+.equ BCM2536_GPFSEL_ALT1,   0b101
+.equ BCM2536_GPFSEL_ALT2,   0b110
+.equ BCM2536_GPFSEL_ALT3,   0b111
+.equ BCM2536_GPFSEL_ALT4,   0b011
+.equ BCM2536_GPFSEL_ALT5,   0b010
 
-.extern BCM2536_GPIO_Open, BCM2536_GPIO_Close, BCM2536_GPIO_PinSelFun, BCM2536_GPIO_PinSet, BCM2536_GPIO_PinClr
+// Aus BCM2536 Datenblatt, Abschnitt GPIOs
+.equ BCM2536_GPIO_BASEOFFSET,   0x200000
+.equ BCM2536_GPIO_LASTADDRESS,  0x2000B4
+.equ BCM2536_GPIO_MEMSIZE,      0x4100 // Must be >=4k according to manual !
+.equ BCM2536_GPIO_BASE, BCM2536_PERI_BASE + BCM2536_GPIO_BASEOFFSET
 
-// Register/Offset-Definitionen und Konstanten fuer GPIOs
-.include "BCM2536_GPIO_constants.h"
+.equ BCM2536_GPFSEL_OFFSET, 0
+.equ BCM2536_GPSET_OFFSET,  0x1C
+.equ BCM2536_GPCLR_OFFSET,  0x28
 
-// Register/Offset-Definitionen und Konstanten fuer SPI
-.include "BCM2536_SPI_constants.h"
-
+.equ BCM2536_SPI0_BASEOFFSET, 0x204000
+.equ BCM2536_SPI1_BASEOFFSET, 0x215000
+.equ BCM2536_SPI2_BASEOFFSET, 0x215080
