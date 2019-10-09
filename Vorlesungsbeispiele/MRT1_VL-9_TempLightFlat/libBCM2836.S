@@ -28,7 +28,6 @@ dev_mem_filename: 	.asciz "/dev/mem"
 dev_mem_gpio_fd: 	      .word 0	@ holds fd to /dev/mem
 dev_mem_gpio_base_addr:	.word 0
 
-
 /********** Text ************/
 .text
 .align 4
@@ -203,6 +202,11 @@ e_reg:	mov r0,#10
  *********************/
 
 BCM2836_SPI0_GetBase:
+ /**
+   * @brief: Returns the base address of the SPI0 registers in mapped memory
+   *
+   * Note that this function assumes you have initialized the peripheral.
+   */
 	ldr r0,=dev_mem_gpio_base_addr
 	ldr r0,[r0]
 	add r0,r0,#(BCM2836_SPI0_BASEOFFSET-BCM2836_GPIO_BASEOFFSET)
@@ -210,6 +214,9 @@ BCM2836_SPI0_GetBase:
 
 // void bcm2836_spi_init(void)
 BCM2836_SPI0_Init:
+  /**
+   * @brief: Setup IO Pins for SPI0 (SoC), config SPI for MCP3008
+   */
   push {r4-r10,fp,lr} // Note: FP/R11 is not part of ARM EABI
 
   // FIXME: This bluntly assumes that GPIO_Init has been called!
@@ -260,12 +267,17 @@ BCM2836_SPI0_Init:
 
   pop {r4-r10,fp,pc}
 
- // size_t bcm2836_spi0_send(size_t dataSz, void* txdata, void *rxdata)
+ // void bcm2836_spi0_send(size_t dataSz, void* txdata, void *rxdata)
  BCM2836_SPI0_Send:
  /**
-  * @brief: Send and receive dataSz bytes over SPI
+  * @brief: Send and receive dataSz bytes over SPI.
   *
-  * Assume *data points to dataSz bytes of data. proceed as follows:
+  * @param dataSz  The number of bytes to be send from txdata
+  * @param *txdata Points to a byte-wise memory buffer from which we read data
+  * @param *rxdata Byte-wise memory buffer where we will store our data
+  * @return        Nothing meaningful
+  *
+  * Assume *txdata points to dataSz bytes of data. proceed as follows:
   *
   * Clear RX/TX FiFos;
   * rxData = 0;
@@ -332,12 +344,13 @@ BCM2836_SPI0_Init:
     b BCM2836_SPI0_Send_rxtxloop_start
   BCM2836_SPI0_Send_rxtxloop_end:
 
+  // while (!DONE) { wait }
   BCM2836_SPI0_Send_wait_for_done:
-
   ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET] // wait for done
   tst r0,#BCM2835_SPI0_CS_DONE
   beq BCM2836_SPI0_Send_wait_for_done
 
+  // Set transmission active to 0 (disables output lines)
   ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
   bic r0,r0,#BCM2835_SPI0_CS_TA
   str r0,[r4,#BCM2835_SPI0_CS_OFFSET]

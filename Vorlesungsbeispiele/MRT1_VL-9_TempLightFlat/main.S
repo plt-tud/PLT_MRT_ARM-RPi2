@@ -25,20 +25,43 @@
  * DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
  */
 
-/* //brief: ThermalLightFlat: Reacts to temperature changes by changing an LED output.
+/**
+ *  @brief: ThermalLightFlat: Reacts to temperature changes by changing an LED output.
  *
  * ThermalLightFlat is a demo program using both SPI to sample an Analog Devices TMP35
- * Temperature sensor using anb MCP3008 ADC. It first aquires an initial measurement.
- * 3 LEDs are assumed to be connected to GPIOs 26, 27 & 22.
+ * Temperature sensor using anb MCP3008 ADC. The lowest value aquired is interpreted as
+ * ambient temperature (compensates for starting the application with a warm sensor).
  *
- * Red:26    - On during ambient temperature
- * Yellow:27 - On during T > ambient temperature + DC_SENSE
- * Green:22  - On during T > ambient temperature + 2*DC_SENSE
+ * The parameter DC_SENSE gives a range for PWM Modulation of the green and red led.
+ * As the Tcurrent-Tambient approaches 0, the green LED will become darker and the
+ * red LED brighter.
  */
-.equ GPIO_RED,    26
-.equ GPIO_YELLOW, 27
-.equ GPIO_GREEN,  22
 
+/**
+ * @param DEBUG Setting Debug to anything but 0 will cause the main loop to delay 1s between
+ *              updates and print the hex ADC Value to the shell.
+ */
+.equ DEBUG,0
+
+/**
+ * @param USE_BOARDLEDS Selects either external LEDs (nice, safe) or on-board LEDs for
+ *                      this example
+ */
+.equ USE_BOARDLEDS,1
+
+.if USE_BOARDLEDS==0
+  /* These LEDs can be connected to the LK Linker Kit
+   */
+  .equ GPIO_RED,    26
+  .equ GPIO_GREEN,  22
+  //.equ GPIO_YELLOW, 27 // unused in this application
+.else
+  /* The following two leds are the system LEDs at the rear of the Pi Board
+   * using them might cause problems if the kernel led-class module is loaded.
+   */
+  .equ GPIO_RED,    35
+  .equ GPIO_GREEN,  47
+.endif
 
 /* From Analog Devices TMP35/36/37 Datasheet:
  * TMP35  V = 10 mV/°C, 25°C=250 mV
@@ -48,12 +71,10 @@
  *           10mV = 31 descrete units = 1 °C
  *           10 descrete units = 0,322 °C
  */
-.equ DC_SENSE, 5 // sensitivity, empirical value for warming up the sensor by hoding in hand at ~23 C
+.equ DC_SENSE, 10 // sensitivity, empirical value for warming up the sensor by hoding in hand at ~23 C
 
 .global main
 .type main, %function
-
-.set DEBUG,0
 
 
 .include "BCM2836.h"
@@ -76,18 +97,16 @@ main:
 	push {r4-r9,fp,lr} // safe 8 regs
 	add fp,sp,#(8-1)*4 // fp <- lr // stack
 
-  mov r4, #0 // r4:MMapBase
-  mov r5, #0 // r5:Ambienttemperature
+  mov r4, #0    // r4:MMapBase
+  mov r5, #1024    // r5:Ambienttemperature=0
+  mov r6, #0    // r6:currentTemp
+  mov r7, #0    // r7:pwmCount
 
 	bl BCM2836_GPIO_Open
 	cmp r0,#0
 	bne err_open
 
 	mov r0,#GPIO_RED
-	mov r1,#BCM2836_GPFSEL_OUTPUT
-	bl BCM2836_GPIO_PinSelFun
-
-	mov r0,#GPIO_YELLOW
 	mov r1,#BCM2836_GPFSEL_OUTPUT
 	bl BCM2836_GPIO_PinSelFun
 
@@ -111,61 +130,49 @@ forever:
 	ldrb r1, [r0, #1]
 	lsl  r1, #8
 	ldrb r0, [r0, #2]
-  orr  r3, r0, r1
+  orr  r6, r0, r1 // currentTemp:r6 = r0
 
-  mov r6, r0 // currentTemp:r6 = r0
+  .if DEBUG==1
+    mov r0, r6
+    bl PrintHex
+    bl PrintNL
+  .endif
 
+  // Update ambient temperate if it is drifting downwards
   // if (ambientTemp:r5 == 0) {
-  cmp   r5, #0
-  moveq r5, r0 //r5 = r0:currentTemp
+  cmp   r6, r5
+  movlt r5, r6 //ambientTemp:r5 = r6:currentTemp
   //}
 
-  //bl PrintHex
-  //bl PrintNL
+  // if (++r7:pwmCount > DC_SENSE) r7 = 0;
+  add   r7, r7,#1   // pwmCnt++
+  cmp   r7, #DC_SENSE
+  movge r7, #0
 
-  // if (Tambient:r5 + 2*DC_SENSE > T)
-  mov r0, r5
-  add r0, r5, #DC_SENSE
-  add r0, r0, #DC_SENSE
-  cmp r6, r0
-  bge light_green
+  // if (currentTemp-ambientTemp > pwmCnt) greenLED=Off
+  sub  r1, r6, r5
+  cmp  r1, r7
+  blgt light_pwm_greenOff
+  // else: greenLED=on
+  mov  r0,#GPIO_GREEN
+  bl   BCM2836_GPIO_PinSet
+  mov  r0, #GPIO_RED
+  bl   BCM2836_GPIO_PinClr
+  bal  light_pwm_done
 
-  // else if (Tambient:r5 + 1*DC_SENSE > T)
-  sub r0, r0, #DC_SENSE
-  cmp r6, r0
-  bge light_yellow
+  light_pwm_greenOff:
+  mov  r0,#GPIO_GREEN
+  bl   BCM2836_GPIO_PinClr
+  mov  r0, #GPIO_RED
+  bl   BCM2836_GPIO_PinSet
+  bal  light_pwm_done
 
-	//else
-	bal light_red
-
-  light_yellow:
-    mov r0,#GPIO_GREEN
-    bl BCM2836_GPIO_PinClr
-    mov r0,#GPIO_YELLOW
-    bl BCM2836_GPIO_PinSet
-    mov r0,#GPIO_RED
-    bl BCM2836_GPIO_PinClr
-    b light_done
-  light_green:
-    mov r0,#GPIO_GREEN
-    bl BCM2836_GPIO_PinSet
-    mov r0,#GPIO_YELLOW
-    bl BCM2836_GPIO_PinClr
-    mov r0,#GPIO_RED
-    bl BCM2836_GPIO_PinClr
-    b light_done
-  light_red:
-    mov r0,#GPIO_GREEN
-    bl BCM2836_GPIO_PinClr
-    mov r0,#GPIO_YELLOW
-    bl BCM2836_GPIO_PinClr
-    mov r0,#GPIO_RED
-    bl BCM2836_GPIO_PinSet
-    b light_done
-
-light_done:
-	mov r0,#1
-	bl sleep
+  light_pwm_done:
+  .if DEBUG==1
+    // sleep(1)
+    mov r0, #1
+    bl sleep
+  .endif
 	bal forever
 
 exit:
