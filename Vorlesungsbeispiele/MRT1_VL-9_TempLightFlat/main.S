@@ -56,13 +56,13 @@
 .set DEBUG,0
 
 
-.include "BCM2536.h"
+.include "BCM2836.h"
 .include "SYSCALL.h"
 
 .data
 .align
-bcm2536_msg_err_open: .asciz "error initializing bcm2536"
-.set bcm2536_mln_err_open, . - bcm2536_msg_err_open
+bcm2836_msg_err_open: .asciz "error initializing bcm2836"
+.set bcm2836_mln_err_open, . - bcm2836_msg_err_open
 
 .align
 // See MCP3008 Datasheet, Figure 6-1, MCU Transmitted Data
@@ -79,30 +79,30 @@ main:
   mov r4, #0 // r4:MMapBase
   mov r5, #0 // r5:Ambienttemperature
 
-	bl BCM2536_GPIO_Open
+	bl BCM2836_GPIO_Open
 	cmp r0,#0
 	bne err_open
 
 	mov r0,#GPIO_RED
-	mov r1,#BCM2536_GPFSEL_OUTPUT
-	bl BCM2536_GPIO_PinSelFun
+	mov r1,#BCM2836_GPFSEL_OUTPUT
+	bl BCM2836_GPIO_PinSelFun
 
 	mov r0,#GPIO_YELLOW
-	mov r1,#BCM2536_GPFSEL_OUTPUT
-	bl BCM2536_GPIO_PinSelFun
+	mov r1,#BCM2836_GPFSEL_OUTPUT
+	bl BCM2836_GPIO_PinSelFun
 
 	mov r0,#GPIO_GREEN
-	mov r1,#BCM2536_GPFSEL_OUTPUT
-	bl BCM2536_GPIO_PinSelFun
+	mov r1,#BCM2836_GPFSEL_OUTPUT
+	bl BCM2836_GPIO_PinSelFun
 
-	bl BCM2536_SPI0_Init
+	bl BCM2836_SPI0_Init
 
 forever:
 	// send()
 	mov r0, #3
 	ldr r1, =spi_msg
 	ldr r2, =spi_reply
-  bl BCM2536_SPI0_Send
+  bl BCM2836_SPI0_Send
 
 	ldr r0, =spi_reply
 	// RX Buffer will appear reversed:
@@ -140,27 +140,27 @@ forever:
 
   light_yellow:
     mov r0,#GPIO_GREEN
-    bl BCM2536_GPIO_PinClr
+    bl BCM2836_GPIO_PinClr
     mov r0,#GPIO_YELLOW
-    bl BCM2536_GPIO_PinSet
+    bl BCM2836_GPIO_PinSet
     mov r0,#GPIO_RED
-    bl BCM2536_GPIO_PinClr
+    bl BCM2836_GPIO_PinClr
     b light_done
   light_green:
     mov r0,#GPIO_GREEN
-    bl BCM2536_GPIO_PinSet
+    bl BCM2836_GPIO_PinSet
     mov r0,#GPIO_YELLOW
-    bl BCM2536_GPIO_PinClr
+    bl BCM2836_GPIO_PinClr
     mov r0,#GPIO_RED
-    bl BCM2536_GPIO_PinClr
+    bl BCM2836_GPIO_PinClr
     b light_done
   light_red:
     mov r0,#GPIO_GREEN
-    bl BCM2536_GPIO_PinClr
+    bl BCM2836_GPIO_PinClr
     mov r0,#GPIO_YELLOW
-    bl BCM2536_GPIO_PinClr
+    bl BCM2836_GPIO_PinClr
     mov r0,#GPIO_RED
-    bl BCM2536_GPIO_PinSet
+    bl BCM2836_GPIO_PinSet
     b light_done
 
 light_done:
@@ -169,14 +169,14 @@ light_done:
 	bal forever
 
 exit:
-	bl BCM2536_GPIO_Close
+	bl BCM2836_GPIO_Close
 	pop {r4-r9,fp,pc} // restore & return
 
 err_open:
 	push {r0,r7}
 	mov r0,#1	// stdout
-	ldr r1,=bcm2536_msg_err_open
-	mov	r2,#bcm2536_mln_err_open
+	ldr r1,=bcm2836_msg_err_open
+	mov	r2,#bcm2836_mln_err_open
 	mov r7,#SYSCALL_WRITE
 	swi #0
 	pop {r0,r7}

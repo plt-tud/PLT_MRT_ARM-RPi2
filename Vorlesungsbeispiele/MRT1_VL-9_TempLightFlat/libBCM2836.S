@@ -1,24 +1,24 @@
 @ Header
-.globl BCM2536_GPIO_GetBase, BCM2536_GPIO_Open, BCM2536_GPIO_Close, BCM2536_GPIO_PinSelFun, BCM2536_GPIO_PinSet, BCM2536_GPIO_PinClr, BCM2536_GPIO_PinSelDump
+.globl BCM2836_GPIO_GetBase, BCM2836_GPIO_Open, BCM2836_GPIO_Close, BCM2836_GPIO_PinSelFun, BCM2836_GPIO_PinSet, BCM2836_GPIO_PinClr, BCM2836_GPIO_PinSelDump
 
-.type  BCM2536_GPIO_Init,%function
-.type  BCM2536_GPIO_Close,%function
-.type  BCM2536_GPIO_PinSelFun,%function
-.type  BCM2536_GPIO_PinSet,%function
-.type  BCM2536_GPIO_PinClr,%function
-.type  BCM2536_GPIO_PinSelDump,%function
-.type  BCM2536_GPIO_GetBase,%function
+.type  BCM2836_GPIO_Init,%function
+.type  BCM2836_GPIO_Close,%function
+.type  BCM2836_GPIO_PinSelFun,%function
+.type  BCM2836_GPIO_PinSet,%function
+.type  BCM2836_GPIO_PinClr,%function
+.type  BCM2836_GPIO_PinSelDump,%function
+.type  BCM2836_GPIO_GetBase,%function
 
-.globl BCM2536_SPI0_GetBase,BCM2536_SPI0_Init,BCM2536_SPI0_Send
-.type  BCM2536_SPI0_GetBase,%function
-.type  BCM2536_SPI0_Init,%function
-.type  BCM2536_SPI0_Send,%function
+.globl BCM2836_SPI0_GetBase,BCM2836_SPI0_Init,BCM2836_SPI0_Send
+.type  BCM2836_SPI0_GetBase,%function
+.type  BCM2836_SPI0_Init,%function
+.type  BCM2836_SPI0_Send,%function
 
 .include "SYSCALL.h"
 // We share these constants with non-library sources
-.include "BCM2536_constants.h"
-.include "BCM2536_GPIO_constants.h"
-.include "BCM2536_SPI_constants.h"
+.include "BCM2836_constants.h"
+.include "BCM2836_GPIO_constants.h"
+.include "BCM2836_SPI_constants.h"
 
 /*********** Data ***********/
 .data
@@ -37,12 +37,12 @@ dev_mem_gpio_base_addr:	.word 0
  * GPIO Functions
  *********************/
 
-BCM2536_GPIO_GetBase:
+BCM2836_GPIO_GetBase:
   ldr r0, =dev_mem_gpio_base_addr
   ldr r0, [r0]
   mov pc, lr
 
-BCM2536_GPIO_Open:
+BCM2836_GPIO_Open:
   push {r4-r7,fp,lr}	// safe relevant registers (6)
   add fp,sp,#((6-1)*4)	// set frame pointer to lr at bottom of local stack
 
@@ -61,10 +61,10 @@ BCM2536_GPIO_Open:
   // dev_mem_gpio_base_addr = mmap(NULL, gpio_speicherbereich, PROT_READ|PROT_WRITE, MAP_SHARED)
   mov r4, r0
   mov r0, #0
-  mov r1, #BCM2536_GPIO_MEMSIZE
+  mov r1, #BCM2836_GPIO_MEMSIZE
   mov r2, #MMAP_PARAMETER_PROT_READ_WRITE
   mov r3, #MMAP_PARAMETER_MAP_SHARED
-  ldr r5, =BCM2536_GPIO_BASE        // mmap benutzt 4k bloecke und multipliziert unsere adresse intern; wir muessen etwas schieben
+  ldr r5, =BCM2836_GPIO_BASE        // mmap benutzt 4k bloecke und multipliziert unsere adresse intern; wir muessen etwas schieben
   lsr r5, r5, #12                   // aus 0x3f200000 sollte 0x3f200 werden...
   mov r7, #SYSCALL_MMAP2
   swi #0
@@ -75,8 +75,8 @@ BCM2536_GPIO_Open:
 exit:
   pop {r4-r7,fp,pc}					// restore saved registers
 
-@ BCM2536_GPIO_PinSelFun(GPIO-Pin, FunctionSelection)
-BCM2536_GPIO_PinSelFun:
+@ BCM2836_GPIO_PinSelFun(GPIO-Pin, FunctionSelection)
+BCM2836_GPIO_PinSelFun:
 	push {r4,r5,fp,lr} // safe 4 registers
 	add fp,sp,#((4-1)*4)
 
@@ -104,13 +104,13 @@ done: add r0,r0,r0,lsl #1	// R0 <- R0 * 3
 
 	pop {r4,r5,fp,pc}	// restore and return
 
-@ void BCM2536_GPIO_PinSet(GPIO_Pin)
-BCM2536_GPIO_PinSet:
+@ void BCM2836_GPIO_PinSet(GPIO_Pin)
+BCM2836_GPIO_PinSet:
 	push {fp,lr}
 	add fp,sp,#4
 
 	// r1 <- Offset to GPSET0 or GPSET1
-	mov r1,#BCM2536_GPSET_OFFSET
+	mov r1,#BCM2836_GPSET_OFFSET
 	cmp r0,#31		@ if (R0 > 31)
 	addgt r1,r1,#4	@	R1 <- R1 + 4
 
@@ -128,13 +128,13 @@ BCM2536_GPIO_PinSet:
 
 	pop {fp,pc} // restore saved registers and return
 
-@ void BCM2536_GPIO_PinClr(GPIO_Pin)
-BCM2536_GPIO_PinClr:
+@ void BCM2836_GPIO_PinClr(GPIO_Pin)
+BCM2836_GPIO_PinClr:
 	push {fp,lr}		// safe registers
 	add fp,sp,#((2-1)*4)	// set frame pointer to lr at bottom of stack
 
 	// r1 <- Offset to GPCLR0 or GPCLR1
-	mov r1,#BCM2536_GPCLR_OFFSET
+	mov r1,#BCM2836_GPCLR_OFFSET
 	cmp r0,#31		@ if (R0 > 31)
 	addgt r1,r1,#4	@	R1 <- R1 + 4
 
@@ -152,14 +152,14 @@ BCM2536_GPIO_PinClr:
 
 	pop {fp,pc} // restore & return
   
-BCM2536_GPIO_Close:
+BCM2836_GPIO_Close:
 	push {r4,r7,fp,lr}	// safe relevant registers (4)
 	add fp,sp,#((4-1)*4)// set frame pointer to lr at bottom of stack
 
   	// munmap
 	ldr r0,=dev_mem_gpio_base_addr
 	ldr r0,[r0]
-	mov r1,#BCM2536_GPIO_MEMSIZE
+	mov r1,#BCM2836_GPIO_MEMSIZE
 	mov r7,#SYSCALL_MUNMAP
 	swi #0
   
@@ -171,7 +171,7 @@ BCM2536_GPIO_Close:
 
 	pop {r4,r7,fp,pc} // restore & return
 
-BCM2536_GPIO_PinSelDump:
+BCM2836_GPIO_PinSelDump:
 	push {r4,r5,fp,lr} // safe 6 registers
 	add fp,sp,#((4-1)*4)
 
@@ -202,40 +202,40 @@ e_reg:	mov r0,#10
  * chapter 10, page 148ff.
  *********************/
 
-BCM2536_SPI0_GetBase:
+BCM2836_SPI0_GetBase:
 	ldr r0,=dev_mem_gpio_base_addr
 	ldr r0,[r0]
-	add r0,r0,#(BCM2536_SPI0_BASEOFFSET-BCM2536_GPIO_BASEOFFSET)
+	add r0,r0,#(BCM2836_SPI0_BASEOFFSET-BCM2836_GPIO_BASEOFFSET)
 	mov pc,lr
 
 // void bcm2836_spi_init(void)
-BCM2536_SPI0_Init:
+BCM2836_SPI0_Init:
   push {r4-r10,fp,lr} // Note: FP/R11 is not part of ARM EABI
 
   // FIXME: This bluntly assumes that GPIO_Init has been called!
-  bl BCM2536_SPI0_GetBase
+  bl BCM2836_SPI0_GetBase
   mov r4, r0 // r4 = SPI Base
 
   // set pin functions to alternate0
   mov r0,#7 // CE1
-  mov r1,#BCM2536_GPFSEL_ALT0
-  bl BCM2536_GPIO_PinSelFun
+  mov r1,#BCM2836_GPFSEL_ALT0
+  bl BCM2836_GPIO_PinSelFun
 
   mov r0,#8 // CE0
-  mov r1,#BCM2536_GPFSEL_ALT0
-  bl BCM2536_GPIO_PinSelFun
+  mov r1,#BCM2836_GPFSEL_ALT0
+  bl BCM2836_GPIO_PinSelFun
 
   mov r0,#9 // MISO
-  mov r1,#BCM2536_GPFSEL_ALT0
-  bl BCM2536_GPIO_PinSelFun
+  mov r1,#BCM2836_GPFSEL_ALT0
+  bl BCM2836_GPIO_PinSelFun
 
   mov r0,#10 // MOSI
-  mov r1,#BCM2536_GPFSEL_ALT0
-  bl BCM2536_GPIO_PinSelFun
+  mov r1,#BCM2836_GPFSEL_ALT0
+  bl BCM2836_GPIO_PinSelFun
 
   mov r0,#11 // CLK
-  mov r1,#BCM2536_GPFSEL_ALT0
-  bl BCM2536_GPIO_PinSelFun
+  mov r1,#BCM2836_GPFSEL_ALT0
+  bl BCM2836_GPIO_PinSelFun
 
   // initialize CS
   mov r0, #0
@@ -260,8 +260,8 @@ BCM2536_SPI0_Init:
 
   pop {r4-r10,fp,pc}
 
- // size_t bcm2536_spi0_send(size_t dataSz, void* txdata, void *rxdata)
- BCM2536_SPI0_Send:
+ // size_t bcm2836_spi0_send(size_t dataSz, void* txdata, void *rxdata)
+ BCM2836_SPI0_Send:
  /**
   * @brief: Send and receive dataSz bytes over SPI
   *
@@ -281,8 +281,8 @@ BCM2536_SPI0_Init:
   // FIXME: This function simply assumes SPI_Init and GPIO_Init where called...
 
   mov r7, r0  // dataSz:r7 = r0:dataSz
-  bl BCM2536_SPI0_GetBase
-  mov r4, r0  // r4 = BCM2536_SPI0_GetBase()
+  bl BCM2836_SPI0_GetBase
+  mov r4, r0  // r4 = BCM2836_SPI0_GetBase()
   mov r5, #0  // rxData:r5 = 0
   mov r6, #0  // txData:r6 = r0:dataSz
   mov r8, r1  // r8 = *txdata_ptr
@@ -295,48 +295,48 @@ BCM2536_SPI0_Init:
   orr r0,r0, #BCM2835_SPI0_CS_TA
   str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 
-  BCM2536_SPI0_Send_rxtxloop_start:
+  BCM2836_SPI0_Send_rxtxloop_start:
     // while (rxdata:r5 < dataSz:r7) ...
     cmp r5, r7
-    bge BCM2536_SPI0_Send_rxtxloop_end
+    bge BCM2836_SPI0_Send_rxtxloop_end
 
-    BCM2536_SPI0_Send_rxtxloop_rx:
+    BCM2836_SPI0_Send_rxtxloop_rx:
     // if (rxBuffer != Empty) {
     ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
     tst r0, #BCM2835_SPI0_CS_RXD_FIFO_NOTEMPTY
-    beq BCM2536_SPI0_Send_rxtxloop_rx_end
+    beq BCM2836_SPI0_Send_rxtxloop_rx_end
 
     // copy(SPI RX Buffer to rxdata[rxData++])
     ldr r0,[r4,#BCM2835_SPI0_FIFO_OFFSET] // read
     and r0,r0,#0xFF
     strb r0,[r9, r5]
     add r5, r5, #1 // rxData++
-    BCM2536_SPI0_Send_rxtxloop_rx_end: // }
+    BCM2836_SPI0_Send_rxtxloop_rx_end: // }
 
-    BCM2536_SPI0_Send_rxtxloop_tx:
+    BCM2836_SPI0_Send_rxtxloop_tx:
     // if (txdata:r6 < dataSz:r7 ...
     cmp r6, r7
-    bge BCM2536_SPI0_Send_rxtxloop_tx_end
+    bge BCM2836_SPI0_Send_rxtxloop_tx_end
     //  && txBuffer != Full ....
     ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
     tst r0, #BCM2835_SPI0_CS_TXD_FIFO_FULL
-    beq BCM2536_SPI0_Send_rxtxloop_tx_end
+    beq BCM2836_SPI0_Send_rxtxloop_tx_end
     // ... ) {
 
     // copy(txdata[txData++] to SPI TX Buffer);
     ldrb r0, [r8, r6]
     str  r0, [r4, #BCM2835_SPI0_FIFO_OFFSET]
     add  r6, r6, #1  // txData++
-    BCM2536_SPI0_Send_rxtxloop_tx_end: //}
+    BCM2836_SPI0_Send_rxtxloop_tx_end: //}
 
-    b BCM2536_SPI0_Send_rxtxloop_start
-  BCM2536_SPI0_Send_rxtxloop_end:
+    b BCM2836_SPI0_Send_rxtxloop_start
+  BCM2836_SPI0_Send_rxtxloop_end:
 
-  BCM2536_SPI0_Send_wait_for_done:
+  BCM2836_SPI0_Send_wait_for_done:
 
   ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET] // wait for done
   tst r0,#BCM2835_SPI0_CS_DONE
-  beq BCM2536_SPI0_Send_wait_for_done
+  beq BCM2836_SPI0_Send_wait_for_done
 
   ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
   bic r0,r0,#BCM2835_SPI0_CS_TA
