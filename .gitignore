@@ -44,5 +44,6 @@ coverage_report
 .kdev4
 .autotools
 /cmake-build*
+/.settings
 Debug*
 Release*

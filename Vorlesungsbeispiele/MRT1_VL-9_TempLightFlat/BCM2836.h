@@ -31,11 +31,11 @@
  * und stellt die einheitlichen Definitionsheader zur Verfuegung.
  */
 
-.extern BCM2536_GPIO_Open, BCM2536_GPIO_Close, BCM2536_GPIO_PinSelFun, BCM2536_GPIO_PinSet, BCM2536_GPIO_PinClr
-
 // Register/Offset-Definitionen und Konstanten fuer GPIOs
-.include "BCM2536_GPIO_constants.h"
+.extern BCM2836_GPIO_Open, BCM2836_GPIO_Close, BCM2836_GPIO_PinSelFun, BCM2836_GPIO_PinSet, BCM2836_GPIO_PinClr
+.include "BCM2836_GPIO_constants.h"
 
 // Register/Offset-Definitionen und Konstanten fuer SPI
-.include "BCM2536_SPI_constants.h"
+.extern BCM2836_SPI0_GetBase, BCM2836_SPI0_Init, BCM2836_SPI0_Send
+.include "BCM2836_SPI_constants.h"
 

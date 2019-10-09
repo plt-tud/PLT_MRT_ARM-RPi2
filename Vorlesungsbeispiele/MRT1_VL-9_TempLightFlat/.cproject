@@ -31,8 +31,8 @@
 								<option id="gnu.cpp.compiler.option.debugging.level.563837273" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1702628132" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker">
-								<option id="gnu.c.link.option.noshared.1546204912" superClass="gnu.c.link.option.noshared" useByScannerDiscovery="false" value="true" valueType="boolean"/>
-								<option id="gnu.c.link.option.ldflags.718375287" superClass="gnu.c.link.option.ldflags" useByScannerDiscovery="false" value="-g" valueType="string"/>
+								<option id="gnu.c.link.option.noshared.1546204912" name="No shared libraries (-static)" superClass="gnu.c.link.option.noshared" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="gnu.c.link.option.ldflags.718375287" name="Linker flags" superClass="gnu.c.link.option.ldflags" useByScannerDiscovery="false" value="-g" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.488418453" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>

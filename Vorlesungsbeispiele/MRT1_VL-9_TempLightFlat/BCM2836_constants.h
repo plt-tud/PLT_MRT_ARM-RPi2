@@ -27,4 +27,4 @@
 
 // @ Definitionen
 // Aus Bootloader, Mapping v. physischem Speicher 0x7Exxxxx --> 0x3fxxxxxx
-.equ BCM2536_PERI_BASE,         0x3f000000
+.equ BCM2836_PERI_BASE,         0x3f000000
