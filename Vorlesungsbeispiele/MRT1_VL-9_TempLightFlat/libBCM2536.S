@@ -9,9 +9,10 @@
 .type  BCM2536_GPIO_PinSelDump,%function
 .type  BCM2536_GPIO_GetBase,%function
 
-.globl BCM2536_SPI0_GetBase,BCM2536_SPI0_Init
+.globl BCM2536_SPI0_GetBase,BCM2536_SPI0_Init,BCM2536_SPI0_Send
 .type  BCM2536_SPI0_GetBase,%function
 .type  BCM2536_SPI0_Init,%function
+.type  BCM2536_SPI0_Send,%function
 
 .include "SYSCALL.h"
 // We share these constants with non-library sources
@@ -207,9 +208,13 @@ BCM2536_SPI0_GetBase:
 	add r0,r0,#(BCM2536_SPI0_BASEOFFSET-BCM2536_GPIO_BASEOFFSET)
 	mov pc,lr
 
-
+// void bcm2836_spi_init(void)
 BCM2536_SPI0_Init:
   push {r4-r10,fp,lr} // Note: FP/R11 is not part of ARM EABI
+
+  // FIXME: This bluntly assumes that GPIO_Init has been called!
+  bl BCM2536_SPI0_GetBase
+  mov r4, r0 // r4 = SPI Base
 
   // set pin functions to alternate0
   mov r0,#7 // CE1
@@ -251,6 +256,90 @@ BCM2536_SPI0_Init:
   bic r0,r0,#BCM2835_SPI0_CS_CPOL
   bic r0,r0,#BCM2835_SPI0_CS_CPHA
   bic r0,r0,#BCM2835_SPI0_CS_CS
+  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+
+  pop {r4-r10,fp,pc}
+
+ // size_t bcm2536_spi0_send(size_t dataSz, void* txdata, void *rxdata)
+ BCM2536_SPI0_Send:
+ /**
+  * @brief: Send and receive dataSz bytes over SPI
+  *
+  * Assume *data points to dataSz bytes of data. proceed as follows:
+  *
+  * Clear RX/TX FiFos;
+  * rxData = 0;
+  * txData = 0;
+  * while (rxData < dataSz) {
+  *   if (txBuffer != Full && txData < dataSz)
+  *     copy(txdata[txData++] to SPI TX Buffer);
+  *   if (rxBuffer != Empty)
+  *     copy(SPI RX Buffer to rxdata[rxData++])
+  * }
+  */
+  push {r4-r10,fp,lr} // Note: FP/R11 is not part of ARM EABI; but we save it anyway
+  // FIXME: This function simply assumes SPI_Init and GPIO_Init where called...
+
+  mov r7, r0  // dataSz:r7 = r0:dataSz
+  bl BCM2536_SPI0_GetBase
+  mov r4, r0  // r4 = BCM2536_SPI0_GetBase()
+  mov r5, #0  // rxData:r5 = 0
+  mov r6, #0  // txData:r6 = r0:dataSz
+  mov r8, r1  // r8 = *txdata_ptr
+  mov r9, r2  // r9 = *rxdata_ptr
+
+  // clear fifos and set TA
+  // CS = CS | (CLEAR|TA)
+  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+  orr r0,r0, #BCM2835_SPI0_CS_CLEAR
+  orr r0,r0, #BCM2835_SPI0_CS_TA
+  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+
+  BCM2536_SPI0_Send_rxtxloop_start:
+    // while (rxdata:r5 < dataSz:r7) ...
+    cmp r5, r7
+    bge BCM2536_SPI0_Send_rxtxloop_end
+
+    BCM2536_SPI0_Send_rxtxloop_rx:
+    // if (rxBuffer != Empty) {
+    ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+    tst r0, #BCM2835_SPI0_CS_RXD_FIFO_NOTEMPTY
+    beq BCM2536_SPI0_Send_rxtxloop_rx_end
+
+    // copy(SPI RX Buffer to rxdata[rxData++])
+    ldr r0,[r4,#BCM2835_SPI0_FIFO_OFFSET] // read
+    and r0,r0,#0xFF
+    strb r0,[r9, r5]
+    add r5, r5, #1 // rxData++
+    BCM2536_SPI0_Send_rxtxloop_rx_end: // }
+
+    BCM2536_SPI0_Send_rxtxloop_tx:
+    // if (txdata:r6 < dataSz:r7 ...
+    cmp r6, r7
+    bge BCM2536_SPI0_Send_rxtxloop_tx_end
+    //  && txBuffer != Full ....
+    ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+    tst r0, #BCM2835_SPI0_CS_TXD_FIFO_FULL
+    beq BCM2536_SPI0_Send_rxtxloop_tx_end
+    // ... ) {
+
+    // copy(txdata[txData++] to SPI TX Buffer);
+    ldrb r0, [r8, r6]
+    str  r0, [r4, #BCM2835_SPI0_FIFO_OFFSET]
+    add  r6, r6, #1  // txData++
+    BCM2536_SPI0_Send_rxtxloop_tx_end: //}
+
+    b BCM2536_SPI0_Send_rxtxloop_start
+  BCM2536_SPI0_Send_rxtxloop_end:
+
+  BCM2536_SPI0_Send_wait_for_done:
+
+  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET] // wait for done
+  tst r0,#BCM2835_SPI0_CS_DONE
+  beq BCM2536_SPI0_Send_wait_for_done
+
+  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+  bic r0,r0,#BCM2835_SPI0_CS_TA
   str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 
   pop {r4-r10,fp,pc}

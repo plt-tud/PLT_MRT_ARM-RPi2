@@ -58,3 +58,7 @@
 .equ BCM2835_SPI0_CS_CPOL,     0x00000008 // Clock Polarity
 .equ BCM2835_SPI0_CS_CPHA,     0x00000004 // Clock Phase
 .equ BCM2835_SPI0_CS_CS,       0x00000003 // Chip Select
+
+// Aliases, a bit more descriptive
+.equ BCM2835_SPI0_CS_TXD_FIFO_FULL, BCM2835_SPI0_CS_TXD
+.equ BCM2835_SPI0_CS_RXD_FIFO_NOTEMPTY, BCM2835_SPI0_CS_RXD
