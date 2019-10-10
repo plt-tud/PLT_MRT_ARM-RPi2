@@ -69,8 +69,9 @@
  *
  * From Microchip MCP3008 datasheet:
  * MCP3008:  D    = 1024 x V / V_ref (10-bit ADC)
- *           10mV = 31 descrete units = 1 °C
  *     --> d2c(d) = v3c(d/1024 * 3.3_V)
+ *
+ *     10 discrete units ~= 3,22 °C
  */
 .equ DC_SENSE, 10 // sensitivity, empirical value for warming up the sensor by hoding in hand at ~23 C
 
