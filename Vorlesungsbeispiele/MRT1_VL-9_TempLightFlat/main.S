@@ -47,9 +47,9 @@
  * @param USE_BOARDLEDS Selects either external LEDs (nice, safe) or on-board LEDs for
  *                      this example
  */
-.equ USE_BOARDLEDS,1
+.equ USE_BOARDLEDS,0
 
-.if USE_BOARDLEDS==0
+.if (USE_BOARDLEDS == 0)
   /* These LEDs can be connected to the LK Linker Kit
    */
   .equ GPIO_RED,    26
@@ -64,12 +64,13 @@
 .endif
 
 /* From Analog Devices TMP35/36/37 Datasheet:
- * TMP35  V = 10 mV/°C, 25°C=250 mV
+ * TMP36  V = 10 mV/°C, 25°C=750 mV
+ *     --> v2c(v) = (v_V-0.75_V)/0.01_V + 25°C
  *
  * From Microchip MCP3008 datasheet:
  * MCP3008:  D    = 1024 x V / V_ref (10-bit ADC)
  *           10mV = 31 descrete units = 1 °C
- *           10 descrete units = 0,322 °C
+ *     --> d2c(d) = v3c(d/1024 * 3.3_V)
  */
 .equ DC_SENSE, 10 // sensitivity, empirical value for warming up the sensor by hoding in hand at ~23 C
 
