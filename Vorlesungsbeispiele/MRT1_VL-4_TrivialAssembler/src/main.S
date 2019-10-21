@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2017 Chris Iatrou <chris_paul.iatrou//tu-dresden.de>
- * Copyright (c) 2018 Leon Urbas <leon.urbas//tu-dresden.de>
- * Copyright (c) 2019 Chris Iatrou <chris_paul.iatrou//tu-dresden.de>
+ * Copyright (c) 2017 Chris Iatrou <chris_paul.iatrou@tu-dresden.de>
+ * Copyright (c) 2018 Leon Urbas <leon.urbas@tu-dresden.de>
+ * Copyright (c) 2019 Chris Iatrou <chris_paul.iatrou@tu-dresden.de>
  *
  * Hiermit wird unentgeltlich jeder Person, die eine Kopie der
  * Software und der zugehörigen Dokumentationen (die "Software")
@@ -25,6 +25,13 @@
  * VERTRAGES, EINES DELIKTES ODER ANDERS IM ZUSAMMENHANG MIT
  * DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
  */
+
+/**
+ *  @brief: Kopiere einen Block aus 8 32bit Datenwerten aus einem .data-wert in einen anderen
+ *
+ * Das Program demonstriert die Nutzung von Load/Store-multiple sowie die Nutzung des Stacks
+ */
+
 //
 // Toolchain Setting:
 //	Cross GCC Assembler: -adhlns="$//.lst"
