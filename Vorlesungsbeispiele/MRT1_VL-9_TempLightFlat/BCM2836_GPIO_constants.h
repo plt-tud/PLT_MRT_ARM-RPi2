@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2017 Chris Iatrou <chris_paul.iatrou//tu-dresden.de>
+ * Copyright (c) 2018 Leon Urbas <leon.urbas@tu-dresden.de>
+ * Copyright (c) 2019 Chris Iatrou <chris_paul.iatrou@tu-dresden.de>
  *
  * Hiermit wird unentgeltlich jeder Person, die eine Kopie der
  * Software und der zugehörigen Dokumentationen (die "Software")
@@ -24,37 +25,26 @@
  * DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
  */
 
-.global main
-.func main
-.balign 4
+// GPFSEL Codes (BCM2835 ARM Peripherals, 2012, Table 6-1, p. 92)
+.equ BCM2836_GPFSEL_INPUT,  0b000
+.equ BCM2836_GPFSEL_OUTPUT, 0b001
+.equ BCM2836_GPFSEL_ALT0,   0b100
+.equ BCM2836_GPFSEL_ALT1,   0b101
+.equ BCM2836_GPFSEL_ALT2,   0b110
+.equ BCM2836_GPFSEL_ALT3,   0b111
+.equ BCM2836_GPFSEL_ALT4,   0b011
+.equ BCM2836_GPFSEL_ALT5,   0b010
 
-fib:
-  // r0 = Parameter
-  CMP r0, #0		// if (n==0) {
-  MOVEQ r0, #0
-  BXEQ LR           // return 0; }
-  CMP r0, #1		// if (n==1) {
-  MOVEQ r0, #1
-  BXEQ LR           // return 1;}
-  MOV R1, R0 		// lokale Kopie von n
-  MOV R2, #0 		// temp = 0
-  SUB R0, #1
-  push {r1-r11, lr}
-  BL fib
-  pop {r1-r11, lr}
-  MOV R2, R0 		// temp = fib(n-1)
-  MOV R0, R1
-  SUB R0, #2
-  push {r1-r11, lr}
-  BL fib
-  pop {r1-r11, lr}
-  ADD R2, R0 		// temp = temp + fib(n-2)
-  MOV R0, R2 		// return temp
-  BX LR
+// Aus BCM2836 Datenblatt, Abschnitt GPIOs
+.equ BCM2836_GPIO_BASEOFFSET,   0x200000
+.equ BCM2836_GPIO_LASTADDRESS,  0x2000B4
+.equ BCM2836_GPIO_MEMSIZE,      0x4100 // Must be >=4k according to manual !
+.equ BCM2836_GPIO_BASE, BCM2836_PERI_BASE + BCM2836_GPIO_BASEOFFSET
 
-main:
-  push {r1-r11, lr}
-  MOV r0, #4
-  BL fib
-  pop {r1-r11, lr}
-  BX  LR
+.equ BCM2836_GPFSEL_OFFSET, 0
+.equ BCM2836_GPSET_OFFSET,  0x1C
+.equ BCM2836_GPCLR_OFFSET,  0x28
+
+.equ BCM2836_SPI0_BASEOFFSET, 0x204000
+.equ BCM2836_SPI1_BASEOFFSET, 0x215000
+.equ BCM2836_SPI2_BASEOFFSET, 0x215080

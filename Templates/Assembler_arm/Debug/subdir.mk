@@ -14,7 +14,7 @@ OBJS += \
 %.o: ../%.S
 	@echo 'Building file: $<'
 	@echo 'Invoking: Cross GCC Assembler'
-	arm-linux-gnueabihf-as  -o "$@" "$<"
+	arm-linux-gnueabihf-as -g -gstabs -adhlns="$@.lst" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

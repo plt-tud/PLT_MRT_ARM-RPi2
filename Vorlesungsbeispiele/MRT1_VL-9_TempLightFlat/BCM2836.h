@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2017 Chris Iatrou <chris_paul.iatrou//tu-dresden.de>
+ * Copyright (c) 2018 Leon Urbas <leon.urbas@tu-dresden.de>
+ * Copyright (c) 2019 Chris Iatrou <chris_paul.iatrou@tu-dresden.de>
  *
  * Hiermit wird unentgeltlich jeder Person, die eine Kopie der
  * Software und der zugehörigen Dokumentationen (die "Software")
@@ -24,37 +25,17 @@
  * DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
  */
 
-.global main
-.func main
-.balign 4
+/* @brief: Header fuer Programme, die unsere libBCM nutzen wollen.
+ *
+ * Der Header definiert unsere Bibliotheksfunktionen als "extern"
+ * und stellt die einheitlichen Definitionsheader zur Verfuegung.
+ */
 
-fib:
-  // r0 = Parameter
-  CMP r0, #0		// if (n==0) {
-  MOVEQ r0, #0
-  BXEQ LR           // return 0; }
-  CMP r0, #1		// if (n==1) {
-  MOVEQ r0, #1
-  BXEQ LR           // return 1;}
-  MOV R1, R0 		// lokale Kopie von n
-  MOV R2, #0 		// temp = 0
-  SUB R0, #1
-  push {r1-r11, lr}
-  BL fib
-  pop {r1-r11, lr}
-  MOV R2, R0 		// temp = fib(n-1)
-  MOV R0, R1
-  SUB R0, #2
-  push {r1-r11, lr}
-  BL fib
-  pop {r1-r11, lr}
-  ADD R2, R0 		// temp = temp + fib(n-2)
-  MOV R0, R2 		// return temp
-  BX LR
+// Register/Offset-Definitionen und Konstanten fuer GPIOs
+.extern BCM2836_GPIO_Open, BCM2836_GPIO_Close, BCM2836_GPIO_PinSelFun, BCM2836_GPIO_PinSet, BCM2836_GPIO_PinClr
+.include "BCM2836_GPIO_constants.h"
 
-main:
-  push {r1-r11, lr}
-  MOV r0, #4
-  BL fib
-  pop {r1-r11, lr}
-  BX  LR
+// Register/Offset-Definitionen und Konstanten fuer SPI
+.extern BCM2836_SPI0_GetBase, BCM2836_SPI0_Init, BCM2836_SPI0_Send
+.include "BCM2836_SPI_constants.h"
+
