@@ -1,4 +1,4 @@
-.data
+	.data
 .balign 4
 var_a: .word 0x00000000
 var_b: .word 0x00000010
@@ -38,6 +38,7 @@ if_done:
 // WHILE ( A < B) {A++}
 
 loop0_start:
+  /*Setup & Test loop expression*/
   // Ergebniss aus Ausdruck A in r0
   ldr r0, =var_a  // load pointer to a
   ldr r0, [r0]    // load value of a
@@ -48,11 +49,13 @@ loop0_start:
   cmp r0, r1      // compare a and b
   bge loop0_end   // skip IF section if b >= a
 
+  /*Loop Body*/
   ldr r1, =var_a  // load pointer to a
   ldr r0, [r1]    // load value of a
   add r0, r0, #1
   str r0, [r1]
 
+  /*Loop End*/
   b loop0_start
 loop0_end:
 
@@ -60,17 +63,20 @@ loop0_end:
 // Abweisende Schleife
 // do {A--} while ( a > 0)
 loop1_start:
+  /*Loop Body*/
   ldr r1, =var_a  // load pointer to a
   ldr r0, [r1]    // load value of a
   sub r0, r0, #1  // a--
+  str r0, [r1]    // store value of a
 
+  /*Setup & Test loop expression*/
   ldr r0, =var_a  // load pointer to a
   ldr r0, [r0]    // load value of a
-
   mov r1, #0
+  cmp r0, r1      // compare a and 0
 
-  cmp r0, r1      // compare a and b
-  ble loop1_start // skip IF section if 0 <= a
+  /*Loop End*/
+  bgt loop1_start // skip IF section if 0 <= a
 
 
 /**********************************/
@@ -82,7 +88,7 @@ for_loop_init:
 for_loop_test:
   mov r0, #10
   cmp r10, r0 // r10 <= 10
-  ble for_loop_done
+  bgt for_loop_done
 
   ldr r1, =var_b
   ldr r0, [r1]
@@ -91,6 +97,7 @@ for_loop_test:
 
 for_loop_advance:
   add r10, r10, #1
+  b for_loop_test
 
 for_loop_done:
 
@@ -100,7 +107,7 @@ for_loop_done:
   // rufe r0 = sum2(1, 11) auf
   // alle Paramter passen in die register
   mov r0, #1
-  mov r0, #11
+  mov r1, #11
   bl sum2
 
   // rufe r0 = sum7(1, 2, 3, 4, 5, 6, 7) auf
@@ -131,7 +138,9 @@ for_loop_done:
 // int sum2(int a, int b)
 sum2:
   // EABI: Wir muessen die Register des Aufrufers sichern!
+  mov   ip, sp			// Move our sp to ipc-scratch (parents FP still active)
   stmfd sp!,{r4-r11,lr} // r0-r4 duerfen von sum2 veraendert werden
+  mov   fp, ip			// Setup our own FP
 
   // int a = r0, int b = r1
   add r0, r0, r1 // R0=A+B
@@ -147,7 +156,9 @@ sum2:
 //              a...d sind r0..r3, der rest liegt auf dem stack
 sum7:
   // EABI: Wir muessen die Register des Aufrufers sichern!
-  stmfd sp!,{r4-r10,r11,lr}
+  mov   ip, sp			// Move our sp to scratch (parents FP still active)
+  stmfd sp!,{r4-r11,lr} // r0-r4 duerfen von sum2 veraendert werden
+  mov   fp, ip			// Setup our own FP
 
   // int a = r0, int b = r1
   add r0, r0, r1 // R0=A+B
@@ -156,11 +167,11 @@ sum7:
 
   // Die Argumente d...g liegen auf dem Stack
   // fp zeigt auf die Adresse direkt nach dem
-  ldr r1, [fp, #8] // R0+=E
+  ldr r1, [fp, #0] // R0+=E
   add r0, r1
   ldr r1, [fp, #4] // R0+=F
   add r0, r1
-  ldr r1, [fp, #0] // R0+=G
+  ldr r1, [fp, #8] // R0+=G
   add r0, r1
 
   // R0=return value
