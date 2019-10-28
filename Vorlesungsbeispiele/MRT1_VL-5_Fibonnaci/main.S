@@ -31,21 +31,30 @@
 
 .func main
 main:
-  push {r1-r11, lr}
+  stmfd sp!,{r4-r11,lr}
+  // Test Pass/Fail
+  mov r4, #0
 
   // Run tests
   BL test_fib_recursive_zero
-  BL test_fib_recursive_one
-  BL test_fib_recursive_two
-  BL test_fib_recursive_4m
+  ORR r4, r4, r0
 
-  BX  LR
+  BL test_fib_recursive_one
+  ORR r4, r4, r0
+
+  BL test_fib_recursive_two
+  ORR r4, r4, r0
+
+  mov r0, r4
+
+  ldmfd sp!,{r4-r11,lr}
+  bx  LR
 .endfunc
 
 .func test_fib_recursive_zero
 test_fib_recursive_zero:
   // small test wrapper: Return 0 if fib(0)==0
-  // We only use temporary regs, no need to save regs
+  stmfd sp!,{r4-r11,lr}
 
   // Test
   mov r0, #0
@@ -55,13 +64,15 @@ test_fib_recursive_zero:
   cmp r1, r0
   moveq r0, #0
   movne r0, #1
+
+  ldmfd sp!,{r4-r10,r11,lr}
   bx lr
 .endfunc
 
 .func test_fib_recursive_one
 test_fib_recursive_one:
   // small test wrapper: Return 0 if fib(0)==0
-  // We only use temporary regs, no need to save regs
+  stmfd sp!,{r4-r11,lr}
 
   // Test
   mov r0, #1
@@ -71,39 +82,28 @@ test_fib_recursive_one:
   cmp r1, r0
   moveq r0, #0
   movne r0, #1
+
+  ldmfd sp!,{r4-r10,r11,lr}
   bx lr
 .endfunc
 
 .func test_fib_recursive_two
 test_fib_recursive_two:
   // small test wrapper: Return 0 if fib(0)==0
-  // We only use temporary regs, no need to save regs
+  stmfd sp!,{r4-r11,lr}
 
   // Test
   mov r0, #2
   bl fib_recursive
-  mov r1, #2 // should be 2
+  mov r1, #1 // should be 1
 
   cmp r1, r0
   moveq r0, #0
   movne r0, #1
+
+  ldmfd sp!,{r4-r10,r11,lr}
   bx lr
 .endfunc
 
-.func test_fib_recursive_4m
-test_fib_recursive_4m:
-  // small test wrapper: Return 0 if fib(0)==0
-  // We only use temporary regs, no need to save regs
-
-  // Test
-  mov r0, #0xFFFFFFFF
-  bl fib_recursive
-  mov r1, #0 // should be 0
-
-  cmp r1, r0
-  moveq r0, #0
-  movne r0, #1
-  bx lr
-.endfunc
 
 

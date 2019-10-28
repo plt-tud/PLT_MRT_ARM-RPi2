@@ -35,7 +35,7 @@
 fib_iterative:
   // EABI: Wir muessen die Register des Aufrufers sichern!
   mov   ip, sp      // Move our sp to scratch (parents FP still active)
-  stmfd sp!,{r4-r11,lr} // r0-r4 duerfen von sum2 veraendert werden
+  stmfd sp!,{r4-r11,lr} // r0-r4 duerfen veraendert werden
   mov   fp, ip      // Setup our own FP
 
 
@@ -50,34 +50,35 @@ fib_iterative:
 fib_recursive:
   // EABI: Wir muessen die Register des Aufrufers sichern!
   mov   ip, sp          // Move our sp to scratch (parents FP still active)
-  stmfd sp!,{r4-r11,lr} // r0-r4 duerfen von sum2 veraendert werden
+  stmfd sp!,{r4-r11,lr} // r0-r4 duerfen veraendert werden
   mov   fp, ip          // Setup our own FP
 
   // r0 = Parameter
-  CMP   r0, #0    // if (n==0) {
+  // if (n==0) { (optimierte Selektion)
+  CMP   r0, #0
   MOVEQ r0, #0
-  BEQ   fib_recursive_done        // return 0; }
+  BEQ   fib_recursive_done
+  //}
 
-  CMP   r0, #1    // if (n==1) {
+  // if (n==1) {  (optimierte Selektion)
+  CMP   r0, #1
   MOVEQ r0, #1
-  BEQ   fib_recursive_done        // return 1;}
+  BEQ   fib_recursive_done
+  //}
 
-  MOV   R1, R0    // lokale Kopie von n
-  MOV   R2, #0    // temp = 0
   SUB   R0, #1
-  BL fib_recursive
+  MOV   R4, R0     //  temp = n-1
+  BL    fib_recursive
+  MOV   R5, R0     // temp2=fib(n-1)
 
-  MOV R2, R0      // temp = fib(n-1)
-  MOV R0, R1
-  SUB R0, #2
-  BL fib_recursive
+  SUB   R0, R4, #1 // r0=n-2
+  BL    fib_recursive
 
-  ADD R2, R0      // temp = temp + fib(n-2)
-  MOV R0, R2      // return temp
+  ADD   R0, R0, R5  // temp = temp + fib(n-2)
 
  fib_recursive_done:
   // R0=return value
   // EABI: Wir muessen die Register des Aufrufers wiederherstellen!
-  ldmfd sp!,{r4-r10,r11,lr}
+  ldmfd sp!,{r4-r11,lr}
   bx lr
 .endfunc
