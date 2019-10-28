@@ -32,12 +32,40 @@
 .global fib_recursive, fib_iterative
 
 .func fib_iterative
+// uint32_t fib(uint32_t n)
 fib_iterative:
   // EABI: Wir muessen die Register des Aufrufers sichern!
   mov   ip, sp      // Move our sp to scratch (parents FP still active)
   stmfd sp!,{r4-r11,lr} // r0-r4 duerfen veraendert werden
   mov   fp, ip      // Setup our own FP
 
+  cmp   r0, #0 // if (n==0)
+  moveq r0, #0 // ... optimierbar
+  beq   fib_iterative_done
+
+  cmp   r0, #1 // if (n==1)
+  moveq r0, #1 // ... optimierbar
+  beq   fib_iterative_done
+
+  mov r1, #1 // r1 := temp_n-1; initial = fib(1) = 1
+  mov r2, #0 // r2 := temp_n-2; initial = fib(0) = 0
+  mov r3, #2 // r3 := k; iterator
+  mov r4, r0 // r4 := n
+
+fib_iterative_loop_test:
+  cmp r4, r3              // while (k <= n)
+  blt fib_iterative_done
+
+fib_iterative_loop_do:
+  add r0, r1, r2
+  mov r2, r1
+  mov r1, r0
+
+fib_iterative_loop_increment:
+  add r3, r3, #1           // k=k+1
+  b fib_iterative_loop_test
+
+fib_iterative_done:
 
   // R0=return value
   // EABI: Wir muessen die Register des Aufrufers wiederherstellen!
