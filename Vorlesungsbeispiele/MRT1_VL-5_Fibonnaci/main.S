@@ -23,38 +23,87 @@
  * VERTRAGES, EINES DELIKTES ODER ANDERS IM ZUSAMMENHANG MIT
  * DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
  */
+.data
 
+.text
 .global main
-.func main
 .balign 4
 
-fib:
-  // r0 = Parameter
-  CMP r0, #0		// if (n==0) {
-  MOVEQ r0, #0
-  BXEQ LR           // return 0; }
-  CMP r0, #1		// if (n==1) {
-  MOVEQ r0, #1
-  BXEQ LR           // return 1;}
-  MOV R1, R0 		// lokale Kopie von n
-  MOV R2, #0 		// temp = 0
-  SUB R0, #1
-  push {r1-r11, lr}
-  BL fib
-  pop {r1-r11, lr}
-  MOV R2, R0 		// temp = fib(n-1)
-  MOV R0, R1
-  SUB R0, #2
-  push {r1-r11, lr}
-  BL fib
-  pop {r1-r11, lr}
-  ADD R2, R0 		// temp = temp + fib(n-2)
-  MOV R0, R2 		// return temp
-  BX LR
-
+.func main
 main:
   push {r1-r11, lr}
-  MOV r0, #4
-  BL fib
-  pop {r1-r11, lr}
+
+  // Run tests
+  BL test_fib_recursive_zero
+  BL test_fib_recursive_one
+  BL test_fib_recursive_two
+  BL test_fib_recursive_4m
+
   BX  LR
+.endfunc
+
+.func test_fib_recursive_zero
+test_fib_recursive_zero:
+  // small test wrapper: Return 0 if fib(0)==0
+  // We only use temporary regs, no need to save regs
+
+  // Test
+  mov r0, #0
+  bl fib_recursive
+  mov r1, #0 // should be 0
+
+  cmp r1, r0
+  moveq r0, #0
+  movne r0, #1
+  bx lr
+.endfunc
+
+.func test_fib_recursive_one
+test_fib_recursive_one:
+  // small test wrapper: Return 0 if fib(0)==0
+  // We only use temporary regs, no need to save regs
+
+  // Test
+  mov r0, #1
+  bl fib_recursive
+  mov r1, #1 // should be 1
+
+  cmp r1, r0
+  moveq r0, #0
+  movne r0, #1
+  bx lr
+.endfunc
+
+.func test_fib_recursive_two
+test_fib_recursive_two:
+  // small test wrapper: Return 0 if fib(0)==0
+  // We only use temporary regs, no need to save regs
+
+  // Test
+  mov r0, #2
+  bl fib_recursive
+  mov r1, #2 // should be 2
+
+  cmp r1, r0
+  moveq r0, #0
+  movne r0, #1
+  bx lr
+.endfunc
+
+.func test_fib_recursive_4m
+test_fib_recursive_4m:
+  // small test wrapper: Return 0 if fib(0)==0
+  // We only use temporary regs, no need to save regs
+
+  // Test
+  mov r0, #0xFFFFFFFF
+  bl fib_recursive
+  mov r1, #0 // should be 0
+
+  cmp r1, r0
+  moveq r0, #0
+  movne r0, #1
+  bx lr
+.endfunc
+
+
