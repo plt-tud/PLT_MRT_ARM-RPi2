@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2017 Chris Iatrou <chris_paul.iatrou//tu-dresden.de>
+ * Copyright (c) 2017 Chris Iatrou <chris_paul.iatrou@tu-dresden.de>
+ * Copyright (c) 2019 Chris Iatrou <chris_paul.iatrou@tu-dresden.de>
  *
  * Hiermit wird unentgeltlich jeder Person, die eine Kopie der
  * Software und der zugehörigen Dokumentationen (die "Software")
