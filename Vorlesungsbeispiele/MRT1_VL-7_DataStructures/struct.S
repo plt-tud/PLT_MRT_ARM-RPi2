@@ -36,7 +36,7 @@
  .global structs_example
 
  .func structs_example
- array_example:
+ structs_example:
   mov   ip, sp
   stmfd sp!,{r4-r11,lr}
   mov   fp, ip
