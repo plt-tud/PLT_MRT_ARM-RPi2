@@ -73,6 +73,8 @@ main:
 
   bl matrix_example
 
+  bl structs_example
+
 	stmfd sp!,{r4-r11,lr}
 	bx    lr
 .endfunc

@@ -90,7 +90,7 @@ MATRIX: .skip P_MATRIX_DIM_I*P_MATRIX_DIM_J*P_MATRIX_ELEMENT_SIZE, 0
   matrix_example_calc2daddress_end:
 
   // Template: Sektion
-  // Mehrdimensionale Felder int[8][3]
+  // Zugriff auf Feld[2,1]
   matrix_example_accessdata:
     ldr r0, [r1]
     add r0, #42 // Veraendere Wert
