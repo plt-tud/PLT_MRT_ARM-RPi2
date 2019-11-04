@@ -1,5 +1,59 @@
+/*
+ * Copyright (c) 2017 Chris Iatrou <chris_paul.iatrou@tu-dresden.de>
+ * Copyright (c) 2018 Leon Urbas <leon.urbas@tu-dresden.de>
+ * Copyright (c) 2019 Chris Iatrou <chris_paul.iatrou@tu-dresden.de>
+ *
+ * Hiermit wird unentgeltlich jeder Person, die eine Kopie der
+ * Software und der zugehörigen Dokumentationen (die "Software")
+ * erhält, die Erlaubnis erteilt, sie uneingeschränkt zu nutzen,
+ * inklusive und ohne Ausnahme mit dem Recht, sie zu verwenden,
+ * zu kopieren, zu verändern, zusammenzufügen, zu veröffentlichen,
+ * zu verbreiten, zu unterlizenzieren und/oder zu verkaufen, und
+ * Personen, denen diese Software überlassen wird, diese Rechte
+ * zu verschaffen, unter den folgenden Bedingungen:
+ *
+ * Der obige Urheberrechtsvermerk und dieser Erlaubnisvermerk
+ * sind in allen Kopien oder Teilkopien der Software beizulegen.
+ *
+ * DIE SOFTWARE WIRD OHNE JEDE AUSDRÜCKLICHE ODER IMPLIZIERTE
+ * GARANTIE BEREITGESTELLT, EINSCHLIEẞLICH DER GARANTIE ZUR
+ * BENUTZUNG FÜR DEN VORGESEHENEN ODER EINEM BESTIMMTEN ZWECK
+ * SOWIE JEGLICHER RECHTSVERLETZUNG, JEDOCH NICHT DARAUF
+ * BESCHRÄNKT. IN KEINEM FALL SIND DIE AUTOREN ODER
+ * COPYRIGHTINHABER FÜR JEGLICHEN SCHADEN ODER SONSTIGE
+ * ANSPRÜCHE HAFTBAR ZU MACHEN, OB INFOLGE DER ERFÜLLUNG EINES
+ * VERTRAGES, EINES DELIKTES ODER ANDERS IM ZUSAMMENHANG MIT
+ * DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
+ */
 
-@ Definitionen
+
+/**
+ * @brief: GPIO27_Toggle_Once schaltet LED an GPIO 27 aus-an-aus
+ */
+
+.equ DEBUG,0
+
+/**
+ * @param USE_BOARDLEDS Selects either external LEDs (nice, safe) or on-board LEDs for
+ *                      this example
+ */
+.equ USE_BOARDLEDS,1
+.if (USE_BOARDLEDS == 0)
+  /* These LEDs can be connected to the LK Linker Kit
+   */
+  .equ GPIO_RED,    26
+  .equ GPIO_GREEN,  22
+  //.equ GPIO_YELLOW, 27 // unused in this application
+.else
+  /* The following two leds are the system LEDs at the rear of the Pi Board
+   * using them might cause problems if the kernel led-class module is loaded.
+   */
+  .equ GPIO_RED,    35
+  .equ GPIO_GREEN,  47
+.endif
+
+
+// Definitionen
 // Aus Bootloader, Mapping v. physischem Speicher 0x7Exxxxx --> 0x3fxxxxxx
 .equ BCM2836_PERI_BASE,         0x3f000000
 
@@ -72,32 +126,41 @@ main:
   */
 
   // ---- Anfang des GPIO-Codes
+  .if (USE_BOARDLEDS == 0)
+    // GPIO 27 als Output deklarieren
+    // Copy-Modify-Update!
+    ldr r0, [r8, #8] // R0 <- GPIO-Register GPFSEL2
+    and r0, r0, #0b11111111111000111111111111111111
+    orr r0, r0, #0b00000000000001000000000000000000
+    str r0, [r8, #8] // R0 -> GPIO-Register GPFSEL1
 
-  // GPIO 21 als Output deklarieren
-  // ldr r0, [r8, #8] // R0 <- GPIO-Register GPFSEL2
-  // and r0, r0, #0b11111111111111111111111111000111
-  // orr r0, r0, #0b00000000000000000000000000001000
-  // str r0, [r8, #8] // R0 -> GPIO-Register GPFSEL1
 
-  // GPIO 17 als Output deklarieren
-  ldr r0, [r8, #4] // R0 <- GPIO-Register GPFSEL1
-  and r0, r0, #0b11111111000111111111111111111111
-  orr r0, r0, #0b00000000001000000000000000000000
-  str r0, [r8, #4] // R0 -> GPIO-Register GPFSEL1
+    // GPIO 27 setzen
+    mov r0, #0b00001000000000000000000000000000
+    str r0, [r8, #28] // R0 -> GPIO-Register GPSET0
 
-  // GPIO 21 setzen
-  // mov r0, #0b00000000000100000000000000000000
-  // str r0, [r8, #28] // R0 -> GPIO-Register GPSET0
-  // GPIO 17 setzen
-  mov r0,    #0b00000000000000100000000000000000
-  str r0, [r8, #28] // R0 -> GPIO-Register GPSET0
+    // GPIO 27 rücksetzen
+    mov r0, #0b00001000000000000000000000000000
+    str r0, [r8, #40] // R0 -> GPIO-Register GPCLR0
+  .else
+    // GPIO 47 als Output deklarieren
+    // Copy-Modify-Update!
+    ldr r0, [r8, #16] // R0 <- GPIO-Register GPFSEL3
+    and r0, r0, #0b11111111111000111111111111111111
+    orr r0, r0, #0b00000000000001000000000000000000
+    str r0, [r8, #16] // R0 -> GPIO-Register GPFSEL3
 
-  // GPIO 21 rücksetzen
-  // mov r0, #0b00000000000100000000000000000000
-  // str r0, [r8, #40] // R0 -> GPIO-Register GPCLR0
-  // GPIO 17 rücksetzen
-  mov r0, #0b00000000000000100000000000000000
-  str r0, [r8, #40] // R0 -> GPIO-Register GPCLR0
+
+    // GPIO 47 setzen
+    mov r0, #0b00000000000000001000000000000000
+    str r0, [r8, #32] // R0 -> GPIO-Register GPSET1
+
+    // GPIO 47 rücksetzen
+    mov r0, #0b00000000000000001000000000000000
+    str r0, [r8, #44] // R0 -> GPIO-Register GPCLR1
+  .endif
+
+
 
   // ---- Ende des GPIO-Codes
 
@@ -113,8 +176,10 @@ main:
   mov r7, #SYSCALL_CLOSE
   swi #0
 
+  // Our return value: 0
   mov r0, #0
 
+  // EABI last
   ldmfd sp!,{r4-r10,r11,lr}
   bx lr
 .endfunc
