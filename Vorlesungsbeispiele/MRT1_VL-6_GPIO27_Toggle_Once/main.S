@@ -41,14 +41,14 @@
 .if (USE_BOARDLEDS == 0)
   /* These LEDs can be connected to the LK Linker Kit
    */
-  .equ GPIO_RED,    26
-  .equ GPIO_GREEN,  22
-  //.equ GPIO_YELLOW, 27 // unused in this application
+  //.equ GPIO_RED,    26
+  //.equ GPIO_GREEN,  22
+  .equ GPIO_YELLOW, 27
 .else
   /* The following two leds are the system LEDs at the rear of the Pi Board
    * using them might cause problems if the kernel led-class module is loaded.
    */
-  .equ GPIO_RED,    35
+  // .equ GPIO_RED,    35
   .equ GPIO_GREEN,  47
 .endif
 
