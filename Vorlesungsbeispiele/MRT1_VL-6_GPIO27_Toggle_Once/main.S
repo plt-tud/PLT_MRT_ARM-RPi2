@@ -1,13 +1,13 @@
 
 @ Definitionen
 // Aus Bootloader, Mapping v. physischem Speicher 0x7Exxxxx --> 0x3fxxxxxx
-.equ BCM2536_PERI_BASE,         0x3f000000
+.equ BCM2836_PERI_BASE,         0x3f000000
 
-// Aus BCM2536 Datenblatt, Abschnitt GPIOs
-.equ BCM2536_GPIO_BASEOFFSET,   0x00200000
-.equ BCM2536_GPIO_LASTADDRESS,  0x002000B4
-.equ BCM2536_GPIO_MEMSIZE,      0x00001000 // Must be >=4k according to manual !
-.equ BCM2536_GPIO_BASE, BCM2536_PERI_BASE + BCM2536_GPIO_BASEOFFSET
+// Aus BCM2836 Datenblatt, Abschnitt GPIOs
+.equ BCM2836_GPIO_BASEOFFSET,   0x00200000
+.equ BCM2836_GPIO_LASTADDRESS,  0x002000B4
+.equ BCM2836_GPIO_MEMSIZE,      0x00001000 // Must be >=4k according to manual !
+.equ BCM2836_GPIO_BASE, BCM2836_PERI_BASE + BCM2836_GPIO_BASEOFFSET
 
 // /usr/include/arm-linux-gnueabihf/bits/fcntl-linux.h:# define O_SYNC            04010000
 // /usr/include/arm-linux-gnueabihf/bits/fcntl-linux.h: #define O_RDWR                  02
@@ -32,15 +32,17 @@
 .data
 .balign 4
 dev_mem_filename: .asciz        "/dev/mem"
-.set dev_mem_filename_strlen, . - dev_mem_filename
+.equ dev_mem_filename_strlen, . - dev_mem_filename
 
 .text
 .global main
-.func main
 
+.func main
 main:
-  push {r4-r9,fp,lr}	// safe relevant registers (8)
-  add fp,sp,#(7*4)		// set frame pointer to lr at bottom of local stack
+  // EABI first
+  mov   ip, sp
+  stmfd sp!,{r4-r11,lr}
+  mov   fp, ip
 
   // r9 = open(/dev/mem,  O_RDWR|O_SYNC, 0)
   ldr r0, =dev_mem_filename
@@ -53,11 +55,11 @@ main:
   // mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
   // r8 = mmap(NULL, gpio_speicherbereich, PROT_READ|PROT_WRITE, MAP_SHARED)
   mov r0, #0
-  mov r1, #BCM2536_GPIO_MEMSIZE
+  mov r1, #BCM2836_GPIO_MEMSIZE
   mov r2, #MMAP_PARAMETER_PROT_READ_WRITE
   mov r3, #MMAP_PARAMETER_MAP_SHARED
   mov r4, r9						// file handle from open /dev/mem
-  ldr r5, =BCM2536_GPIO_BASE        // mmap benutzt 4k bloecke und multipliziert unsere adresse intern; wir muessen etwas schieben
+  ldr r5, =BCM2836_GPIO_BASE        // mmap benutzt 4k bloecke und multipliziert unsere adresse intern; wir muessen etwas schieben
   lsr r5, r5, #12                   // aus 0x3f200000 sollte 0x3f200 werden...
   mov r7, #SYSCALL_MMAP2
   swi #0
@@ -102,7 +104,7 @@ main:
 
   // munmap
   mov r0, r8
-  mov r1, #BCM2536_GPIO_MEMSIZE
+  mov r1, #BCM2836_GPIO_MEMSIZE
   mov r7, #SYSCALL_MUNMAP
   swi #0
 
@@ -111,6 +113,8 @@ main:
   mov r7, #SYSCALL_CLOSE
   swi #0
 
-  pop {r4-r9,fp,lr}
   mov r0, #0
-  bx  lr
+
+  ldmfd sp!,{r4-r10,r11,lr}
+  bx lr
+.endfunc
