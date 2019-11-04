@@ -61,27 +61,36 @@ BCM2836_GPIO_PinSelFun:
   stmfd sp!,{r4-r11,lr}
   mov   fp, ip
 
-  // r2 <- Index of GPFSELn register; r0 <- 10⁰ remainder of pin number
-  mov r2,#0
-BCM2836_GPIO_PinSelFun_loop:
-  cmp r0,#10                           // while ( r0 < 10)
-  blt BCM2836_GPIO_PinSelFun_done      // {
-  add r2,r2,#1                         //   r2 <- r2 + 1
-  sub r0,r0,#10                        //   r0 <- r0 - 10
-  bal BCM2836_GPIO_PinSelFun_loop      // }
+  // r10 <- Index of GPFSELn register; r0 <- 10⁰ remainder of pin number
+  // template: ablehnende schleife
+  BCM2836_GPIO_PinSelFun_divloop_init:
+  // while (r9:div=0, r0:mod=27); r0 = value --> value%10; r9=value/10
+  mov r9, #0
+  BCM2836_GPIO_PinSelFun_divloop_test:
+    // Subtrahiere, solange r0 positiv ist
+    subs r0, r0, #10
+    bmi  BCM2836_GPIO_PinSelFun_divloop_done
+    add  r9, r9, #1
+    b    BCM2836_GPIO_PinSelFun_divloop_test
+  BCM2836_GPIO_PinSelFun_divloop_done:
+  add r10, r0, #10 // r0 ist ins negative gerutsch, korrigiere letzte subraktion
+  add r10, r10, r10, lsl #1 // r0 ist ins negative gerutsch, korrigiere letzte subraktion
+  // r10: (GPIONr%10)*3; Shift-bits in FSEL
+  // r9:  GPIONr/10
 
-BCM2836_GPIO_PinSelFun_done: add r0,r0,r0,lsl #1  // R0 <- R0 * 3
-
+  /* Copy - ... */
   ldr r3,=dev_mem_gpio_base_addr
-  ldr r3,[r3]    // R3 <- address of gpio_base
+  ldr r3,[r3]   // R3 <- address of gpio_base
 
-  ldr r4,[r3,r2,LSL #2]   // R4 <- [ GPFSEL<r2> ]
+  ldr r4,[r3,r9,LSL #2]   // R4 <- [ GPFSEL<r2> ]
 
+  /* ... - Modify - ...*/
   mov r5,#0b111
-  bic r4,r4,r5,LSL R0  // R4 <- R4 AND NOT ( 0b111 << R0)
-  orr r4,r4,r1,LSL R0 // R4 <- R4 ORR R1
+  bic r4,r4,r5,LSL R10  // R4 <- R4 AND NOT ( 0b111 << R10)
+  orr r4,r4,r1,LSL R10 // R4 <- R4 ORR R1
 
-  str r4,[r3,r2,LSL #2]  // R4 -> [ GPFSEL<r2> ]
+  /* ... - Update*/
+  str r4,[r3,r9,LSL #2] // R4 -> [ GPFSEL<r2> ]
 
   ldmfd sp!,{r4-r10,r11,lr}
   bx lr
