@@ -53,7 +53,7 @@ BCM2836_GPIO_Open_exit:
   bx lr
 .endfunc
 
-@ BCM2836_GPIO_PinSelFun(GPIO-Pin, FunctionSelection)
+// BCM2836_GPIO_PinSelFun(GPIO-Pin, FunctionSelection)
 .func BCM2836_GPIO_PinSelFun
 BCM2836_GPIO_PinSelFun:
   // EABI first
@@ -96,7 +96,7 @@ BCM2836_GPIO_PinSelFun:
   bx lr
 .endfunc
 
-@ void BCM2836_GPIO_PinSet(GPIO_Pin)
+// void BCM2836_GPIO_PinSet(GPIO_Pin)
 .func BCM2836_GPIO_PinSet
 BCM2836_GPIO_PinSet:
   // EABI first
@@ -106,13 +106,13 @@ BCM2836_GPIO_PinSet:
 
   // r1 <- Offset to GPSET0 or GPSET1
   mov r1,#BCM2836_GPSET_OFFSET
-  cmp r0,#31    @ if (R0 > 31)
-  addgt r1,r1,#4  @  R1 <- R1 + 4
+  cmp r0,#31      // if (R0 > 31)
+  addgt r1,r1,#4  // R1 <- R1 + 4
 
   // r0 <- 1 << ( pin % 32)
-  and r0, r0, #0x1F  @ pin % 32
+  and r0, r0, #0x1F  // pin % 32
   mov r3, #1
-  lsl r0, r3, r0    @ 1 << ( pin % 32)
+  lsl r0, r3, r0     // 1 << ( pin % 32)
 
   // r2 <- gpio_base_addr
   ldr r2,=dev_mem_gpio_base_addr
@@ -125,7 +125,7 @@ BCM2836_GPIO_PinSet:
   bx lr
 .endfunc
 
-@ void BCM2836_GPIO_PinClr(GPIO_Pin)
+// void BCM2836_GPIO_PinClr(GPIO_Pin)
 .func BCM2836_GPIO_PinClr
 BCM2836_GPIO_PinClr:
   // EABI first
@@ -135,8 +135,8 @@ BCM2836_GPIO_PinClr:
 
   // r1 <- Offset to GPCLR0 or GPCLR1
   mov r1,#BCM2836_GPCLR_OFFSET
-  cmp r0,#31    @ if (R0 > 31)
-  addgt r1,r1,#4  @  R1 <- R1 + 4
+  cmp r0,#31      // if (R0 > 31)
+  addgt r1,r1,#4  //  R1 <- R1 + 4
 
   // r0 <- ( b1 << ( PIN % 32 ))
   and r0, r0, #0x1F
