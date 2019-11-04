@@ -37,7 +37,7 @@
  * @param USE_BOARDLEDS Selects either external LEDs (nice, safe) or on-board LEDs for
  *                      this example
  */
-.equ USE_BOARDLEDS,1
+.equ USE_BOARDLEDS,0
 .if (USE_BOARDLEDS == 0)
   /* These LEDs can be connected to the LK Linker Kit
    */
@@ -130,10 +130,10 @@ main:
     // GPIO 27 als Output deklarieren
     // Copy-Modify-Update!
     ldr r0, [r8, #8] // R0 <- GPIO-Register GPFSEL2
-    and r0, r0, #0b11111111111000111111111111111111
-    orr r0, r0, #0b00000000000001000000000000000000
+    and r0, r0, #0b11111111000111111111111111111111
+    orr r0, r0, #0b00000000001000000000000000000000
     str r0, [r8, #8] // R0 -> GPIO-Register GPFSEL1
-
+    ldr r0, [r8, #8] // R0 <- GPIO-Register GPFSEL2
 
     // GPIO 27 setzen
     mov r0, #0b00001000000000000000000000000000
