@@ -28,3 +28,7 @@
 // @ Definitionen
 // Aus Bootloader, Mapping v. physischem Speicher 0x7Exxxxx --> 0x3fxxxxxx
 .equ BCM2836_PERI_BASE,         0x3f000000
+
+// Wir ab den GPIOs (+0x00200000) auf die SPI0 (+x00204000-+x00204014)
+// --> Wir brauchen 0x3f200000 + 0x4
+.equ BCM2836_PERI_MAPSIZE,      0x4100 // Must be >=4k according to manual !

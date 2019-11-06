@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2018 Leon Urbas <leon.urbas@tu-dresden.de>
- * Copyright (c) 2019 Chris Iatrou <chris_paul.iatrou@tu-dresden.de>
+ * Copyright (c) 2018 Leon Urbas <leon.urbas//tu-dresden.de>
+ * Copyright (c) 2019 Chris Iatrou <chris_paul.iatrou//tu-dresden.de>
  *
  * Hiermit wird unentgeltlich jeder Person, die eine Kopie der
  * Software und der zugehörigen Dokumentationen (die "Software")
@@ -25,6 +25,7 @@
  * DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
  */
 
+
 // GPFSEL Codes (BCM2835 ARM Peripherals, 2012, Table 6-1, p. 92)
 .equ BCM2836_GPFSEL_INPUT,  0b000
 .equ BCM2836_GPFSEL_OUTPUT, 0b001
@@ -38,13 +39,10 @@
 // Aus BCM2836 Datenblatt, Abschnitt GPIOs
 .equ BCM2836_GPIO_BASEOFFSET,   0x200000
 .equ BCM2836_GPIO_LASTADDRESS,  0x2000B4
-.equ BCM2836_GPIO_MEMSIZE,      0x4100 // Must be >=4k according to manual !
 .equ BCM2836_GPIO_BASE, BCM2836_PERI_BASE + BCM2836_GPIO_BASEOFFSET
 
 .equ BCM2836_GPFSEL_OFFSET, 0
 .equ BCM2836_GPSET_OFFSET,  0x1C
 .equ BCM2836_GPCLR_OFFSET,  0x28
 
-.equ BCM2836_SPI0_BASEOFFSET, 0x204000
-.equ BCM2836_SPI1_BASEOFFSET, 0x215000
-.equ BCM2836_SPI2_BASEOFFSET, 0x215080
+

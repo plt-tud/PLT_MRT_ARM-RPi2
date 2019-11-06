@@ -36,6 +36,5 @@
 .include "BCM2836_GPIO_constants.h"
 
 // Register/Offset-Definitionen und Konstanten fuer SPI
-.extern BCM2836_SPI0_GetBase, BCM2836_SPI0_Init, BCM2836_SPI0_Send
 .include "BCM2836_SPI_constants.h"
 
