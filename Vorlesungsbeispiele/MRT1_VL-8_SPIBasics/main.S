@@ -30,8 +30,6 @@
  */
 
 .global main
-.type main, %function
-
 .include "BCM2836.h"
 
 .data
@@ -53,7 +51,7 @@ main:
 
   // Template: Section
   main_spi_init:
-    bl BCM2836_SPI0_GetBase
+    bl main_SPI0_GetBase
     mov r4, r0 // r4 = SPI Base
 
     // set pin functions to alternate0
@@ -106,41 +104,7 @@ main:
 	mov r5,#3	          // send 3 byte
 	ldr r6,=spi_msg     // message
 
-  /* start our RX/RX Algorithm
-    @startuml
-    start
-      : dataSz r7 = 3
-       r8 txdata_ptr
-       r9 rxdata_ptr;
-
-      : rxByteCount r5 = 0
-        txByteCount r6 = dataSz;
-
-      : Clear Fifos ;
-
-      while (rxByteCount < dataSz)
-       partition SPI_ReceiveByte {
-           if (SPI0 rxbuffer not empty)
-             : r0 = read byte from SPI0 rxFIFO;
-             : rxdata[rxByteCount] = r0;
-             : rxByteCount++;
-           endif
-       }
-
-       partition SPI_SendByte {
-           if (rxByteCount < dataSz)
-             : r0 = txdata[txByteCount];
-             : write byte to SPI0 txFIFO;
-             : txByteCount++;
-           endif
-       }
-      endwhile
-
-      while (spi not idle/cs still low)
-      endwhile
-    stop
-    @enduml
-   */
+  /* start our RX/RX Algorithm */
 
   main_forever:
     // clear fifos and set TA
@@ -158,50 +122,50 @@ main:
     mov r5, #0  // rxDataCount:r5 = 0
     mov r6, #0  // rxDataCount:r6 = 0
     // Template: Ablehnende Schleife
-    BCM2836_SPI0_Send_rxtxloop_start:
+    main_SPI0_Send_rxtxloop_start:
       // while (rxdata:r5 < dataSz:r7) ...
       cmp r5, r7
-      bge BCM2836_SPI0_Send_rxtxloop_end
+      bge main_SPI0_Send_rxtxloop_end
 
       // Template Selektion
-      BCM2836_SPI0_Send_rxtxloop_rx:
+      main_SPI0_Send_rxtxloop_rx:
         // if (rxBuffer != Empty) {
         ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
         tst r0, #BCM2835_SPI0_CS_RXD_FIFO_NOTEMPTY
-        beq BCM2836_SPI0_Send_rxtxloop_rx_end
+        beq main_SPI0_Send_rxtxloop_rx_end
 
         // copy(SPI RX Buffer to rxdata[rxData++])
         ldr r0,[r4,#BCM2835_SPI0_FIFO_OFFSET] // read
         and r0,r0,#0xFF
         strb r0,[r9, r5]
         add r5, r5, #1 // rxData++
-      BCM2836_SPI0_Send_rxtxloop_rx_end: // }
+      main_SPI0_Send_rxtxloop_rx_end: // }
 
       // Template Selektion
-      BCM2836_SPI0_Send_rxtxloop_tx:
+      main_SPI0_Send_rxtxloop_tx:
         // if (txdata:r6 < dataSz:r7 ...
         cmp r6, r7
-        bge BCM2836_SPI0_Send_rxtxloop_tx_end
+        bge main_SPI0_Send_rxtxloop_tx_end
         //  && txBuffer != Full ....
         ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
         tst r0, #BCM2835_SPI0_CS_TXD_FIFO_FULL
-        beq BCM2836_SPI0_Send_rxtxloop_tx_end
+        beq main_SPI0_Send_rxtxloop_tx_end
         // ... ) {
 
         // copy(txdata[txData++] to SPI TX Buffer);
         ldrb r0, [r8, r6]
         str  r0, [r4, #BCM2835_SPI0_FIFO_OFFSET]
         add  r6, r6, #1  // txData++
-      BCM2836_SPI0_Send_rxtxloop_tx_end: //}
+      main_SPI0_Send_rxtxloop_tx_end: //}
 
-      b BCM2836_SPI0_Send_rxtxloop_start
-    BCM2836_SPI0_Send_rxtxloop_end:
+      b main_SPI0_Send_rxtxloop_start
+    main_SPI0_Send_rxtxloop_end:
 
     // while (!DONE) { wait }
-    BCM2836_SPI0_Send_wait_for_done:
+    main_SPI0_Send_wait_for_done:
     ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET] // wait for done
     tst r0,#BCM2835_SPI0_CS_DONE
-    beq BCM2836_SPI0_Send_wait_for_done
+    beq main_SPI0_Send_wait_for_done
 
     ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
     bic r0,r0,#BCM2835_SPI0_CS_TA
