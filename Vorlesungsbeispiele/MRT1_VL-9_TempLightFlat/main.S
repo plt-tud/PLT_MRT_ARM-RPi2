@@ -38,12 +38,6 @@
  */
 
 /**
- * @param DEBUG Setting Debug to anything but 0 will cause the main loop to delay 1s between
- *              updates and print the hex ADC Value to the shell.
- */
-.equ DEBUG,0
-
-/**
  * @param USE_BOARDLEDS Selects either external LEDs (nice, safe) or on-board LEDs for
  *                      this example
  */
@@ -76,117 +70,102 @@
 .equ DC_SENSE, 10 // sensitivity, empirical value for warming up the sensor by hoding in hand at ~23 C
 
 .global main
-.type main, %function
-
 
 .include "BCM2836.h"
 .include "SYSCALL.h"
 
 .data
 .align
-bcm2836_msg_err_open: .asciz "error initializing bcm2836"
-.set bcm2836_mln_err_open, . - bcm2836_msg_err_open
-
-.align
-// See MCP3008 Datasheet, Figure 6-1, MCU Transmitted Data
 spi_msg:   .byte 0x01, 0x80, 0x00, 0x00
 .align
 spi_reply: .byte 0x00, 0x00, 0x00, 0x00
 
 .text
 .align
+.func main
 main:
-	push {r4-r9,fp,lr} // safe 8 regs
-	add fp,sp,#(8-1)*4 // fp <- lr // stack
+  // EABI first
+  mov   ip, sp
+  stmfd sp!,{r4-r11,lr}
+  mov   fp, ip
 
-  mov r4, #0    // r4:MMapBase
-  mov r5, #1024    // r5:Ambienttemperature=0
-  mov r6, #0    // r6:currentTemp
-  mov r7, #0    // r7:pwmCount
 
-	bl BCM2836_GPIO_Open
-	cmp r0,#0
-	bne err_open
+  mov r4, #0     // r4:MMapBase
+  mov r5, #1024  // r5:Ambienttemperature=0
+  mov r6, #0     // r6:currentTemp
+  mov r7, #0     // r7:pwmCount
 
-	mov r0,#GPIO_RED
-	mov r1,#BCM2836_GPFSEL_OUTPUT
-	bl BCM2836_GPIO_PinSelFun
+  main_io_init:     // Template: Sektion
+  	bl BCM2836_GPIO_Open
+  	cmp r0,#0
+  	bne main_exit
 
-	mov r0,#GPIO_GREEN
-	mov r1,#BCM2836_GPFSEL_OUTPUT
-	bl BCM2836_GPIO_PinSelFun
+  	mov r0,#GPIO_GREEN
+  	mov r1,#BCM2836_GPFSEL_OUTPUT
+  	bl BCM2836_GPIO_PinSelFun
 
-	bl BCM2836_SPI0_Init
+    mov r0,#GPIO_GREEN
+    bl BCM2836_GPIO_PinClr
 
-forever:
-	// send()
-	mov r0, #3
-	ldr r1, =spi_msg
-	ldr r2, =spi_reply
-  bl BCM2836_SPI0_Send
+  	bl BCM2836_SPI0_Init
+  main_io_init_done:
 
-	ldr r0, =spi_reply
-	// RX Buffer will appear reversed:
-	//   LSB is first byte received, which to the MCP3008 is an MSP
-	//   to create a propper 10bit int, place in order #0,#0,[1],[2]
-	ldrb r1, [r0, #1]
-	lsl  r1, #8
-	ldrb r0, [r0, #2]
-  orr  r6, r0, r1 // currentTemp:r6 = r0
+  main_loop_forever: // Template: Endlossschleife
+  	// send()
+  	mov r0, #3
+  	ldr r1, =spi_msg
+  	ldr r2, =spi_reply
+    bl BCM2836_SPI0_Send
 
-  .if DEBUG==1
-    mov r0, r6
-    bl PrintHex
-    bl PrintNL
-  .endif
+  	ldr r0, =spi_reply
+  	// RX Buffer will appear reversed:
+  	//   LSB is first byte received, which to the MCP3008 is an MSP
+  	//   to create a propper 10bit int, place in order #0,#0,[1],[2]
+  	ldrb r1, [r0, #1]
+  	lsl  r1, #8
+  	ldrb r0, [r0, #2]
+    orr  r6, r0, r1 // currentTemp:r6 = r0
 
-  // Update ambient temperate if it is drifting downwards
-  // if (ambientTemp:r5 == 0) {
-  cmp   r6, r5
-  movlt r5, r6 //ambientTemp:r5 = r6:currentTemp
-  //}
+    // Update ambient temperate if it is drifting downwards
+    // Template: Selektion
+    main_loop_forever_updateAmbient:      // if (ambientTemp:r5 > currentTemp:r6) {
+      cmp   r6, r5
+      movlt r5, r6 //ambientTemp:r5 = r6:currentTemp
+    main_loop_forever_updateAmbient_done: //}
 
-  // if (++r7:pwmCount > DC_SENSE) r7 = 0;
-  add   r7, r7,#1   // pwmCnt++
-  cmp   r7, #DC_SENSE
-  movge r7, #0
+    add   r7, r7,#1   // pwmCnt++
 
-  // if (currentTemp-ambientTemp > pwmCnt) greenLED=Off
-  sub  r1, r6, r5
-  cmp  r1, r7
-  blgt light_pwm_greenOff
-  // else: greenLED=on
-  mov  r0,#GPIO_GREEN
-  bl   BCM2836_GPIO_PinSet
-  mov  r0, #GPIO_RED
-  bl   BCM2836_GPIO_PinClr
-  bal  light_pwm_done
+    // Template: Selektion
+    main_loop_forever_resetPWMCount: // if (++r7:pwmCount > DC_SENSE)
+      cmp   r7, #DC_SENSE
+      movge r7, #0                   // r7 = 0;
+    main_loop_forever_resetPWMCount_done:
 
-  light_pwm_greenOff:
-  mov  r0,#GPIO_GREEN
-  bl   BCM2836_GPIO_PinClr
-  mov  r0, #GPIO_RED
-  bl   BCM2836_GPIO_PinSet
-  bal  light_pwm_done
 
-  light_pwm_done:
-  .if DEBUG==1
-    // sleep(1)
-    mov r0, #1
-    bl sleep
-  .endif
-	bal forever
+    // Template: Selektion
+    main_loop_forever_pwm_setGreen_test:
+    // if (currentTemp-ambientTemp < pwmCnt)
+    sub  r1, r6, r5
+    cmp  r1, r7
+    bge  main_loop_forever_pwm_setGreen_else
+    main_loop_forever_pwm_setGreen_if:
+      // then GPIO_GREEN On
+      mov  r0, #GPIO_GREEN
+      bl   BCM2836_GPIO_PinSet
+      b    main_loop_forever_pwm_setGreen_done
+    main_loop_forever_pwm_setGreen_else:
+      // else GPIO_GREEN Off
+      mov  r0,#GPIO_GREEN
+      bl   BCM2836_GPIO_PinClr
+    main_loop_forever_pwm_setGreen_done:
 
-exit:
+  	b main_loop_forever
+  main_loop_forever_done:
+
+  main_exit:
 	bl BCM2836_GPIO_Close
-	pop {r4-r9,fp,pc} // restore & return
 
-err_open:
-	push {r0,r7}
-	mov r0,#1	// stdout
-	ldr r1,=bcm2836_msg_err_open
-	mov	r2,#bcm2836_mln_err_open
-	mov r7,#SYSCALL_WRITE
-	swi #0
-	pop {r0,r7}
-	bal exit
+  // EABI Last
+	ldmfd sp!,{r4-r10,r11,lr}
+  bx lr
+.endfunc // main
