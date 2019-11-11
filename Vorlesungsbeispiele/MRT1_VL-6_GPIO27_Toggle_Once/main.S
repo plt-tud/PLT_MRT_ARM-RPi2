@@ -65,7 +65,7 @@
 
 // /usr/include/arm-linux-gnueabihf/bits/fcntl-linux.h:# define O_SYNC            04010000
 // /usr/include/arm-linux-gnueabihf/bits/fcntl-linux.h: #define O_RDWR                  02
-.equ OPEN_PARAMETER_SYNC_RDWR, 0x40100002
+.equ OPEN_PARAMETER_SYNC_RDWR, 0x4010002
 
 // /usr/include/arm-linux-gnueabihf/bits/mman-linux.h:#define MAP_SHARED   0x01
 .equ MMAP_PARAMETER_MAP_SHARED, 0x01
