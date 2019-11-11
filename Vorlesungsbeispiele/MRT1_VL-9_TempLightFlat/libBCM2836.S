@@ -1,5 +1,5 @@
 @ Header
-.globl BCM2836_GPIO_Open, BCM2836_Close, BCM2836_GPIO_PinSelFun, BCM2836_GPIO_PinSet, BCM2836_GPIO_PinClr, BCM2836_GPIO_PinSelDump
+.globl BCM2836_Open, BCM2836_Close, BCM2836_GPIO_PinSelFun, BCM2836_GPIO_PinSet, BCM2836_GPIO_PinClr, BCM2836_GPIO_PinSelDump
 .globl BCM2836_SPI0_GetBase, BCM2836_SPI0_Init, BCM2836_SPI0_Send
 
 .include "BCM2836_constants.h"
