@@ -89,41 +89,39 @@ main:
   stmfd sp!,{r4-r11,lr}
   mov   fp, ip
 
-
-  mov r4, #0     // r4:MMapBase
-  mov r5, #1024  // r5:Ambienttemperature=0
-  mov r6, #0     // r6:currentTemp
-  mov r7, #0     // r7:pwmCount
-
   main_io_init:     // Template: Sektion
-  	bl BCM2836_GPIO_Open
-  	cmp r0,#0
-  	bne main_exit
+    bl BCM2836_Open
+    cmp r0,#0
+    bne main_exit
 
-  	mov r0,#GPIO_GREEN
-  	mov r1,#BCM2836_GPFSEL_OUTPUT
-  	bl BCM2836_GPIO_PinSelFun
+    mov r0,#GPIO_GREEN
+    mov r1,#BCM2836_GPFSEL_OUTPUT
+    bl BCM2836_GPIO_PinSelFun
 
     mov r0,#GPIO_GREEN
     bl BCM2836_GPIO_PinClr
 
-  	bl BCM2836_SPI0_Init
+    bl BCM2836_SPI0_Init
   main_io_init_done:
 
+  mov r5, #1024  // r5:Ambienttemperature=0
+  mov r6, #0     // r6:currentTemp
+  mov r7, #0     // r7:pwmCount
+
   main_loop_forever: // Template: Endlossschleife
-  	// send()
-  	mov r0, #3
-  	ldr r1, =spi_msg
-  	ldr r2, =spi_reply
+    // send()
+    mov r0, #3
+    ldr r1, =spi_msg
+    ldr r2, =spi_reply
     bl BCM2836_SPI0_Send
 
-  	ldr r0, =spi_reply
-  	// RX Buffer will appear reversed:
-  	//   LSB is first byte received, which to the MCP3008 is an MSP
-  	//   to create a propper 10bit int, place in order #0,#0,[1],[2]
-  	ldrb r1, [r0, #1]
-  	lsl  r1, #8
-  	ldrb r0, [r0, #2]
+    ldr r0, =spi_reply
+    // RX Buffer will appear reversed:
+    //   LSB is first byte received, which to the MCP3008 is an MSP
+    //   to create a propper 10bit int, place in order #0,#0,[1],[2]
+    ldrb r1, [r0, #1]
+    lsl  r1, #8
+    ldrb r0, [r0, #2]
     orr  r6, r0, r1 // currentTemp:r6 = r0
 
     // Update ambient temperate if it is drifting downwards
@@ -159,13 +157,13 @@ main:
       bl   BCM2836_GPIO_PinClr
     main_loop_forever_pwm_setGreen_done:
 
-  	b main_loop_forever
+    b main_loop_forever
   main_loop_forever_done:
 
   main_exit:
-	bl BCM2836_GPIO_Close
+  bl BCM2836_Close
 
   // EABI Last
-	ldmfd sp!,{r4-r10,r11,lr}
+  ldmfd sp!,{r4-r10,r11,lr}
   bx lr
 .endfunc // main

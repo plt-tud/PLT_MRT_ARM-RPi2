@@ -32,7 +32,7 @@
  */
 
 // Register/Offset-Definitionen und Konstanten fuer GPIOs
-.extern BCM2836_GPIO_Open, BCM2836_GPIO_Close, BCM2836_GPIO_PinSelFun, BCM2836_GPIO_PinSet, BCM2836_GPIO_PinClr
+.extern BCM2836_Open, BCM2836_Close, BCM2836_GPIO_PinSelFun, BCM2836_GPIO_PinSet, BCM2836_GPIO_PinClr
 .include "BCM2836_GPIO_constants.h"
 
 // Register/Offset-Definitionen und Konstanten fuer SPI

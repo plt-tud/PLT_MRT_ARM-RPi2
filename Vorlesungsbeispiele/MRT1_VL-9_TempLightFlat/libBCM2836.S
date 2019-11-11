@@ -1,5 +1,5 @@
 @ Header
-.globl BCM2836_GPIO_Open, BCM2836_GPIO_Close, BCM2836_GPIO_PinSelFun, BCM2836_GPIO_PinSet, BCM2836_GPIO_PinClr, BCM2836_GPIO_PinSelDump
+.globl BCM2836_GPIO_Open, BCM2836_Close, BCM2836_GPIO_PinSelFun, BCM2836_GPIO_PinSet, BCM2836_GPIO_PinClr, BCM2836_GPIO_PinSelDump
 .globl BCM2836_SPI0_GetBase, BCM2836_SPI0_Init, BCM2836_SPI0_Send
 
 .include "BCM2836_constants.h"
@@ -22,11 +22,11 @@ dev_mem_gpio_base_addr:  .word 0
 .align 4
 
 /*********************
- * GPIO Functions
+ * General BCM2836 Functions
  *********************/
 
-.func BCM2836_GPIO_Open
-BCM2836_GPIO_Open:
+.func BCM2836_Open
+BCM2836_Open:
   // EABI first
   mov   ip, sp
   stmfd sp!,{r4-r11,lr}
@@ -41,7 +41,7 @@ BCM2836_GPIO_Open:
   ldr r1,=dev_mem_gpio_fd  @ save file-handle at =dev_mem_gpio_fd
   str r0,[r1]
   cmp r0,#0
-  ble BCM2836_GPIO_Open_error
+  ble BCM2836_Open_error
 
   // mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
   // dev_mem_gpio_base_addr = mmap(NULL, gpio_speicherbereich, PROT_READ|PROT_WRITE, MAP_SHARED)
@@ -58,21 +58,49 @@ BCM2836_GPIO_Open:
   str r0,[r1]
   cmp r0,#0
   movne r0,#0
-BCM2836_GPIO_Open_exit:
+BCM2836_Open_exit:
   ldmfd sp!,{r4-r10,r11,lr}
   bx lr
 
-BCM2836_GPIO_Open_error:
+BCM2836_Open_error:
   push {r0,r7}
   mov r0,#1 // stdout
   ldr r1,=BCM2836_msg_err_open
   mov r2,#BCM2836_strlen_err_open
   mov r7,#SYSCALL_WRITE
   swi #0
-  pop {r0,r7}
-  bal BCM2836_GPIO_Open_exit
+
+  ldmfd sp!,{r4-r10,r11,lr}
+  bal BCM2836_Open_exit
 .endfunc
 
+.func BCM2836_Close
+BCM2836_Close:
+  // EABI first
+  mov   ip, sp
+  stmfd sp!,{r4-r11,lr}
+  mov   fp, ip
+
+    // munmap
+  ldr r0,=dev_mem_gpio_base_addr
+  ldr r0,[r0]
+  mov r1,#BCM2836_PERI_MAPSIZE
+  mov r7,#SYSCALL_MUNMAP
+  swi #0
+
+  // close
+  ldr r0,=dev_mem_gpio_fd
+  ldr r0,[r0]
+  mov r7, #SYSCALL_CLOSE
+  swi #0
+
+  ldmfd sp!,{r4-r10,r11,lr}
+  bx lr
+.endfunc
+
+/*********************
+ * GPIO Functions
+ *********************/
 // BCM2836_GPIO_PinSelFun(GPIO-Pin, FunctionSelection)
 .func BCM2836_GPIO_PinSelFun
 BCM2836_GPIO_PinSelFun:
@@ -173,31 +201,6 @@ BCM2836_GPIO_PinClr:
   ldmfd sp!,{r4-r10,r11,lr}
   bx lr
 .endfunc
-
-.func BCM2836_GPIO_Close
-BCM2836_GPIO_Close:
-  // EABI first
-  mov   ip, sp
-  stmfd sp!,{r4-r11,lr}
-  mov   fp, ip
-
-    // munmap
-  ldr r0,=dev_mem_gpio_base_addr
-  ldr r0,[r0]
-  mov r1,#BCM2836_PERI_MAPSIZE
-  mov r7,#SYSCALL_MUNMAP
-  swi #0
-  
-  // close
-  ldr r0,=dev_mem_gpio_fd
-  ldr r0,[r0]
-  mov r7, #SYSCALL_CLOSE
-  swi #0
-
-  ldmfd sp!,{r4-r10,r11,lr}
-  bx lr
-.endfunc
-
 
 /*********************
  * SPI Functions
