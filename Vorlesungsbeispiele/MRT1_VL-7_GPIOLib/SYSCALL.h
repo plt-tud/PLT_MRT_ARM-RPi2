@@ -5,8 +5,8 @@
 .equ SYSCALL_OPEN, 5
 // /usr/include/arm-linux-gnueabihf/bits/fcntl-linux.h:# define O_SYNC            04010000
 // /usr/include/arm-linux-gnueabihf/bits/fcntl-linux.h: #define O_RDWR                  02
-.equ OPEN_PARAMETER_SYNC, 0x4010000
-.equ OPEN_PARAMETER_RDWR, 0x0000002
+.equ OPEN_PARAMETER_SYNC, 04010000
+.equ OPEN_PARAMETER_RDWR, 00000002
 .equ OPEN_PARAMETER_SYNC_RDWR, OPEN_PARAMETER_RDWR + OPEN_PARAMETER_SYNC
 
 // /usr/arm-linux-gnueabihf/include/asm/unistd.h: #define __NR_close (__NR_SYSCALL_BASE+6)
