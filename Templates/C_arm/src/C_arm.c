@@ -11,6 +11,6 @@
 #include <stdio.h>
 
 int main(void) {
-	puts("!!!Hello World!!!"); /* prints !!!Hello World!!! */
+	/* Hier koennte Ihr Quelltext stehen*/
 	return 0;
 }
