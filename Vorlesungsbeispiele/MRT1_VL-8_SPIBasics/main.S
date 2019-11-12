@@ -51,7 +51,7 @@ main:
 
   // Template: Section
   main_spi_init:
-    bl main_SPI0_GetBase
+    bl BCM2836_SPI0_GetBase
     mov r4, r0 // r4 = SPI Base
 
     // set pin functions to alternate0
