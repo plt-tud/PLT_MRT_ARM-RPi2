@@ -8,9 +8,9 @@
  ============================================================================
  */
 
-#include <stdio.h>
 
 int main(void) {
-	/* Hier koennte Ihr Quelltext stehen*/
+	/* Hier koennte Ihr Quelltext stehen */
+
 	return 0;
 }
