@@ -9,8 +9,8 @@
 
 #include "BCM2836.h"
 
-void *bcm2836_baseaddr_ptr = NULL;
-int  bcm2836_devmem_h=0;
+static volatile void *bcm2836_baseaddr_ptr = NULL;
+static int 			  bcm2836_devmem_h=0;
 
 int BCM2836_Open(void)
 {
@@ -109,19 +109,21 @@ void BCM2836_SPI0_Init() {
 
   volatile uint32_t* clk_reg_ptr = (uint32_t*) (BCM2836_SPI_REGADDR(BCM2835_SPI0_CLK_OFFSET));
 
-  BCM2836_GPIO_PinSelFun(SPI0_CE0_GPIONO,   BCM2836_GPFSEL_ALT0);
-  BCM2836_GPIO_PinSelFun(SPI0_CE1_GPIONO,   BCM2836_GPFSEL_ALT0);
-  BCM2836_GPIO_PinSelFun(SPI0_CLK_GPIONO,   BCM2836_GPFSEL_ALT0);
-  BCM2836_GPIO_PinSelFun(SPI0_MOSI_GPIONO,  BCM2836_GPFSEL_ALT0);
-  BCM2836_GPIO_PinSelFun(SPI0_MISO_GPIONO,  BCM2836_GPFSEL_ALT0);
+  BCM2836_GPIO_PinSelFun(SPI0_CE0_GPIONO,  BCM2836_GPFSEL_ALT0);
+  BCM2836_GPIO_PinSelFun(SPI0_CE1_GPIONO,  BCM2836_GPFSEL_ALT0);
+  BCM2836_GPIO_PinSelFun(SPI0_CLK_GPIONO,  BCM2836_GPFSEL_ALT0);
+  BCM2836_GPIO_PinSelFun(SPI0_MOSI_GPIONO, BCM2836_GPFSEL_ALT0);
+  BCM2836_GPIO_PinSelFun(SPI0_MISO_GPIONO, BCM2836_GPFSEL_ALT0);
 
   // Clear Fifos
   *cs_reg_ptr = BCM2835_SPI0_CS_CLEAR;
 
-  // Mode settings for MCP3008
-  *cs_reg_ptr = BCM2835_SPI0_CS_CSPOL0 | BCM2835_SPI0_CS_CSPOL1 |
-		        BCM2835_SPI0_CS_CPOL | BCM2835_SPI0_CS_CPHA |
-				BCM2835_SPI0_CS_CS ;
+  // Mode settings for MCP3008: Clear these Bits
+  *cs_reg_ptr &= ~BCM2835_SPI0_CS_CS
+		       & ~BCM2835_SPI0_CS_CPOL
+			   & ~BCM2835_SPI0_CS_CPHA
+			   & ~BCM2835_SPI0_CS_CSPOL0
+			   & ~BCM2835_SPI0_CS_CSPOL1 ;
 
   // Clock divider at 3.9Mhz for MCP3008
   *clk_reg_ptr = 64;
@@ -129,11 +131,9 @@ void BCM2836_SPI0_Init() {
   return;
 }
 
-
-
 void BCM2836_SPI0_Send(size_t dataSz, uint8_t *txdata_ptr, uint8_t *rxdata_ptr) {
-  volatile uint32_t* cs_reg_ptr     = (uint32_t*) (BCM2836_SPI_REGADDR(BCM2835_SPI0_CS_OFFSET));
-  volatile uint8_t*  fifo_reg_ptr   = (uint8_t*)  (BCM2836_SPI_REGADDR(BCM2835_SPI0_FIFO_OFFSET));
+  volatile uint32_t* cs_reg_ptr   = (uint32_t*) (BCM2836_SPI_REGADDR(BCM2835_SPI0_CS_OFFSET));
+  volatile uint32_t* fifo_reg_ptr = (uint32_t*) (BCM2836_SPI_REGADDR(BCM2835_SPI0_FIFO_OFFSET));
 
   size_t rxDataCount = 0;
   size_t txDataCount = 0;
@@ -144,11 +144,11 @@ void BCM2836_SPI0_Send(size_t dataSz, uint8_t *txdata_ptr, uint8_t *rxdata_ptr) 
 
   while(rxDataCount < dataSz) {
 	  if (rxDataCount < dataSz && ((*cs_reg_ptr) & BCM2835_SPI0_CS_RXD)) {
-		  uint8_t rxd  = *fifo_reg_ptr;
+		  uint32_t rxd  = *fifo_reg_ptr;
 		  rxdata_ptr[rxDataCount++] = rxd;
 	  }
 	  if (txDataCount < dataSz && ((*cs_reg_ptr) & BCM2835_SPI0_CS_TXD)) {
-		  uint8_t txd  = txdata_ptr[txDataCount++];
+		  uint32_t txd  = txdata_ptr[txDataCount++];
 		  *fifo_reg_ptr = txd;
 	  }
   }
