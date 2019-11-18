@@ -109,24 +109,21 @@ void stringsStuff(void)
 	return;
 }
 
-#include "linked_lists.h"
-void linkedListExample()
+
+void printf_example(void)
 {
-	list_header listhead = {NULL, NULL};
+	char *s  = "Hallo";    // String als Pointer auf 0-terminierte Ascii-Folge
+	int   x  = 32;
+	float pi = 22/7;
 
-	// 100 statische elemente... wir wissen noch nicht, wie das dynamisch geht...
-	list_element elements[100] = {{NULL, NULL}};
+	printf("pi ist so grob %f\n");
 
-	// ein Paar statische Datentypen als Payload
-	int payloadData[] = {0,1,2,3,4,5,6,7,8,9};
+	printf("Was...");
+	printf("macht\n eignentlich? Es ist %i Zeilenumbruch", x);
 
-	for (int i=0; i<10; i++) {
-		listelement_append(&listhead, &elements[i], &payloadData[i]);
-	}
-
-	while(listhead.head != NULL) listelement_delete(&listhead, listhead.head);
 	return;
 }
+
 
 int  main(int argc, char **argv)
 {
@@ -134,10 +131,11 @@ int  main(int argc, char **argv)
 
 	for(int argn=0; argn<argc && argv[argn]!=NULL; argn++)
 	{
-		// Process arf
+		// Process arguments here
 	}
 
-	linkedListExample();
+
+	printf_example(); // Use Console->Pi Console to view output
 
 	return 0;
 }
