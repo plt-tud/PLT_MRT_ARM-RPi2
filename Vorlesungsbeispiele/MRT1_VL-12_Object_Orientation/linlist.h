@@ -18,4 +18,6 @@ void linlist_deleteMembers(linlist *this);
 int32_t linlist_appendElement(linlist *this, cobj *payload);
 cobj *linlist_removeElement(linlist *this, cobj *payload);
 
+void linlist_clear(linlist *this);
+
 #endif /* HAVE_LINLIST_H */

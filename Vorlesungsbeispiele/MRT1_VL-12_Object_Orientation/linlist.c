@@ -9,6 +9,8 @@ linlist *linlist_new() {
 }
 
 void linlist_init(linlist *this) {
+	if (this==NULL) return;
+
     this->obj_fp.delete = linlist_delete;
     this->obj_fp.deleteMembers = linlist_deleteMembers;
     
@@ -17,6 +19,8 @@ void linlist_init(linlist *this) {
 }
 
 void linlist_delete(linlist *this) {
+	if (this==NULL) return;
+
     if(this) {
         linlist_deleteMembers(this);
         free(this);
@@ -25,6 +29,8 @@ void linlist_delete(linlist *this) {
 }
 
 void linlist_deleteMembers(linlist *this) {
+	if (this==NULL) return;
+
     linlist_elem *current;
     while(this->first != NULL) {
         current = this->first;
@@ -35,7 +41,9 @@ void linlist_deleteMembers(linlist *this) {
 }
 
 int32_t linlist_appendElement(linlist *this, cobj *payload) {
-    DEBUG("Adding new list element");
+	if (this==NULL) return;
+
+	DEBUG("Adding new list element");
     if(this->first == NULL) {
         this->first = linlist_elem_new(payload);
         return 0;
@@ -45,4 +53,10 @@ int32_t linlist_appendElement(linlist *this, cobj *payload) {
 
 cobj *linlist_removeElement(linlist *this, cobj *payload) {
     return linlist_elem_removeElement(this->first, payload);
+}
+
+void linlist_clear(linlist *this) {
+	linlist_deleteMembers(this);
+
+	return;
 }

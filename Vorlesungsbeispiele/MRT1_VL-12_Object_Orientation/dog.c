@@ -14,9 +14,9 @@ dog* dog_new(const char* name, human *owner) {
 
 void dog_init(dog *this, const char* name, human *owner) {
     mamal_init((mamal*) this);
-    this->mamalAttr.obj_fp.delete = dog_delete;
-    this->mamalAttr.obj_fp.deleteMembers = dog_deleteMembers;
-    this->mamalAttr.mamal_makeSound = dog_makeSound;
+    this->mamalAttr.obj_fp.delete 		 = (cobj_delete_fp*)    &dog_delete;
+    this->mamalAttr.obj_fp.deleteMembers = (cobj_delete_fp*)    &dog_deleteMembers;
+    this->mamalAttr.mamal_makeSound 	 = (mamal_makeSound_f*) &dog_makeSound;
     
     this->mamalAttr.genus = (char *) malloc(strlen("Canis")+1);
     strcpy(this->mamalAttr.genus, "Canis");
