@@ -24,30 +24,28 @@
  * DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
  */
 
-#ifndef LINKED_LISTS_H_
-#define LINKED_LISTS_H_
+#ifndef HAVE_LINKED_LIST_H
+#define HAVE_LINKED_LIST_H
 
 #include <stdbool.h>
-
-typedef struct list_el_t {
-	struct list_el_t *next; // nächstes Element
-	void *payload;
-} list_element;
+#include "linked_list_element.h"
 
 typedef struct liste_t {
-	list_element *head; // Kopf der Liste
-	list_element *tail; // Ende der Liste
-} list_header;
+	linked_list_element *head; // Kopf der Liste
+	linked_list_element *tail; // Ende der Liste
+} linked_list_head;
 
-// Dynamische Datenstrukturfunktionen
-list_element* list_element_new();
-void          list_element_init(list_element* el);
-void          list_element_deleteMembers(list_element* el, _Bool freePayload);
-void          list_element_delete(list_element* el, _Bool freePayload);
+typedef linked_list_head linked_list;
 
-void listelement_append(list_header *l, list_element *el, void* payload);
-void listelement_delete(list_header *l, list_element *el,  _Bool freePayload);
+// Konstruktoren und Destruktoren fuer Dynamische Datenstrukturfunktionen
+linked_list*  linked_list_new();
+void          linked_list_init(linked_list* el);
+void          linked_list_deleteMembers(linked_list* el);
+void          linked_list_delete(linked_list* el);
 
-void list_clear(list_header *l);
+// Bedien-Funktionen
+void linked_list_appendElement(linked_list *l, linked_list_element *el, void* payload);
+void linked_list_deleteElement(linked_list *l, linked_list_element *el);
+void linked_list_clear(linked_list_head *l);
 
-#endif /* LINKED_LISTS_H_ */
+#endif /* HAVE_LINKED_LIST_H */

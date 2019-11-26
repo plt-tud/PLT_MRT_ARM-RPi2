@@ -38,51 +38,80 @@
 
 #include <stddef.h>
 #include <stdlib.h>
-#include "linked_lists.h"
+#include <stdio.h>
+
+#include "linked_list_element.h"
+#include "linked_list.h"
 
 static void linkedListExample_static()
 {
-	list_header listhead = {NULL, NULL};
+	linked_list listhead;
+	linked_list_init(&listhead);
 
 	// 100 statische elemente... wir wissen noch nicht, wie das dynamisch geht...
-	list_element elements[100] = {{NULL, NULL}};
+	linked_list_element elements[100] = {{NULL, NULL}};
 
 	// ein Paar statische Datentypen als Payload
 	int payloadData[] = {0,1,2,3,4,5,6,7,8,9};
 
 	// Statische Werte einfuegen ...
 	for (int i=0; i<10; i++) {
-		listelement_append(&listhead, &elements[i], &payloadData[i]);
+		linked_list_appendElement(&listhead, &elements[i], &payloadData[i]);
 	}
 
 	// ... und wieder loeschen.
-	while(listhead.head != NULL) {
-		listelement_delete(&listhead, listhead.head, false);
+	linked_list_element *it;
+	while( (it = listhead.head) != NULL) {
+		// Ausklinked des elements aus der Liste
+		linked_list_deleteElement(&listhead, listhead.head);
+
+		// Aufraeumen des Elemente (aber nicht das payload loeschen)
+		linked_list_element_deleteMembers(it, false);
 	}
+
+	// Aufraeumen des Listenkopfes
+	linked_list_deleteMembers(&listhead);
 	return;
 }
 
 static void linkedListExample_dynamic()
 {
-	list_header listhead = {NULL, NULL};
+	linked_list listhead;
+	linked_list_init(&listhead);
 
-	// Statische Werte einfuegen ...
+	// Dynamische Werte einfuegen ...
 	for (int i=0; i<10; i++) {
+		// Wir brauchen eine dynamische Kopie unseres Integers i
 		int *payloadInt = (int *) malloc(sizeof(int));
 		*payloadInt = i;
-		listelement_append(&listhead,
-							list_element_new(),
-							payloadInt);
+
+		// Fuege ein neues Listenelement hinzu
+		linked_list_appendElement(&listhead,
+									linked_list_element_new(),
+									payloadInt);
 		printf("Added %i to list\n", *payloadInt);
 	}
 
-	list_clear(&listhead);
+	// Iteriere ueber alle Elemente...
+	linked_list_element *it;
+	while( (it = listhead.head) != NULL) {
+		// Ausklinked des elements aus der Liste
+		linked_list_deleteElement(&listhead, listhead.head);
+
+		// Aufraeumen des Elemente & loeschen der dyn. Datenstruktur samt payload
+		linked_list_element_deleteMembers(it, true);
+	}
+
+	linked_list_deleteMembers(&listhead);
 	return;
 }
 
 int  main(int argc, char **argv)
 {
+	// Statisches Beispiel (VL-11): Nur appendElement und deleteElement
 	linkedListExample_static();
+
+	// Dynamisches Beispiel (VL-12): Wir generieren unsere Listenelemente zur Laufzeit
 	linkedListExample_dynamic();
 	return 0;
 }

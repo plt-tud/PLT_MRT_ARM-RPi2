@@ -24,54 +24,51 @@
  * DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
  */
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include "linked_lists.h"
 
-list_element* list_element_new()
+#include "linked_list.h"
+#include "linked_list_element.h"
+
+linked_list*  linked_list_new()
 {
-	list_element* new = (list_element*) malloc(sizeof(list_element));
-	list_element_init(new);
-	return new;
+	linked_list *n = (linked_list *) malloc(sizeof(linked_list)) ;
+	linked_list_init(n);
+	return n;
 }
 
-void list_element_init(list_element* el)
+void linked_list_init(linked_list* el)
 {
 	if (el == NULL) return;
+	el->head = NULL;
+	el->tail = NULL;
+	return;
+}
 
-	el->next    = NULL;
-	el->payload = NULL;
+void linked_list_deleteMembers(linked_list* l)
+{
+	if (l == NULL)  return;
+
+	l->head = NULL;
+	l->tail = NULL;
 
 	return;
 }
 
-void list_element_deleteMembers(list_element* el, _Bool freePayload)
+void linked_list_delete(linked_list* l)
 {
-	if (el == NULL) return;
+	if (l == NULL)  return;
 
-	if (freePayload==true && el->payload != NULL ){
-		free(el->payload );
-	}
-
-	el->payload = NULL;
-	el->next    = NULL;
-
-	return;
-}
-
-void list_element_delete(list_element* el, _Bool freePayload)
-{
-	if (el == NULL) return;
-
-	list_element_deleteMembers(el, freePayload);
-	free(el);
-	el = NULL;
+	linked_list_deleteMembers(l);
+	free(l);
+	l=NULL;
 
 	return;
 }
 
 
-void listelement_append(list_header *l, list_element *el, void* payload)
+void linked_list_appendElement(linked_list_head *l, linked_list_element *el, void* payload)
 {
 	if (l == NULL)  return;
 	if (el == NULL) return;
@@ -86,19 +83,18 @@ void listelement_append(list_header *l, list_element *el, void* payload)
 	return;
 }
 
-void listelement_delete(list_header *l, list_element *el, _Bool freePayload)
+void linked_list_deleteElement(linked_list_head *l, linked_list_element *el)
 {
 	if (l == NULL)  return;
 	if (el == NULL) return;
 
-	list_element *it   = l->head;
-	list_element *prev = NULL;
+	linked_list_element *it   = l->head;
+	linked_list_element *prev = NULL;
 	while (it != el && it != NULL) {
 		prev = el;
 		el = el->next;
 	}
 	if (it == NULL) return; // el not found
-
 
 	if (it == l-> tail) {
 		if (prev==NULL) {
@@ -117,19 +113,11 @@ void listelement_delete(list_header *l, list_element *el, _Bool freePayload)
 		prev->next = it->next;
 	}
 
-	list_element_deleteMembers(it, freePayload);
-
 	return;
 }
 
 
-void list_clear(list_header *l)
+void linked_list_clear(linked_list_head *l)
 {
-	if (l == NULL)  return;
-	while (l->head != NULL)
-		listelement_delete(l, l->head, true);
-
-	l->tail = NULL;
-
-	return;
+	linked_list_deleteMembers(l);
 }
