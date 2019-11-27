@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2018 Leon Urbas   <leon.urbas@tu-dresden.de>
+ * Copyright (c) 2018 Leon Urbas <leon.urbas@tu-dresden.de>
+ * Copyright (c) 2019 Chris Iatrou <chris_paul.iatrou@tu-dresden.de>
  *
  * Hiermit wird unentgeltlich jeder Person, die eine Kopie der
  * Software und der zugehörigen Dokumentationen (die "Software")
@@ -24,37 +25,32 @@
  * DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
  */
 
-/**
- *  @brief: Blinken der GPIO27 oder 47 mit 3rd party libbcm2835
+/* @brief: Header fuer Programme, die unsere libBCM nutzen wollen.
  *
- *  Schaltet wahlweise GPIO 47 (Boad Status LED) oder 27 (externe
- *  LED/Linker Kit) an/aus. Die LED kann mit der Definition
- *  USE_BOARDLED ausgewaehlt werden.
- *
- *  Nutzt die 3rd Party libbcm2835 **mit manuellem Patch fuer das Pi
- *  2B!** (liegt als binaeres Archiv im Projekt bei)
+ * Der Header definiert unsere Bibliotheksfunktionen als "extern"
+ * und stellt die einheitlichen Definitionsheader zur Verfuegung.
  */
 
-#include "bcm2835.h"
+#ifndef _HAVE_BCM2836_H_
+#define _HAVE_BCM2836_H_
+
+#include "BCM2836_constants.h"
+#include "BCM2836_GPIO_constants.h"
+#include "BCM2836_SPI_constants.h"
+#include <unistd.h>
+#include <stdint.h>
+
+int  BCM2836_Open();
+void BCM2836_Close();
+void BCM2836_GPIO_PinSelFun(unsigned int gpiono, gpfsel_function fun);
+void BCM2836_GPIO_PinSet(unsigned int gpiono);
+void BCM2836_GPIO_PinClr(unsigned int gpiono);
 
 
-#define USE_BOARDLEDS
-#ifndef USE_BOARDLEDS
-  #define GPIO_LED 27
-#else
-  #define GPIO_LED 47
-#endif
+#define BCM2836_SPI0_RELOFFSET BCM2836_SPI0_BASEOFFSET-BCM2836_GPIO_BASEOFFSET
+#define BCM2836_SPI_REGADDR(x) bcm2836_baseaddr_ptr + BCM2836_SPI0_RELOFFSET + x
 
-void main() {
-  bcm2835_init();
-  
-  // Set RPI pin P1-15 to be an input
-  bcm2835_gpio_fsel(GPIO_LED, BCM2835_GPIO_FSEL_OUTP);
-  
-  bcm2835_gpio_set(GPIO_LED);
-  bcm2835_gpio_clr(GPIO_LED);
+void BCM2836_SPI0_Send(size_t dataSz, uint8_t *txdata_ptr, uint8_t *rxdata_ptr);
+void BCM2836_SPI0_Init();
 
-  
-  bcm2835_close();
-  return;
-}
+#endif // _HAVE_BCM2836_H_

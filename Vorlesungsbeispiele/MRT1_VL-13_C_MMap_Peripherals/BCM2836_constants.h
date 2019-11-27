@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2018 Leon Urbas   <leon.urbas@tu-dresden.de>
+ * Copyright (c) 2018 Leon Urbas <leon.urbas@tu-dresden.de>
+ * Copyright (c) 2019 Chris Iatrou <chris_paul.iatrou@tu-dresden.de>
  *
  * Hiermit wird unentgeltlich jeder Person, die eine Kopie der
  * Software und der zugehörigen Dokumentationen (die "Software")
@@ -24,37 +25,10 @@
  * DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
  */
 
-/**
- *  @brief: Blinken der GPIO27 oder 47 mit 3rd party libbcm2835
- *
- *  Schaltet wahlweise GPIO 47 (Boad Status LED) oder 27 (externe
- *  LED/Linker Kit) an/aus. Die LED kann mit der Definition
- *  USE_BOARDLED ausgewaehlt werden.
- *
- *  Nutzt die 3rd Party libbcm2835 **mit manuellem Patch fuer das Pi
- *  2B!** (liegt als binaeres Archiv im Projekt bei)
- */
+#ifndef _HAVE_BCM2836_CONSTANTS_H_
+#define _HAVE_BCM2836_CONSTANTS_H_
 
-#include "bcm2835.h"
+#define BCM2836_PERI_BASE         0x3f000000
+#define BCM2836_PERI_MAPSIZE      0x4100
 
-
-#define USE_BOARDLEDS
-#ifndef USE_BOARDLEDS
-  #define GPIO_LED 27
-#else
-  #define GPIO_LED 47
-#endif
-
-void main() {
-  bcm2835_init();
-  
-  // Set RPI pin P1-15 to be an input
-  bcm2835_gpio_fsel(GPIO_LED, BCM2835_GPIO_FSEL_OUTP);
-  
-  bcm2835_gpio_set(GPIO_LED);
-  bcm2835_gpio_clr(GPIO_LED);
-
-  
-  bcm2835_close();
-  return;
-}
+#endif //_HAVE_BCM2836_CONSTANTS_H_
