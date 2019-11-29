@@ -33,9 +33,9 @@
  *  USE_BOARDLED ausgewaehlt werden.
  */
 
-#define USE_BOARDLEDS
+//#define USE_BOARDLEDS
 #ifndef USE_BOARDLEDS
-  #define GPIO_LED 27
+  #define GPIO_LED 26
 #else
   #define GPIO_LED 47
 #endif
@@ -57,12 +57,13 @@
 #define RPI2_PERI_BASE          0x3f000000
 #define RPI2_GPIO_OFFSET        0x00200000
 #define RPI2_GPIO_GPSEL2_OFFS   0x00000008
+#define RPI2_GPIO_GPSEL3_OFFS   0x0000000C
 #define RPI2_GPIO_GPSEL4_OFFS   0x00000010
 
+#define RPI2_GPIO_GPSET0_OFFS   0x0000001C
 #define RPI2_GPIO_GPSET1_OFFS   0x00000020
-#define RPI2_GPIO_GPSET2_OFFS   0x00000024
+#define RPI2_GPIO_GPCLR0_OFFS   0x00000028
 #define RPI2_GPIO_GPCLR1_OFFS   0x0000002C
-#define RPI2_GPIO_GPCLR2_OFFS   0x00000030
 
 int manual_example()
 {
@@ -79,44 +80,44 @@ int manual_example()
 			return -1;
 		}
 
-		volatile uint32_t *gpioFSEL2_ptr = (uint32_t *) &peripheral[RPI2_GPIO_GPSEL2_OFFS];
-		volatile uint32_t *gpioFSEL4_ptr = (uint32_t *) &peripheral[RPI2_GPIO_GPSEL4_OFFS];
-		volatile uint32_t *gpioSet1_ptr  = (uint32_t *) &peripheral[RPI2_GPIO_GPSET1_OFFS];
-		volatile uint32_t *gpioSet2_ptr  = (uint32_t *) &peripheral[RPI2_GPIO_GPSET2_OFFS];
-		volatile uint32_t *gpioClr1_ptr  = (uint32_t *) &peripheral[RPI2_GPIO_GPCLR1_OFFS];
-		volatile uint32_t *gpioClr2_ptr  = (uint32_t *) &peripheral[RPI2_GPIO_GPCLR2_OFFS];
+		#ifndef USE_BOARDLEDS
+			volatile uint32_t *gpioFSEL2_ptr = (uint32_t *) &peripheral[RPI2_GPIO_GPSEL2_OFFS];
+			volatile uint32_t *gpioSet1_ptr  = (uint32_t *) &peripheral[RPI2_GPIO_GPSET0_OFFS];
+			volatile uint32_t *gpioClr1_ptr  = (uint32_t *) &peripheral[RPI2_GPIO_GPCLR0_OFFS];
 
+			// Make GPIO26 an output
+			unsigned int fsel = *gpioFSEL2_ptr;
+			fsel             &= ~( ((unsigned int) 0x7) << (3*(26%10)) );
+			fsel			 |=  ( ((unsigned int) 0x1) << (3*(26%10)) );
+			*gpioFSEL2_ptr    = fsel;
 
-		#ifdef USE_BOARDLEDS
-			// Make GPIO27 an output
-			unsigned int fsel = *(gpioFSEL2_ptr)
-								& ( ~((unsigned int) 0x7) << (27/10)  )
-								| (  ((unsigned int)  0x1) << (27/10) );
-			*(gpioFSEL2_ptr) |= fsel;
+			// Turn GPIO26 off
+			*(gpioClr1_ptr) = (unsigned int) 1 << (26 %32);
 
-			// Turn GPIO27 off
-			*(gpioClr1_ptr) = ((unsigned int) 1) << (27 %32);
-
-			// Turn GPIO27 on
-			*(gpioSet1_ptr) = ((unsigned int) 1) << (27 %32);
+			// Turn GPIO26 on
+			*(gpioSet1_ptr) = (unsigned int) 1 << (26 %32);
 
 			// Turn GPIO27 off
-			*(gpioClr1_ptr) = ((unsigned int) 1) << (27 %32);
-		#else // User Linker Kit LEDs
+			*(gpioClr1_ptr) = (unsigned int) 1 << (26 %32);
+		#else // Use Board LEDs: GPIO 47 is the green system LED
+			volatile uint32_t *gpioFSEL4_ptr = (uint32_t *) &peripheral[RPI2_GPIO_GPSEL4_OFFS];
+			volatile uint32_t *gpioSet2_ptr  = (uint32_t *) &peripheral[RPI2_GPIO_GPSET1_OFFS];
+			volatile uint32_t *gpioClr2_ptr  = (uint32_t *) &peripheral[RPI2_GPIO_GPCLR1_OFFS];
+
 			// Make GPIO47 an output
-			unsigned int fsel = *(gpioFSEL4_ptr)
-			                    & ( ~((unsigned int) 0x7) << (47/10) )
-			                    | ( ((unsigned int) 0x1) << (47/10)  );
-			*(gpioFSEL4_ptr) |= fsel;
+			uint32_t fsel    = *gpioFSEL4_ptr;
+			fsel             &=  ~(  (unsigned int) 0x7 << (3* (47%10)) ) ;
+			fsel 	         |=      (unsigned int) 0x1 << (3* (47%10))  ;
+			*(gpioFSEL4_ptr) = fsel;
 
 			// Turn GPIO47 off
-			*(gpioClr2_ptr) = ((unsigned int) 1) << (47 %32);
+			*(gpioClr2_ptr) = (unsigned int) 1 << (47 %32);
 
 			// Turn GPIO47 on
-			*(gpioSet2_ptr) = ((unsigned int) 1) << (47 %32);
+			*(gpioSet2_ptr) = (unsigned int) 1 << (47 %32);
 
 			// Turn GPIO47 off
-			*(gpioClr2_ptr) = ((unsigned int) 1) << (47 %32);
+			*(gpioClr2_ptr) = (unsigned int) 1 << (47 %32);
 		#endif // USE_BOARDLEDS
 
 		munmap(peripheral, 4096);
