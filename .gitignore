@@ -1,7 +1,6 @@
 # Exclude compiler products
 *.m4
 *.o
-*.a
 *.la
 *.so*
 *.pyc
