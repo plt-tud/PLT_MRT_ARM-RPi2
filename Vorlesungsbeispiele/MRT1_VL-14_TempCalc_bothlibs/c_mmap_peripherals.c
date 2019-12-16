@@ -67,7 +67,7 @@ static double spiData2Temp(char *spidata)
 	temp = temp/1024 * 3.3; 					  // To Voltage
 
 	// Die Konvertierung ergibt sich aus dem TMP36 Datenblatt
-	temp = 25 + (temp-0.75)/0.1;				  // Umwandlung in Celsius
+	temp = 25 + (temp-0.75)/0.01;				  // Umwandlung in Celsius
 
 	return temp;
 }
