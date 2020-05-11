@@ -28,8 +28,8 @@
 
 #include "Automaton.h"
 
-Automaton::Automaton(State& startState, std::list<Transition*> pTT)
-: pCurrentState(&startState), pTT(pTT), TTlength(TTlength), currentStateTicks(0), first(true) {
+Automaton::Automaton(State& startState, std::list<Transition*> pTransitionTable)
+: pCurrentState(&startState), pTT(pTransitionTable), TTlength(pTransitionTable.size()), currentStateTicks(0), first(true) {
 }
 
 void Automaton::run() {
