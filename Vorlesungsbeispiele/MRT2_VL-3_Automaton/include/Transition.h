@@ -36,6 +36,9 @@ using namespace std;
 #include "State.h"
 
 class Transition : public AutomatonElement {
+public:
+  const State& start;
+  const State& target;        
 private:
   Guard guardFunc;
   Behavior effectFunc;
@@ -44,9 +47,6 @@ public:
   // Konstruktur
   explicit Transition(const State& start, const State& target, Guard guardFunc=defaultGuard, Behavior effectFunc=defaultBehavior, void *handle=nullptr);
   
-  const State& start;
-  const State& target;
-        
   // Wächterfunktion
   bool guard() const { return guardFunc(*this,"guard"); }
   // Übergangsverhalten
