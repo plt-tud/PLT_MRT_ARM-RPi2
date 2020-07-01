@@ -34,7 +34,8 @@ Die Nachfolgenden Einstellungen sind zur Vollständigkeit dokumentiert. Einige d
 1. Project Properties >  C/C++ Build > Settings > GCC C++ Linker > Libraries > Libraries (-l)> `pthread`
 1. Project Properties >  C/C++ Build > Settings > GCC C++ Linker > Libraries > Libraries (-l)> `bcm2835`
 1. Project Properties >  C/C++ Build > Settings > GCC C++ Linker > Libraries > Library Search Path (-L) > `${workspce_loc:}${ProjName}/lib`
-
+1. Project Properties >  C/C++ Build > Settings > GCC C++ Linker
+   1. Für die Library bcm2835 statisch zu linken, fügen Sie die Option -static im command line pattern: ${COMMAND} -static ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}
 
 ## Für x86/x86_64 (native)
 
