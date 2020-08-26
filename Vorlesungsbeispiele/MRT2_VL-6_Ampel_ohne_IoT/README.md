@@ -2,7 +2,7 @@
 
 Die Ampel ohne IoT-Schnittstelle (VL-6) als Eclipse-Projekt. Das Projekt implementiert eine Ampel, mit multithreaded tasks, die auf Knopdruck (Sensor) die Ampelphase umschaltet. Ampel, Automat und Peripherieklassen dienen als Vorlesungsbeispiele.
 
-Das Programm besitzt einen Preprocessor-Schalter (BUILD_PI), um die Peripherie-Funktionen des Raspberry Pis zu de-/aktivieren.
+Das Programm besitzt einen Preprocessor-Schalter (BUILD_RPI), um die Peripherie-Funktionen des Raspberry Pis zu de-/aktivieren.
 
 # Einstellungen für Eclipse
 
