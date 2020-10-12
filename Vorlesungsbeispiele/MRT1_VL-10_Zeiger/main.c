@@ -87,12 +87,6 @@ void pointerBasics(void)
 
 }
 
-void zeigerAufFelder(void)
-{
-
-	return;
-}
-
 void stringsStuff(void)
 {
 	char *s    = "ABCD";    // String als Pointer auf 0-terminierte Ascii-Folge
@@ -133,7 +127,6 @@ int  main(int argc, char **argv)
 	{
 		// Process arguments here
 	}
-
 
 	printf_example(); // Use Console->Pi Console to view output
 
