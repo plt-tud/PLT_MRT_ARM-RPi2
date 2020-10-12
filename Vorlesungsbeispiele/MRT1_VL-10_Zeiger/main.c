@@ -5,7 +5,7 @@
  *      Author: mrt
  */
 
-#include <stddef.h>
+#include <stddef.h> // Defines the NULL macro
 
 int global_var;
 
