@@ -21,7 +21,7 @@ main:
   ldr r1, [r1]    // load value of b
 
   cmp r0, r1      // compare a and b
-  bge if_else     // skip IF section if b >= a
+  bge if_else     // skip IF section if a >= b
 if_match:
   mov r0, #1      // IF section: load 1 into r0
   b if_done       // skip ELSE section unconditionally
@@ -32,3 +32,6 @@ if_done:
   ldr r1, =var_x  // load pointer to x
   str r0, [r1]    // store r0 in x
 
+  ldmfd sp!,{r4-r11,lr}
+  bx lr
+.endfunc
