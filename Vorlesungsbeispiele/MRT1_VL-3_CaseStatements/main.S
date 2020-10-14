@@ -1,9 +1,9 @@
 	.data
 .balign 4
-var_a: .word 0x00000010
-var_b: .word 0x00000010
-var_x: .word 0x00000100
-var_c: .word 0x00000011
+var_a: .word 0x00000011		//A = 17
+var_b: .word 0x00000001		//B = 1
+var_x: .word 0x00000100		//X = 256
+var_c: .word 0x0000000F		//C = 15
 
 .text
 .balign 4
@@ -37,3 +37,4 @@ case_done:	ldr r1, =var_x		@ load pointer to x
 	ldmfd sp!,{r0-r4,lr}
   	bx lr
 .endfunc
+

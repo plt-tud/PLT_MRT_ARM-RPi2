@@ -32,9 +32,9 @@
  *          - Abschnitte einer Assembler-datei
  *          - labels
  */
-		.data
+	.data
 		.balign 4
-countD: .word 0x000010
+countD: .word 0x000003		//number of loops
 
 		.text
 		.func main
