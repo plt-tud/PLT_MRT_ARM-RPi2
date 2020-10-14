@@ -77,7 +77,7 @@ loop1_start:
 
   /*Loop End*/
   bgt loop1_start // skip IF section if 0 <= a
-loop1_start:
+loop1_end:
 
 /**********************************/
 // for-Schleife
