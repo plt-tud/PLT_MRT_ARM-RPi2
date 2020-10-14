@@ -27,7 +27,7 @@ loop_start:
   cmp r0, r1      // compare a and 0
 
   /*Loop End*/
-  bgt loop1_start // skip IF section if 0 <= a
+  bgt loop_start // skip IF section if a > 0
 loop_end:
   ldmfd sp!,{r4-r11,lr}
   bx lr

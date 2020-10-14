@@ -23,7 +23,7 @@ loop0_start:
   ldr r1, [r1]    // load value of b
 
   cmp r0, r1      // compare a and b
-  bge loop0_end   // skip IF section if b >= a
+  bge loop0_end   // skip IF section if a >= b
 
   /*Loop Body*/
   ldr r1, =var_a  // load pointer to a

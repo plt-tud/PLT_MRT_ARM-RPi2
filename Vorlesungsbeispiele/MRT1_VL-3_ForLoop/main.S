@@ -14,12 +14,12 @@ main:
 // for-Schleife
 // for (i=1; i<=3; i++) { b++ }
 for_loop_init:
-  mov r10, #1
+  mov r10, #1		//This is our counter
 
 for_loop_test:
   mov r0, #3
-  cmp r10, r0 // r10 <= 3
-  bgt for_loop_done
+  cmp r10, r0
+  bgt for_loop_done // r10 > 3 or r10 <= 3
 
   ldr r1, =var_b
   ldr r0, [r1]
