@@ -4,8 +4,6 @@
 #include "mamal.h"
 #include "human.h"
 
-typedef struct human_t human;
-
 typedef struct dog_t {
     mamal mamalAttr;
     char *name;
