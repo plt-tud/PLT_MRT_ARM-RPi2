@@ -22,7 +22,7 @@ void human_init(human *this, const char* name) {
     this->mamalAttr.species = (char *) malloc(strlen("Homo Sapiens")+1);
     strcpy(this->mamalAttr.species, "Homo Sapiens");
     
-    this->name = (char *) malloc(strlen(name));
+    this->name = (char *) malloc(strlen(name) + 1);
     strcpy(this->name, name);
     
     return;
@@ -38,8 +38,10 @@ void human_delete(human *this) {
 }
 
 void human_deleteMembers(human *this) {
-    free(this->name);
-    this->name = NULL;
+    if(this->name) {
+        free(this->name);
+        this->name = NULL;
+    }
     
     mamal_deleteMembers((mamal*) this);
     return;
