@@ -42,7 +42,6 @@ void human_deleteMembers(human *this) {
         free(this->name);
         this->name = NULL;
     }
-    this->name = NULL;
     
     mamal_deleteMembers((mamal*) this);
     return;
