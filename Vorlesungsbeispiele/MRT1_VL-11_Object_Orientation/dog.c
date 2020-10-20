@@ -23,7 +23,7 @@ void dog_init(dog *this, const char* name, human *owner) {
     this->mamalAttr.species = (char *) malloc(strlen("Canis Familaris")+1);
     strcpy(this->mamalAttr.species, "Canis Familaris");
     
-    this->name = (char *) malloc(strlen(name));
+    this->name = (char *) malloc(strlen(name) + 1);
     strcpy(this->name, name);
     
     this->owner = owner;
