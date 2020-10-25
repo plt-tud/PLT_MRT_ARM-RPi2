@@ -2,7 +2,7 @@
 .type main, %function
 
 .data
-src:	.word 0x2F534350,0x20455350,0x20445554,0x3154524D
+src:	.word 0x2F534350,0x20455350,0x20445554,0x3154524D   //String is PCS/PSE TUD MRT1
 .set len,.-src
 	.byte 0
 .text
