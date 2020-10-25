@@ -53,8 +53,8 @@ fib_iterative:
   mov r4, r0 // r4 := n
 
 fib_iterative_loop_test:
-  cmp r4, r3              // while (k <= n)
-  blt fib_iterative_done
+  cmp r4, r3
+  blt fib_iterative_done	 // while (k <= n) continue else jump to done
 
 fib_iterative_loop_do:
   add r0, r1, r2
@@ -95,14 +95,14 @@ fib_recursive:
   //}
 
   SUB   R0, #1
-  MOV   R4, R0     //  temp = n-1
+  MOV   R4, R0     		//  R4 = n-1
   BL    fib_recursive
-  MOV   R5, R0     // temp2=fib(n-1)
+  MOV   R5, R0     		// R5=fib(n-1)
 
-  SUB   R0, R4, #1 // r0=n-2
-  BL    fib_recursive
+  SUB   R0, R4, #1 		// r0=n-2
+  BL    fib_recursive	//R0 = fib(n-2)
 
-  ADD   R0, R0, R5  // temp = temp + fib(n-2)
+  ADD   R0, R0, R5  // temp = fib(n-2) + fib(n-1)
 
  fib_recursive_done:
   // R0=return value
