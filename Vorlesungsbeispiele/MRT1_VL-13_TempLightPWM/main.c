@@ -75,7 +75,7 @@ int main(void) {
 			ambientTemperature = currentTemperature;
 		}
 
-		if (currentTemperature - ambientTemperature > DC_SENSE) {
+		if (currentTemperature - ambientTemperature > pwmcount) {
 			BCM2836_GPIO_PinClr(GPIO_GREEN);
 		}
 		else {
