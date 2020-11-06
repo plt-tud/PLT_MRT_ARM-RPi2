@@ -52,7 +52,7 @@ main:
 
   ldr r3, =FIELD                 // r3 <- base address
   mov r2, #FIELD2_SRC_INDEX      // r2 <- index
-  rsb r4, r2, #FIELD2_DST_INDEX  // r4 <- #FIELD2_DST_INDEX - r2
+  rsb r4, r2, #FIELD2_DST_INDEX  // r4 <- #FIELD2_DST_INDEX - r2 i.e. difference between source and destination
   .if FIELD2_TYPE_SIZE!=12         // this code is valid for type size = 12 only
     .error "Optimierter Zugriff nur fuer Elementgroesse 12 gueltig"
   .endif

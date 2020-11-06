@@ -33,7 +33,7 @@
 
 .equ FIELD_TYPE_LSL,  2
 .equ FIELD_TYPE_SIZE, 4
-.equ FIELD_SIZE,      24
+.equ ARRAY_SIZE,      24
 
 .equ WIERDFIELD_TYPE_SIZE, 12
 .equ WIERDFIELD_SIZE,      8
@@ -41,7 +41,7 @@
 .data
 .balign 4
 .word 0xAAAAAAAA // Namenslose Variable fuer Anfang, macht es einfacher unser Feld im Memory-Viewer zu erkennen, hat sonst keine Funktion im Code/Beispiel
-FIELD:      .skip FIELD_SIZE*FIELD_TYPE_SIZE, 0
+FIELD:      .skip ARRAY_SIZE*FIELD_TYPE_SIZE, 0
 .word 0xEEEEEEEE // Namenslose Variable fuer Ende, macht es einfacher unser Feld im Memory-Viewer zu erkennen, hat sonst keine Funktion im Code/Beispiel
 WIERDFIELD: .skip WIERDFIELD_SIZE*WIERDFIELD_TYPE_SIZE, 0
 
@@ -56,6 +56,7 @@ WIERDFIELD: .skip WIERDFIELD_SIZE*WIERDFIELD_TYPE_SIZE, 0
   mov   fp, ip
 
   // Zugriff auf zur Laufzeit bekanntes Feldelement, e.g. R0 <- FIELD[4]
+  //using immediate offset
   array_example_staticAddress:
   .equ FIELD_INDEX, 4
   ldr r3, =FIELD                              // r3 <- base address
@@ -65,24 +66,27 @@ WIERDFIELD: .skip WIERDFIELD_SIZE*WIERDFIELD_TYPE_SIZE, 0
 
   // Zugriff auf zur Laufzeit unbekanntes Feldelement
   //   mit Feldelementen arbitraerer Groesse
+  //using multiplication
   .equ FIELD_INDEX, 3
   mov r2, #FIELD_INDEX                  // r2 <- 3 (index)
   array_example_dynamicAddress_general:
     ldr r0, =FIELD_TYPE_SIZE
-    mul r0, r2, r0
-    ldr r1, =FIELD
-    add r1, r0, r1
+    mul r0, r2, r0							//r0 <- index * type_size
+    ldr r1, =FIELD							//r1 <- base
+    add r1, r0, r1							//r1 <- r0 + r1 i.e (index * type_size) + base
 
-    ldr r0, [r1]     // r0 <- [base + index * 4]
-    add r0, r0, #42  // r0 <- r0 + 3
-    str r0, [r1]     // r0 -> [base + index * 4]
+    ldr r0, [r1]     // r0 <- [base + index * 4]  : load the value
+    add r0, r0, #42  // r0 <- r0 + 3 // r0 <- r0 + 42 : work on the value
+    str r0, [r1]     // r0 -> [base + index * 4] : storet he changed value back in memory
   array_example_dynamicAddress_general_end:
 
   // Zugriff auf zur Laufzeit unbekanntes Feldelement
   //   mit Feldelementgroesse %2
+  //using shift
   array_example_dynamicAddress_optimal:
   .equ FIELD_INDEX, 3
     mov r2, #FIELD_INDEX                  // r2 <- 3 (index)
+    ldr r3, =FIELD   					// r3 <- base
     ldr r0, [r3, r2, LSL #FIELD_TYPE_LSL] // r0 <- [base + index * 4]
     add r0, r0, #FIELD_INDEX              // r0 <- r0 + 3
     str r0, [r3, r2, LSL #FIELD_TYPE_LSL] // r0 -> [base + index * 4]
@@ -93,9 +97,9 @@ WIERDFIELD: .skip WIERDFIELD_SIZE*WIERDFIELD_TYPE_SIZE, 0
   // for (r2=BASEADDR, r3=0, r3<FIELDELEMENTS, r3+=1)
   array_example_dynamicAddress_iterate_init:
     ldr r2, =FIELD
-    mov r3, #0
+    mov r3, #0				//counter or the index to be accessed
   array_example_dynamicAddress_iterate_condition:
-    cmp r3,#FIELD_SIZE
+    cmp r3,#ARRAY_SIZE
     bge array_example_dynamicAddress_iterate_end
 
     // Berechne Element-Addresse
