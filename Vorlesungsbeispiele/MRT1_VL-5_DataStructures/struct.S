@@ -103,16 +103,16 @@ structs_example:
 
     // Anzahl der Bits, die wir unser Feld nach Links schieben muessen: 27%10 * 3
     mov r1, r8, lsl #1 	//r1= 2*mod = 2* r8
-    add r1, r1, r8    // r1 = 2*mod + mod = r1+r8 --> GPIO27 -> 27%10 * 3 = 21
-    lsl r2, r2, r1    // Prepare the value: Richte unser Bitfeld korrekt im Register aus: bring the value to the correct position in the regster
+    add r1, r1, r8    	// r1 = 2*mod + mod = r1+r8 --> GPIO27 -> 27%10 * 3 = 21
+    lsl r2, r2, r1    	//Prepare the value: Richte unser Bitfeld korrekt im Register aus: bring the value to the correct position in the regster
 
     mov r3, #FSEL_MASK
-    lsl r3, r3, r1    // Prepare the mask: Richte unsere Maske im Bitfeld aus
+    lsl r3, r3, r1    	//Prepare the mask: Richte unsere Maske im Bitfeld aus
 
     // Read-modify-update
-    ldr r0, [r7]      // Copy: Lade unser aktuelles register
-    bic r0, r0, r3    // Modify: Clear mit Maske
-    orr r0, r0, r2    // Update: Setze unsere Bits
+    ldr r0, [r7]      	// Copy: Lade unser aktuelles register
+    bic r0, r0, r3    	// Modify: Clear mit Maske
+    orr r0, r0, r2    	// Update: Setze unsere Bits
 
     // Speichere Element
     str r0, [r7]

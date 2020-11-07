@@ -25,11 +25,17 @@
  * DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
  */
 // Textdefinitions
+// Textdefinitions
 .equ FIELD_TYPE_SIZE, 4
 .equ FIELD_TYPE_LSL,  2
 .equ FIELD_SIZE,      24
 .data
-FIELD: .skip FIELD_SIZE*FIELD_TYPE_SIZE, 0
+//FIELD: .skip FIELD_SIZE*FIELD_TYPE_SIZE, 0
+FIELD:
+	.asciz "0 1 2 3 4 5 6 7 8 9 10"
+	.asciz "11 12 13 14 15 16 17 18"
+	.asciz "19 20 21 22 23 24 25 26"
+	.asciz "27 28 29 30 31 32 33 34"
 .balign 4
 
 .text
@@ -46,7 +52,6 @@ main:
     // Adressberechnung für Feldgrößen ungleich 4,8,16,...
   calcAddressWithShiftAddMult:
   .equ FIELD2_TYPE_SIZE,12
-  .equ FIELD2_SIZE, FIELD_SIZE / FIELD2_TYPE_SIZE
   .equ FIELD2_SRC_INDEX, 3
   .equ FIELD2_DST_INDEX, 5
 
@@ -56,19 +61,20 @@ main:
   .if FIELD2_TYPE_SIZE!=12         // this code is valid for type size = 12 only
     .error "Optimierter Zugriff nur fuer Elementgroesse 12 gueltig"
   .endif
+	//Calculate the distance = difference between index * size of the element
+	//	= r4 * 12 = 4 * (2*r4 + r4)
+    ADD R4,R4,R4,LSL #1            // R4 = 2*r4 + r4
+    LSL R4, R4, #2					//R4 = 4*r4 = 4* (2*r4 + r4)
+	//12*i = 4*(2*i+i) i.e. to get to the source
+    ADD R2,R2,R2,LSL #1        // r2 = r2 + r2*2
+    LDR R0,[R3,R2,LSL#2]!      // r0 <- [r3+r2*4], then r3<-r3+r2*4
+    STR R0,[R3,R4]             // r0 -> [r3 + Distance]
 
-    ADD R4,R4,R4,LSL #1            // calculate distance between SRC and DST
-    LSL R4, R4, #2
-
-    ADD R2,R2,R2,LSL #1        // 12*i = (i*2+i)*4
-    LDR R0,[R3,R2,LSL#2]!      // r0 <- [r3+r2*FIELD2_TYPE_SIZE], then r3<-r3+r2*FIELD2_TYPE_SIZE
-    STR R0,[R3,R4]             // r0 -> [r3+r2*FIELD2_TYPE_SIZE + Distance]
+    LDR R0,[R3,#4]!            // r0 <- next four bytes r0 <- r3 + 4; then r3 <- r3+4
+    STR R0,[R3,R4]             // r0 -> [r3 + Distance]
 
     LDR R0,[R3,#4]!            // r0 <- next four bytes
-    STR R0,[R3,R4]             // r0 -> [r3+r2*FIELD2_TYPE_SIZE + Distance]
-
-    LDR R0,[R3,#4]!            // r0 <- next four bytes
-    STR R0,[R3,R4]             // r0 -> [r3+r2*FIELD2_TYPE_SIZE + Distance]
+    STR R0,[R3,R4]             // r0 -> [r3 + Distance]
   calcAddressWithShiftAddMult_end:
 
   bl matrix_example

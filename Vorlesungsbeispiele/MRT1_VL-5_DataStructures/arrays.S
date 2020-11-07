@@ -35,15 +35,11 @@
 .equ FIELD_TYPE_SIZE, 4
 .equ ARRAY_SIZE,      24
 
-.equ WIERDFIELD_TYPE_SIZE, 12
-.equ WIERDFIELD_SIZE,      8
-
 .data
 .balign 4
 .word 0xAAAAAAAA // Namenslose Variable fuer Anfang, macht es einfacher unser Feld im Memory-Viewer zu erkennen, hat sonst keine Funktion im Code/Beispiel
 FIELD:      .skip ARRAY_SIZE*FIELD_TYPE_SIZE, 0
 .word 0xEEEEEEEE // Namenslose Variable fuer Ende, macht es einfacher unser Feld im Memory-Viewer zu erkennen, hat sonst keine Funktion im Code/Beispiel
-WIERDFIELD: .skip WIERDFIELD_SIZE*WIERDFIELD_TYPE_SIZE, 0
 
  .text
  .global array_example
