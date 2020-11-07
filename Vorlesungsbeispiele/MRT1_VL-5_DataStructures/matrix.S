@@ -86,7 +86,7 @@ MATRIX: .skip P_MATRIX_DIM_I*P_MATRIX_DIM_J*P_MATRIX_ELEMENT_SIZE, 0
       .error "Indexberechnung ist fuer geg. Matrixgroesse nicht gueltig"
     .endif
 	//r9 = i, r10 = j
-    lsl r1, R10, #2         // r1 = 4j
+    lsl r1, r10, #2         // r1 = 4j
     add r0, r9, r9, LSL #1  // r0 = r9 + r9 * 2 = 2i+i
     add r0, r1, r0, LSL #2  // r0 = 4j + (2i+i)*4
     ldr r1, =MATRIX			// r1 <- base address

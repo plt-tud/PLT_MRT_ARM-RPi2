@@ -25,7 +25,6 @@
  * DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
  */
 // Textdefinitions
-// Textdefinitions
 .equ FIELD_TYPE_SIZE, 4
 .equ FIELD_TYPE_LSL,  2
 .equ FIELD_SIZE,      24
