@@ -65,28 +65,32 @@ MATRIX: .skip P_MATRIX_DIM_I*P_MATRIX_DIM_J*P_MATRIX_ELEMENT_SIZE, 0
   mov   fp, ip
 
   // Greife zu auf MATRIX[2,1]
-  .equ P_ACCESS_J, 2
-  .equ P_ACCESS_I, 1
+  .equ P_ACCESS_I, 2
+  .equ P_ACCESS_J, 1
 
-  mov r9,  #P_ACCESS_J
-  mov r10, #P_ACCESS_I
+  mov r9,  #P_ACCESS_I
+  mov r10, #P_ACCESS_J
 
   // Template: Sektion
   matrix_example_calc2daddress:
-    // Berechne:    P_MATRIX_ELEMENT_SIZE*P_MATRIX_DIM_I*j + P_MATRIX_ELEMENT_SIZE*i
-    //           =  4*3*j + 4*i
-    //           =  12*j  + (4*i)
-    //           =  4*(2j+j)  + (4*i)
+/*
+     Berechne die offset: number of columns*row number to be accessed * type_size + column to be accessed * type_size
+    				i.e. in a dimI*dimJ matrix : dimJ*i*type_size + j*type_size
+        P_MATRIX_ELEMENT_SIZE*P_MATRIX_DIM_J*P_ACCESS_I + P_MATRIX_ELEMENT_SIZE*P_ACCESS_J
+                 =  4*3*i + 4*j
+              	 =  12*i  + (4*j)
+            	 =  4*(2i+i)  + (4*j)
+    */
     .if P_MATRIX_DIM_I != 4 || P_MATRIX_DIM_I==3
       // Safeguard gegen versehentliches Zahlendrehen
       .error "Indexberechnung ist fuer geg. Matrixgroesse nicht gueltig"
     .endif
-
-    lsl r1, R10, #2         // r1 = 4i
-    add r0, r9, r9, LSL #1  // r0 = r9 + r9 * 2
-    add r0, r1, r0, LSL #2  // r0 = 4i + (2i+i)*4
-    ldr r1, =MATRIX
-    add r1, r0, r1          // r1 = addrof(feld[i,j]) = BASE + 4*4*j + 4*i
+	//r9 = i, r10 = j
+    lsl r1, r10, #2         // r1 = 4j
+    add r0, r9, r9, LSL #1  // r0 = r9 + r9 * 2 = 2i+i
+    add r0, r1, r0, LSL #2  // r0 = 4j + (2i+i)*4
+    ldr r1, =MATRIX			// r1 <- base address
+    add r1, r0, r1          // r1 = addr of(feld[i,j]) = BASE + 4*3*i + 4*j
   matrix_example_calc2daddress_end:
 
   // Template: Sektion
