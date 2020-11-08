@@ -129,15 +129,14 @@ main:
   .if (USE_BOARDLEDS == 0)
     // GPIO 27 als Output deklarieren
     // Copy-Modify-Update!
-    ldr r0, [r8, #8] // R0 <- GPIO-Register GPFSEL2
-    and r0, r0, #0b11111111000111111111111111111111
-    orr r0, r0, #0b00000000001000000000000000000000
-    str r0, [r8, #8] // R0 -> GPIO-Register GPFSEL1
-    ldr r0, [r8, #8] // R0 <- GPIO-Register GPFSEL2
+    ldr r0, [r8, #8] // copy: R0 <- GPIO-Register GPFSEL2
+    and r0, r0, #0b11111111000111111111111111111111	//modify: clear the bits
+    orr r0, r0, #0b00000000001000000000000000000000 //update
+    str r0, [r8, #8] // R0 -> GPIO-Register GPFSEL2 : store it back
 
     // GPIO 27 setzen
     mov r0, #0b00001000000000000000000000000000
-    str r0, [r8, #28] // R0 -> GPIO-Register GPSET0
+    str r0, [r8, #28] // R0 -> GPIO-Register GPSET0, it is on offset 28 from r8
 
     // GPIO 27 rücksetzen
     mov r0, #0b00001000000000000000000000000000
@@ -145,7 +144,7 @@ main:
   .else
     // GPIO 47 als Output deklarieren
     // Copy-Modify-Update!
-    ldr r0, [r8, #16] // R0 <- GPIO-Register GPFSEL3
+    ldr r0, [r8, #16] // R0 <- GPIO-Register GPFSEL3 it is on offset 16
     and r0, r0, #0b11111111111000111111111111111111
     orr r0, r0, #0b00000000000001000000000000000000
     str r0, [r8, #16] // R0 -> GPIO-Register GPFSEL3
