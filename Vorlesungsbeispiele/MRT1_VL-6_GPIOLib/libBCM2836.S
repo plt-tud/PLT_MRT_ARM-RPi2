@@ -74,20 +74,21 @@ BCM2836_GPIO_PinSelFun:
     b    BCM2836_GPIO_PinSelFun_divloop_test
   BCM2836_GPIO_PinSelFun_divloop_done:
   add r10, r0, #10 // r0 ist ins negative gerutsch, korrigiere letzte subraktion
-  add r10, r10, r10, lsl #1 // r0 ist ins negative gerutsch, korrigiere letzte subraktion
+  add r10, r10, r10, lsl #1 // r10 = r10 + r10*2
+
   // r10: (GPIONr%10)*3; Shift-bits in FSEL
   // r9:  GPIONr/10
 
   /* Copy - ... */
-  ldr r3,=dev_mem_gpio_base_addr
+  ldr r3,=dev_mem_gpio_base_addr 	//we have stored the base address from mmap at this address in mmap call
   ldr r3,[r3]   // R3 <- address of gpio_base
 
-  ldr r4,[r3,r9,LSL #2]   // R4 <- [ GPFSEL<r2> ]
+  ldr r4,[r3,r9,LSL #2]   // R4 <- [ GPFSEL<r2> ] //R4 <- GPIO_BASE + 4*(GPIONR/10) = gpio_base + 4* r9
 
   /* ... - Modify - ...*/
-  mov r5,#0b111
-  bic r4,r4,r5,LSL R10  // R4 <- R4 AND NOT ( 0b111 << R10)
-  orr r4,r4,r1,LSL R10 // R4 <- R4 ORR R1
+  mov r5,#0b111			//Get the mask
+  bic r4,r4,r5,LSL R10  // R4 <- R4 AND NOT ( 0b111 << R10) i.e. clear the bits where the gpio is
+  orr r4,r4,r1,LSL R10 // R4 <- R4 ORR R1 i.e. setting the function of the GPIO it is passed as an argument in r1
 
   /* ... - Update*/
   str r4,[r3,r9,LSL #2] // R4 -> [ GPFSEL<r2> ]
@@ -96,7 +97,7 @@ BCM2836_GPIO_PinSelFun:
   bx lr
 .endfunc
 
-// void BCM2836_GPIO_PinSet(GPIO_Pin)
+// void BCM2836_GPIO_PinSet(GPIO_Pin) r0=GPIO_Pin
 .func BCM2836_GPIO_PinSet
 BCM2836_GPIO_PinSet:
   // EABI first
@@ -107,19 +108,19 @@ BCM2836_GPIO_PinSet:
   // r1 <- Offset to GPSET0 or GPSET1
   mov r1,#BCM2836_GPSET_OFFSET
   cmp r0,#31      // if (R0 > 31)
-  addgt r1,r1,#4  // R1 <- R1 + 4
+  addgt r1,r1,#4  // then R1 <- R1 + 4 //this is done to move to GPSET1 which GPSET0 + 4 byte
 
-  // r0 <- 1 << ( pin % 32)
-  and r0, r0, #0x1F  // pin % 32
+  // r0 <- 1 << (pin % 32)
+  and r0, r0, #0x1F  // pin % 32 to get the bit shift in the field
   mov r3, #1
-  lsl r0, r3, r0     // 1 << ( pin % 32)
+  lsl r0, r3, r0     // 1 << ( pin % 32) move 1 to the location of the pin in the field i.e. the value is ready for GPSET
 
   // r2 <- gpio_base_addr
   ldr r2,=dev_mem_gpio_base_addr
   ldr r2,[r2]
 
   // r0 -> [base + offset]
-  str r0,[r2,r1]
+  str r0,[r2,r1] // store the value prepared above in GPSET
 
   ldmfd sp!,{r4-r10,r11,lr}
   bx lr

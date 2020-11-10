@@ -92,8 +92,10 @@ main:
   bl BCM2836_GPIO_PinSelFun
 
 // Template: Endlosschleife
+//loop init
+	mov r10, #0
 main_loop: // clear all lights
-  // red for 2 seconds
+  // red for 1 seconds
   mov r0,#GPIO_RED
   bl BCM2836_GPIO_PinSet
   mov r0,#GPIO_GREEN
@@ -109,8 +111,7 @@ main_loop: // clear all lights
   mov r0,#1
   bl sleep
 
-  // green for 2 seconds
-  // red + green for 1 second
+  // green for 1 seconds
   mov r0,#GPIO_RED
   bl BCM2836_GPIO_PinClr
   mov r0,#GPIO_GREEN
@@ -118,9 +119,18 @@ main_loop: // clear all lights
   mov r0,#1
   bl sleep
 
-  bal main_loop
+//loop advance
+  add r10, r10 ,#1
+//loop test
+  cmp r10, #3
+  bgt main_loop_done
+  bal main_loop	//Branch always
 
 main_loop_done:
+  mov r0,#GPIO_RED
+  bl BCM2836_GPIO_PinClr
+  mov r0,#GPIO_GREEN
+  bl BCM2836_GPIO_PinClr
   bl BCM2836_GPIO_Close
 
   mov r0, #0
