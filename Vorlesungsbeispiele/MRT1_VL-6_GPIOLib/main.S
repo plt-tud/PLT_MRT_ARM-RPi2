@@ -91,7 +91,7 @@ main:
   mov r1,#BCM2836_GPFSEL_OUTPUT
   bl BCM2836_GPIO_PinSelFun
 
-// Template: Endlosschleife
+
 //loop init
 	mov r10, #0
 main_loop: // clear all lights
