@@ -73,7 +73,7 @@ BCM2836_GPIO_Open_error:
   bal BCM2836_GPIO_Open_exit
 .endfunc
 
-// BCM2836_GPIO_PinSelFun(GPIO-Pin, FunctionSelection)
+// BCM2836_GPIO_PinSelFun(r0=GPIO-Pin, r1=FunctionSelection)
 .func BCM2836_GPIO_PinSelFun
 BCM2836_GPIO_PinSelFun:
   // EABI first
@@ -199,12 +199,14 @@ BCM2836_GPIO_Close:
 .endfunc
 
 
+
 /*********************
  * SPI Functions
  *
  * For documentation, see BCM2835 datasheet
  * chapter 10, page 148ff.
  *********************/
+
 .func BCM2836_SPI0_GetBase
  /**
    * @brief: Returns the base address of the SPI0 registers in mapped memory
@@ -263,28 +265,28 @@ BCM2836_SPI0_Init:
 
   // initialize CS
   mov r0, #0
-  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+  str r0,[r4,#BCM2836_SPI0_CS_OFFSET]
 
   // clear fifos
-  mov r0,    #BCM2835_SPI0_CS_CLEAR
-  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+  mov r0,    #BCM2836_SPI0_CS_CLEAR
+  str r0,[r4,#BCM2836_SPI0_CS_OFFSET]
 
   // set CS-Polarity of cs0 and cs1 to 0
-  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-  bic r0,r0,#BCM2835_SPI0_CS_CSPOL0
-  bic r0,r0,#BCM2835_SPI0_CS_CSPOL1
-  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+  ldr r0,[r4,#BCM2836_SPI0_CS_OFFSET]
+  bic r0,r0,#BCM2836_SPI0_CS_CSPOL0
+  bic r0,r0,#BCM2836_SPI0_CS_CSPOL1
+  str r0,[r4,#BCM2836_SPI0_CS_OFFSET]
 
   // set data mode to mode 0 (cpol=0, cpha=0) and select CS0 (CS=0)
-  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-  bic r0,r0,#BCM2835_SPI0_CS_CPOL
-  bic r0,r0,#BCM2835_SPI0_CS_CPHA
-  bic r0,r0,#BCM2835_SPI0_CS_CS
-  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+  ldr r0,[r4,#BCM2836_SPI0_CS_OFFSET]
+  bic r0,r0,#BCM2836_SPI0_CS_CPOL
+  bic r0,r0,#BCM2836_SPI0_CS_CPHA
+  bic r0,r0,#BCM2836_SPI0_CS_CS
+  str r0,[r4,#BCM2836_SPI0_CS_OFFSET]
 
   // set clock divider
   mov r0,#64 // 3.9 MhZ on RPi2
-  str r0,[r4,#BCM2835_SPI0_CLK_OFFSET]
+  str r0,[r4,#BCM2836_SPI0_CLK_OFFSET]
 
   ldmfd sp!,{r4-r10,r11,lr}
   bx lr
@@ -328,10 +330,10 @@ BCM2836_SPI0_Init:
 
   // clear fifos and set TA
   // CS = CS | (CLEAR|TA)
-  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-  orr r0,r0, #BCM2835_SPI0_CS_CLEAR
-  orr r0,r0, #BCM2835_SPI0_CS_TA
-  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+  ldr r0,[r4,#BCM2836_SPI0_CS_OFFSET]
+  orr r0,r0, #BCM2836_SPI0_CS_CLEAR
+  orr r0,r0, #BCM2836_SPI0_CS_TA
+  str r0,[r4,#BCM2836_SPI0_CS_OFFSET]
 
   // Template Ablehnende Schleife
   BCM2836_SPI0_Send_rxtxloop_start:
@@ -342,12 +344,12 @@ BCM2836_SPI0_Init:
     // Template Selektion
     BCM2836_SPI0_Send_rxtxloop_rx:
       // if (rxBuffer != Empty) {
-      ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-      tst r0, #BCM2835_SPI0_CS_RXD_FIFO_NOTEMPTY
+      ldr r0,[r4,#BCM2836_SPI0_CS_OFFSET]
+      tst r0, #BCM2836_SPI0_CS_RXD_FIFO_NOTEMPTY
       beq BCM2836_SPI0_Send_rxtxloop_rx_end
 
       // copy(SPI RX Buffer to rxdata[rxData++])
-      ldr r0,[r4,#BCM2835_SPI0_FIFO_OFFSET] // read
+      ldr r0,[r4,#BCM2836_SPI0_FIFO_OFFSET] // read
       and r0,r0,#0xFF
       strb r0,[r9, r5]
       add r5, r5, #1 // rxData++
@@ -359,14 +361,14 @@ BCM2836_SPI0_Init:
       cmp r6, r7
       bge BCM2836_SPI0_Send_rxtxloop_tx_end
       //  && txBuffer != Full ....
-      ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-      tst r0, #BCM2835_SPI0_CS_TXD_FIFO_FULL
+      ldr r0,[r4,#BCM2836_SPI0_CS_OFFSET]
+      tst r0, #BCM2836_SPI0_CS_TXD_FIFO_FULL
       beq BCM2836_SPI0_Send_rxtxloop_tx_end
       // ... ) {
 
       // copy(txdata[txData++] to SPI TX Buffer);
       ldrb r0, [r8, r6]
-      str  r0, [r4, #BCM2835_SPI0_FIFO_OFFSET]
+      str  r0, [r4, #BCM2836_SPI0_FIFO_OFFSET]
       add  r6, r6, #1  // txData++
     BCM2836_SPI0_Send_rxtxloop_tx_end: //}
 
@@ -375,14 +377,14 @@ BCM2836_SPI0_Init:
 
   // while (!DONE) { wait }
   BCM2836_SPI0_Send_wait_for_done:
-  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET] // wait for done
-  tst r0,#BCM2835_SPI0_CS_DONE
+  ldr r0,[r4,#BCM2836_SPI0_CS_OFFSET] // wait for done
+  tst r0,#BCM2836_SPI0_CS_DONE
   beq BCM2836_SPI0_Send_wait_for_done
 
   // Set transmission active to 0 (disables output lines)
-  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-  bic r0,r0,#BCM2835_SPI0_CS_TA
-  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+  ldr r0,[r4,#BCM2836_SPI0_CS_OFFSET]
+  bic r0,r0,#BCM2836_SPI0_CS_TA
+  str r0,[r4,#BCM2836_SPI0_CS_OFFSET]
 
   ldmfd sp!,{r4-r10,r11,lr}
   bx lr
