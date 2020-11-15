@@ -51,7 +51,7 @@ main:
 
   // Template: Section
   main_spi_init:
-    bl BCM2836_SPI0_GetBase
+   bl BCM2836_SPI0_GetBase
     mov r4, r0 // r4 = SPI Base
 
     // set pin functions to alternate0
@@ -77,28 +77,27 @@ main:
 
     // initialize CS
     mov r0, #0
-    str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+    str r0,[r4,#BCM2836_SPI0_CS_OFFSET]
 
     // clear fifos
-    mov r0,    #BCM2835_SPI0_CS_CLEAR
-    str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+    mov r0,    #BCM2836_SPI0_CS_CLEAR
+    str r0,[r4,#BCM2836_SPI0_CS_OFFSET]
 
     // set CS-Polarity of cs0 and cs1 to 0
-    ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-    bic r0,r0, #BCM2835_SPI0_CS_CSPOL0
-    bic r0,r0, #BCM2835_SPI0_CS_CSPOL1
-    str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+    ldr r0,[r4,#BCM2836_SPI0_CS_OFFSET]
+    bic r0,r0, #BCM2836_SPI0_CS_CSPOL0
+    str r0,[r4,#BCM2836_SPI0_CS_OFFSET]
 
     // set data mode to mode 0 (cpol=0, cpha=0) and select CS0 (CS=0)
-    ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-    bic r0,r0,#BCM2835_SPI0_CS_CPOL
-    bic r0,r0,#BCM2835_SPI0_CS_CPHA
-    bic r0,r0,#BCM2835_SPI0_CS_CS
-    str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+    ldr r0,[r4,#BCM2836_SPI0_CS_OFFSET]
+    bic r0,r0,#BCM2836_SPI0_CS_CPOL
+    bic r0,r0,#BCM2836_SPI0_CS_CPHA
+    bic r0,r0,#BCM2836_SPI0_CS_CS
+    str r0,[r4,#BCM2836_SPI0_CS_OFFSET]
 
     // set clock divider
-    mov r0,#128 // 3.9 MhZ on RPi2
-    str r0,[r4,#BCM2835_SPI0_CLK_OFFSET]
+    mov r0,#128 // 1.9 MhZ on RPi2
+    str r0,[r4,#BCM2836_SPI0_CLK_OFFSET]
   main_spi_init_done:
 
 	mov r5,#3	          // send 3 byte
@@ -109,10 +108,10 @@ main:
   main_forever:
     // clear fifos and set TA
     // CS = CS | (CLEAR|TA)
-    ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-    orr r0,r0, #BCM2835_SPI0_CS_CLEAR
-    orr r0,r0, #BCM2835_SPI0_CS_TA
-    str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+    ldr r0,[r4,#BCM2836_SPI0_CS_OFFSET]
+    orr r0,r0, #BCM2836_SPI0_CS_CLEAR
+    orr r0,r0, #BCM2836_SPI0_CS_TA
+    str r0,[r4,#BCM2836_SPI0_CS_OFFSET]
 
     mov r7, #3  // dataSz; Unsere Nachricht ist 3 Byte gross
     ldr r8, =spi_msg  // r8 = *txdata_ptr; Und beginnt hier
@@ -130,12 +129,12 @@ main:
       // Template Selektion
       main_SPI0_Send_rxtxloop_rx:
         // if (rxBuffer != Empty) {
-        ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-        tst r0, #BCM2835_SPI0_CS_RXD_FIFO_NOTEMPTY
+        ldr r0,[r4,#BCM2836_SPI0_CS_OFFSET]
+        tst r0, #BCM2836_SPI0_CS_RXD_FIFO_NOTEMPTY
         beq main_SPI0_Send_rxtxloop_rx_end
 
         // copy(SPI RX Buffer to rxdata[rxData++])
-        ldr r0,[r4,#BCM2835_SPI0_FIFO_OFFSET] // read
+        ldr r0,[r4,#BCM2836_SPI0_FIFO_OFFSET] // read
         and r0,r0,#0xFF
         strb r0,[r9, r5]
         add r5, r5, #1 // rxData++
@@ -147,14 +146,14 @@ main:
         cmp r6, r7
         bge main_SPI0_Send_rxtxloop_tx_end
         //  && txBuffer != Full ....
-        ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-        tst r0, #BCM2835_SPI0_CS_TXD_FIFO_FULL
+        ldr r0,[r4,#BCM2836_SPI0_CS_OFFSET]
+        tst r0, #BCM2836_SPI0_CS_TXD_FIFO_FULL
         beq main_SPI0_Send_rxtxloop_tx_end
         // ... ) {
 
         // copy(txdata[txData++] to SPI TX Buffer);
         ldrb r0, [r8, r6]
-        str  r0, [r4, #BCM2835_SPI0_FIFO_OFFSET]
+        str  r0, [r4, #BCM2836_SPI0_FIFO_OFFSET]
         add  r6, r6, #1  // txData++
       main_SPI0_Send_rxtxloop_tx_end: //}
 
@@ -163,13 +162,13 @@ main:
 
     // while (!DONE) { wait }
     main_SPI0_Send_wait_for_done:
-    ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET] // wait for done
-    tst r0,#BCM2835_SPI0_CS_DONE
+    ldr r0,[r4,#BCM2836_SPI0_CS_OFFSET] // wait for done
+    tst r0,#BCM2836_SPI0_CS_DONE
     beq main_SPI0_Send_wait_for_done
 
-    ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-    bic r0,r0,#BCM2835_SPI0_CS_TA
-    str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+    ldr r0,[r4,#BCM2836_SPI0_CS_OFFSET]
+    bic r0,r0,#BCM2836_SPI0_CS_TA
+    str r0,[r4,#BCM2836_SPI0_CS_OFFSET]
 
     // FIXME: EABI: SP muss an 8-Byte-Grenze ausgerichtet sein! (externe Schnittstelle)
     mov r0,#1 // EABI-konforme Übergabe des 0ten Parameters

@@ -73,7 +73,7 @@ BCM2836_GPIO_Open_error:
   bal BCM2836_GPIO_Open_exit
 .endfunc
 
-// BCM2836_GPIO_PinSelFun(GPIO-Pin, FunctionSelection)
+// BCM2836_GPIO_PinSelFun(r0=GPIO-Pin, r1=FunctionSelection)
 .func BCM2836_GPIO_PinSelFun
 BCM2836_GPIO_PinSelFun:
   // EABI first
@@ -199,12 +199,14 @@ BCM2836_GPIO_Close:
 .endfunc
 
 
+
 /*********************
  * SPI Functions
  *
  * For documentation, see BCM2835 datasheet
  * chapter 10, page 148ff.
  *********************/
+
 .func BCM2836_SPI0_GetBase
  /**
    * @brief: Returns the base address of the SPI0 registers in mapped memory
@@ -220,169 +222,6 @@ BCM2836_SPI0_GetBase:
   ldr r0,=dev_mem_gpio_base_addr
   ldr r0,[r0]
   add r0,r0,#(BCM2836_SPI0_BASEOFFSET-BCM2836_GPIO_BASEOFFSET)
-
-  ldmfd sp!,{r4-r10,r11,lr}
-  bx lr
-.endfunc
-
-// void bcm2836_spi_init(void)
-.func BCM2836_SPI0_Init
-  /**
-   * @brief: Setup IO Pins for SPI0 (SoC), config SPI for MCP3008
-   */
-BCM2836_SPI0_Init:
-  // EABI first
-  mov   ip, sp
-  stmfd sp!,{r4-r11,lr}
-  mov   fp, ip
-
-  // FIXME: This bluntly assumes that GPIO_Init has been called!
-  bl BCM2836_SPI0_GetBase
-  mov r4, r0 // r4 = SPI Base
-
-  // set pin functions to alternate0
-  mov r0,#7 // CE1
-  mov r1,#BCM2836_GPFSEL_ALT0
-  bl BCM2836_GPIO_PinSelFun
-
-  mov r0,#8 // CE0
-  mov r1,#BCM2836_GPFSEL_ALT0
-  bl BCM2836_GPIO_PinSelFun
-
-  mov r0,#9 // MISO
-  mov r1,#BCM2836_GPFSEL_ALT0
-  bl BCM2836_GPIO_PinSelFun
-
-  mov r0,#10 // MOSI
-  mov r1,#BCM2836_GPFSEL_ALT0
-  bl BCM2836_GPIO_PinSelFun
-
-  mov r0,#11 // CLK
-  mov r1,#BCM2836_GPFSEL_ALT0
-  bl BCM2836_GPIO_PinSelFun
-
-  // initialize CS
-  mov r0, #0
-  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-
-  // clear fifos
-  mov r0,    #BCM2835_SPI0_CS_CLEAR
-  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-
-  // set CS-Polarity of cs0 and cs1 to 0
-  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-  bic r0,r0,#BCM2835_SPI0_CS_CSPOL0
-  bic r0,r0,#BCM2835_SPI0_CS_CSPOL1
-  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-
-  // set data mode to mode 0 (cpol=0, cpha=0) and select CS0 (CS=0)
-  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-  bic r0,r0,#BCM2835_SPI0_CS_CPOL
-  bic r0,r0,#BCM2835_SPI0_CS_CPHA
-  bic r0,r0,#BCM2835_SPI0_CS_CS
-  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-
-  // set clock divider
-  mov r0,#64 // 3.9 MhZ on RPi2
-  str r0,[r4,#BCM2835_SPI0_CLK_OFFSET]
-
-  ldmfd sp!,{r4-r10,r11,lr}
-  bx lr
-.endfunc
-
- // void bcm2836_spi0_send(size_t dataSz, void* txdata, void *rxdata)
- .func BCM2836_SPI0_Send
-  /**
-  * @brief: Send and receive dataSz bytes over SPI.
-  *
-  * @param dataSz  The number of bytes to be send from txdata
-  * @param *txdata Points to a byte-wise memory buffer from which we read data
-  * @param *rxdata Byte-wise memory buffer where we will store our data
-  * @return        Nothing meaningful
-  *
-  * Assume *txdata points to dataSz bytes of data. proceed as follows:
-  *
-  * Clear RX/TX FiFos;
-  * rxData = 0;
-  * txData = 0;
-  * while (rxData < dataSz) {
-  *   if (txBuffer != Full && txData < dataSz)
-  *     copy(txdata[txData++] to SPI TX Buffer);
-  *   if (rxBuffer != Empty)
-  *     copy(SPI RX Buffer to rxdata[rxData++])
-  * }
-  */
- BCM2836_SPI0_Send:
-  // EABI first
-  mov   ip, sp
-  stmfd sp!,{r4-r11,lr}
-  mov   fp, ip
-
-  mov r7, r0  // dataSz:r7 = r0:dataSz
-  bl BCM2836_SPI0_GetBase
-  mov r4, r0  // r4 = BCM2836_SPI0_GetBase()
-  mov r5, #0  // rxData:r5 = 0
-  mov r6, #0  // txData:r6 = r0:dataSz
-  mov r8, r1  // r8 = *txdata_ptr
-  mov r9, r2  // r9 = *rxdata_ptr
-
-  // clear fifos and set TA
-  // CS = CS | (CLEAR|TA)
-  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-  orr r0,r0, #BCM2835_SPI0_CS_CLEAR
-  orr r0,r0, #BCM2835_SPI0_CS_TA
-  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-
-  // Template Ablehnende Schleife
-  BCM2836_SPI0_Send_rxtxloop_start:
-    // while (rxdata:r5 < dataSz:r7) ...
-    cmp r5, r7
-    bge BCM2836_SPI0_Send_rxtxloop_end
-
-    // Template Selektion
-    BCM2836_SPI0_Send_rxtxloop_rx:
-      // if (rxBuffer != Empty) {
-      ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-      tst r0, #BCM2835_SPI0_CS_RXD_FIFO_NOTEMPTY
-      beq BCM2836_SPI0_Send_rxtxloop_rx_end
-
-      // copy(SPI RX Buffer to rxdata[rxData++])
-      ldr r0,[r4,#BCM2835_SPI0_FIFO_OFFSET] // read
-      and r0,r0,#0xFF
-      strb r0,[r9, r5]
-      add r5, r5, #1 // rxData++
-    BCM2836_SPI0_Send_rxtxloop_rx_end: // }
-
-    // Template Selektion
-    BCM2836_SPI0_Send_rxtxloop_tx:
-      // if (txdata:r6 < dataSz:r7 ...
-      cmp r6, r7
-      bge BCM2836_SPI0_Send_rxtxloop_tx_end
-      //  && txBuffer != Full ....
-      ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-      tst r0, #BCM2835_SPI0_CS_TXD_FIFO_FULL
-      beq BCM2836_SPI0_Send_rxtxloop_tx_end
-      // ... ) {
-
-      // copy(txdata[txData++] to SPI TX Buffer);
-      ldrb r0, [r8, r6]
-      str  r0, [r4, #BCM2835_SPI0_FIFO_OFFSET]
-      add  r6, r6, #1  // txData++
-    BCM2836_SPI0_Send_rxtxloop_tx_end: //}
-
-    b BCM2836_SPI0_Send_rxtxloop_start
-  BCM2836_SPI0_Send_rxtxloop_end:
-
-  // while (!DONE) { wait }
-  BCM2836_SPI0_Send_wait_for_done:
-  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET] // wait for done
-  tst r0,#BCM2835_SPI0_CS_DONE
-  beq BCM2836_SPI0_Send_wait_for_done
-
-  // Set transmission active to 0 (disables output lines)
-  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-  bic r0,r0,#BCM2835_SPI0_CS_TA
-  str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 
   ldmfd sp!,{r4-r10,r11,lr}
   bx lr
