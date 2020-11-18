@@ -286,7 +286,7 @@ BCM2836_SPI0_Init:
   str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 
   // set clock divider
-  mov r0,#64 // 3.9 MhZ on RPi2
+  mov r0,#128 // 1.9 MhZ on RPi2
   str r0,[r4,#BCM2835_SPI0_CLK_OFFSET]
 
   ldmfd sp!,{r4-r10,r11,lr}
