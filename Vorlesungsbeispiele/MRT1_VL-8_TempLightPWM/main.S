@@ -66,7 +66,7 @@
  *
  *     10 discrete units ~= 3,22 °C
  */
-.equ DC_SENSE, 30 // sensitivity, empirical value for warming up the sensor by hoding in hand at ~23 C
+.equ DC_SENSE, 30 // sensitivity, empirical value for warming up the sensor by hoding in hand
 
 .global main
 
@@ -155,8 +155,6 @@ main:
       mov  r0,#GPIO_GREEN
       bl   BCM2836_GPIO_PinClr
     main_loop_forever_pwm_setGreen_done:
-	//mov r0, #1
-	//bl sleep
     b main_loop_forever
   main_loop_forever_done:
 
