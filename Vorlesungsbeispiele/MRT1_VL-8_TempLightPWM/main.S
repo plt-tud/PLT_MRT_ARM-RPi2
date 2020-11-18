@@ -26,15 +26,14 @@
  */
 
 /**
- *  @brief: ThermalLightFlat: Reacts to temperature changes by changing an LED output.
+ *  @brief: ThermalLightPWM: Reacts to temperature changes by changing an LED output.
  *
- * ThermalLightFlat is a demo program using both SPI to sample an Analog Devices TMP35
+ * ThermalLightPWM is a demo program using both SPI to sample an Analog Devices TMP35
  * Temperature sensor using anb MCP3008 ADC. The lowest value aquired is interpreted as
  * ambient temperature (compensates for starting the application with a warm sensor).
  *
- * The parameter DC_SENSE gives a range for PWM Modulation of the green and red led.
- * As the Tcurrent-Tambient approaches 0, the green LED will become darker and the
- * red LED brighter.
+ * The parameter DC_SENSE gives a range for PWM Modulation of the green LED.
+ * As the Tcurrent-Tambient approaches 0, the green LED will become brighter
  */
 
 /**
@@ -46,7 +45,7 @@
 .if (USE_BOARDLEDS == 0)
   /* These LEDs can be connected to the LK Linker Kit
    */
-  .equ GPIO_RED,    26
+  //.equ GPIO_RED,    26 //unsued in this application
   .equ GPIO_GREEN,  22
   //.equ GPIO_YELLOW, 27 // unused in this application
 .else
@@ -58,12 +57,12 @@
 .endif
 
 /* From Analog Devices TMP35/36/37 Datasheet:
- * TMP36  V = 10 mV/°C, 25°C=750 mV
- *     --> v2c(v) = (v_V-0.75_V)/0.01_V + 25°C
+ * TMP36  V = 10 mV/°C
+ *     --> v2c(v) = (v_V-0.5_V)/0.01_V
  *
  * From Microchip MCP3008 datasheet:
  * MCP3008:  D    = 1024 x V / V_ref (10-bit ADC)
- *     --> d2c(d) = v3c(d/1024 * 3.3_V)
+ *     --> d2c(d) = v2c(d/1024 * 3.3_V)
  *
  *     10 discrete units ~= 3,22 °C
  */
