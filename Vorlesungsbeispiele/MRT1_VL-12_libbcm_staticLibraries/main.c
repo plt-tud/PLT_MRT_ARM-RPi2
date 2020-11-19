@@ -35,6 +35,7 @@
  *  2B!** (liegt als binaeres Archiv im Projekt bei)
  */
 
+#include <unistd.h>
 #include "bcm2835.h"
 
 
@@ -45,16 +46,15 @@
   #define GPIO_LED 47
 #endif
 
-void main() {
+int main() {
   bcm2835_init();
   
-  // Set RPI pin P1-15 to be an input
   bcm2835_gpio_fsel(GPIO_LED, BCM2835_GPIO_FSEL_OUTP);
-  
   bcm2835_gpio_set(GPIO_LED);
+  sleep(1);
   bcm2835_gpio_clr(GPIO_LED);
 
   
   bcm2835_close();
-  return;
+  return 0;
 }
