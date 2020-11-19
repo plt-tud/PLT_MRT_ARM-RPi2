@@ -26,7 +26,7 @@
  */
 
 
-// GPFSEL Codes (BCM2835 ARM Peripherals, 2012, Table 6-1, p. 92)
+// GPFSEL Codes (BCM2835 ARM Peripherals, Table 6-2, p. 92)
 .equ BCM2836_GPFSEL_INPUT,  0b000
 .equ BCM2836_GPFSEL_OUTPUT, 0b001
 .equ BCM2836_GPFSEL_ALT0,   0b100
