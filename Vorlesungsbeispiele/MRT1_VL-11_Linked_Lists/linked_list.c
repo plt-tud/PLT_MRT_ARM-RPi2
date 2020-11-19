@@ -91,8 +91,8 @@ void linked_list_deleteElement(linked_list_head *l, linked_list_element *el)
 	linked_list_element *it   = l->head;
 	linked_list_element *prev = NULL;
 	while (it != el && it != NULL) {
-		prev = el;
-		el = el->next;
+		prev = it;
+		it = it->next;
 	}
 	if (it == NULL) return; // el not found
 
