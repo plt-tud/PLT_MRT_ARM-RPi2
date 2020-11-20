@@ -80,7 +80,7 @@ void BCM2836_GPIO_PinSet(unsigned int gpiono)
 	set_reg_ptr++;
   }
 
-  *set_reg_ptr = 1 <<  gpiono;
+  *set_reg_ptr = 1 <<  gpiono % 32;
   return;
 }
 
@@ -95,7 +95,7 @@ void BCM2836_GPIO_PinClr(unsigned int gpiono)
 	clr_reg_ptr++;
   }
 
-  *clr_reg_ptr = 1 << gpiono;
+  *clr_reg_ptr = 1 << gpiono % 32;
   return;
 }
 

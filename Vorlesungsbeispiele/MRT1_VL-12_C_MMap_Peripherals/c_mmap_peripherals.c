@@ -33,9 +33,9 @@
  *  USE_BOARDLED ausgewaehlt werden.
  */
 
-//#define USE_BOARDLEDS
+#define USE_BOARDLEDS
 #ifndef USE_BOARDLEDS
-  #define GPIO_LED 26
+  #define GPIO_LED 27
 #else
   #define GPIO_LED 47
 #endif
@@ -53,6 +53,8 @@
 #include <errno.h>
 
 #include <unistd.h>
+
+#include "BCM2836.h"
 
 #define RPI2_PERI_BASE          0x3f000000
 #define RPI2_GPIO_OFFSET        0x00200000
@@ -85,20 +87,22 @@ int manual_example()
 			volatile uint32_t *gpioSet1_ptr  = (uint32_t *) &peripheral[RPI2_GPIO_GPSET0_OFFS];
 			volatile uint32_t *gpioClr1_ptr  = (uint32_t *) &peripheral[RPI2_GPIO_GPCLR0_OFFS];
 
-			// Make GPIO26 an output
+			// Make GPIO27 an output
 			unsigned int fsel = *gpioFSEL2_ptr;
-			fsel             &= ~( ((unsigned int) 0x7) << (3*(26%10)) );
-			fsel			 |=  ( ((unsigned int) 0x1) << (3*(26%10)) );
+			fsel             &= ~( ((unsigned int) 0x7) << (3*(27%10)) );
+			fsel			 |=  ( ((unsigned int) 0x1) << (3*(27%10)) );
 			*gpioFSEL2_ptr    = fsel;
 
-			// Turn GPIO26 off
-			*(gpioClr1_ptr) = (unsigned int) 1 << (26 %32);
+			// Turn GPIO27 off
+			*(gpioClr1_ptr) = (unsigned int) 1 << (27 %32);
+			sleep(1);
 
-			// Turn GPIO26 on
-			*(gpioSet1_ptr) = (unsigned int) 1 << (26 %32);
+			// Turn GPIO27 on
+			*(gpioSet1_ptr) = (unsigned int) 1 << (27 %32);
+			sleep(1);
 
 			// Turn GPIO27 off
-			*(gpioClr1_ptr) = (unsigned int) 1 << (26 %32);
+			*(gpioClr1_ptr) = (unsigned int) 1 << (27 %32);
 		#else // Use Board LEDs: GPIO 47 is the green system LED
 			volatile uint32_t *gpioFSEL4_ptr = (uint32_t *) &peripheral[RPI2_GPIO_GPSEL4_OFFS];
 			volatile uint32_t *gpioSet2_ptr  = (uint32_t *) &peripheral[RPI2_GPIO_GPSET1_OFFS];
@@ -112,9 +116,11 @@ int manual_example()
 
 			// Turn GPIO47 off
 			*(gpioClr2_ptr) = (unsigned int) 1 << (47 %32);
+			sleep(1);
 
 			// Turn GPIO47 on
 			*(gpioSet2_ptr) = (unsigned int) 1 << (47 %32);
+			sleep(1);
 
 			// Turn GPIO47 off
 			*(gpioClr2_ptr) = (unsigned int) 1 << (47 %32);
@@ -126,13 +132,14 @@ int manual_example()
 	return 0;
 }
 
-#include "BCM2836.h"
 int library_example()
 {
 	if (! BCM2836_Open() ) {
 		BCM2836_GPIO_PinSelFun(GPIO_LED, BCM2836_GPFSEL_OUTPUT);
 		BCM2836_GPIO_PinClr(GPIO_LED);
+		sleep(1);
 		BCM2836_GPIO_PinSet(GPIO_LED);
+		sleep(1);
 		BCM2836_GPIO_PinClr(GPIO_LED);
 	}
 
