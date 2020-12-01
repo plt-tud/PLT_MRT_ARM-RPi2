@@ -125,8 +125,8 @@ void BCM2836_SPI0_Init() {
 			   & ~BCM2835_SPI0_CS_CSPOL0
 			   & ~BCM2835_SPI0_CS_CSPOL1 ;
 
-  // Clock divider at 3.9Mhz for MCP3008
-  *clk_reg_ptr = 64;
+  // Clock divider at 1.9Mhz for MCP3008
+  *clk_reg_ptr = 128;
 
   return;
 }
