@@ -35,9 +35,9 @@
 
 //#define USE_BOARDLEDS
 #ifndef USE_BOARDLEDS
-  #define GPIO_LED 26
+#define GPIO_LED 27
 #else
-  #define GPIO_LED 47
+#define GPIO_LED 47
 #endif
 
 #include <stdio.h>
@@ -57,65 +57,61 @@
 #include "BCM2836.h"
 #include "bcm2835.h"
 
-static double spiData2Temp(char *spidata)
-{
+static double spiData2Temp(char *spidata) {
 	/**
 	 *  Egal wie wir den ADC-Wert per SPI auslesen, wir konvertieren
 	 *  ihn immer auf die gleiche Weise zu Celcius...
 	 */
 	double temp = (spidata[1] << 8) + spidata[2]; // To 10-bit value
-	temp = temp/1024 * 3.3; 					  // To Voltage
+	temp = temp / 1024 * 3.3; 					  // To Voltage
 
 	// Die Konvertierung ergibt sich aus dem TMP36 Datenblatt
-	temp = 25 + (temp-0.75)/0.01;				  // Umwandlung in Celsius
+	temp = (temp - 0.5) / 0.01;				  // Umwandlung in Celsius
 
 	return temp;
 }
 
-static void readTempUsingLibbcm2836()
-{
+static void readTempUsingLibbcm2836() {
 	/**
 	 *  Diese Funktion nutzt unsere C-Bibliothek, die wir in der Vorlesung
 	 *  hergeleitet haben.
 	 */
-	char spidata[] = {0x01, 0x80, 0x00};
+	uint8_t spidata[] = { 0x01, 0x80, 0x00 };
 
-	if (! BCM2836_Open() ) {
+	if (!BCM2836_Open()) {
 		BCM2836_SPI0_Init();
 
 		BCM2836_SPI0_Send(3, &spidata, &spidata);
 
-	    printf("Temp %f °C\n", spiData2Temp(&spidata));
+		printf("Temp %f °C\n", spiData2Temp(&spidata));
 	}
 
 	BCM2836_Close();
 
-	return 0;
+	return;
 }
 
-static void readTempUsingLibbcm2835()
-{
+static void readTempUsingLibbcm2835() {
 	/**
 	 *  Diese Funktion nutzt Mike McCauleys libbcm2835; die Bibliothek
-	 *  ist maechtiger, aber ihre Funktionen sind und nicht so vertraut.
+	 *  ist maechtiger, aber ihre Funktionen sind uns nicht so vertraut.
 	 */
-	char spidata[] = {0x01, 0x80, 0x00};
+	char spidata[] = { 0x01, 0x80, 0x00 };
 
 	if (bcm2835_init()) {
 		bcm2835_spi_begin();
 		bcm2835_spi_setChipSelectPolarity(BCM2835_SPI_CS0, 0);
 		bcm2835_spi_chipSelect(BCM2835_SPI_CS0);
 		bcm2835_spi_setDataMode(BCM2835_SPI_MODE0);
-		bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_64);
+		bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_128);
 		bcm2835_spi_transfern(&spidata, 3);
 		bcm2835_spi_end();
 	}
 	bcm2835_close();
 
-    printf("Temp %f °C\n", spiData2Temp(&spidata));
-	return 0;
+	printf("Temp %f °C\n", spiData2Temp(&spidata));
+	return;
 }
-
 
 int main(int argc, char **argv) {
 	readTempUsingLibbcm2836();
