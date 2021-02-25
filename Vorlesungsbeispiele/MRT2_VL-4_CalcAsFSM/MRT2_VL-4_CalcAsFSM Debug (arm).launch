@@ -22,19 +22,19 @@
 <stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_START_MODE" value="remote"/>
 <booleanAttribute key="org.eclipse.cdt.launch.DEBUGGER_STOP_AT_MAIN" value="true"/>
 <stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_STOP_AT_MAIN_SYMBOL" value="main"/>
-<stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="Debug/Automaton_Example"/>
-<stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="Automaton_Example"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="Debug/CalcAsFSM"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="MRT2_VL-4_CalcAsFSM"/>
 <booleanAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_AUTO_ATTR" value="true"/>
-<stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value="cdt.managedbuild.config.gnu.cross.exe.debug.741895174"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value="cdt.managedbuild.config.gnu.exe.debug.1569433549"/>
 <booleanAttribute key="org.eclipse.cdt.launch.remote.RemoteCDSFDebuggerTab.DEFAULTS_SET" value="true"/>
 <stringAttribute key="org.eclipse.debug.core.ATTR_GDBSERVER_COMMAND" value="gdbserver"/>
 <stringAttribute key="org.eclipse.debug.core.ATTR_GDBSERVER_OPTIONS" value=""/>
 <stringAttribute key="org.eclipse.debug.core.ATTR_GDBSERVER_PORT" value="2345"/>
 <stringAttribute key="org.eclipse.debug.core.ATTR_PRERUN_CMDS" value=""/>
 <booleanAttribute key="org.eclipse.debug.core.ATTR_SKIP_DOWNLOAD_TO_TARGET" value="false"/>
-<stringAttribute key="org.eclipse.debug.core.ATTR_TARGET_PATH" value="/home/pi/Automaton_Example"/>
+<stringAttribute key="org.eclipse.debug.core.ATTR_TARGET_PATH" value="/home/pi/CalcAsFSM"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/Automaton_Example"/>
+<listEntry value="/MRT2_VL-4_CalcAsFSM"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="4"/>
