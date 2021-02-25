@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <list>
 using namespace std;
 
 #include <stdlib.h> // atoi
