@@ -29,7 +29,7 @@
 		<link>
 			<name>src</name>
 			<type>2</type>
-			<location>C:/Users/User/git/PLT_MRT_ARM-RPi2/Vorlesungsbeispiele/MRT2_VL-1-FrequencyResponse/src</location>
+			<location>/home/mrt/MRT-Environment-Setup/workspace/PLT_MRT_ARM-RPi2/Vorlesungsbeispiele/MRT2_VL-1-FrequencyResponse/src</location>
 		</link>
 	</linkedResources>
 </projectDescription>
