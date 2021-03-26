@@ -2,7 +2,6 @@
 #define ACCUMULATOR_H_
 
 #include <stdlib.h>
-#include <iostream>
 
 class Accumulator {
 	int num, sign;		// currently stored input which will be used for next computation
