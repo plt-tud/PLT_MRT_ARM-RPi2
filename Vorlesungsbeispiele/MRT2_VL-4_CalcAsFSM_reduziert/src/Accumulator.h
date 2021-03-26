@@ -1,10 +1,3 @@
-/*
- * Accumulator.h
- *
- *  Created on: 22.03.2021
- *      Author: mrt
- */
-
 #ifndef ACCUMULATOR_H_
 #define ACCUMULATOR_H_
 

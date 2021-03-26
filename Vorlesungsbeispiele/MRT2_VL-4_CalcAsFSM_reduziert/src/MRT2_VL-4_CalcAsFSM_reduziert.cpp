@@ -1,11 +1,3 @@
-//============================================================================
-// Name        : MRT2_VL-4_CalcAsFSM_reduziert.cpp
-// Author      : Jonas Kreissl
-// Version     :
-// Copyright   : 
-// Description : Hello World in C++, Ansi-style
-//============================================================================
-
 #include <iostream>
 #include <fstream>
 

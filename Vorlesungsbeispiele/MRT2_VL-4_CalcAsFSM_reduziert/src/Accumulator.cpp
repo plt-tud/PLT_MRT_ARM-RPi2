@@ -1,10 +1,3 @@
-/*
- * Accumulator.cpp
- *
- *  Created on: 22.03.2021
- *      Author: mrt
- */
-
 #include "Accumulator.h"
 
 using namespace std;
