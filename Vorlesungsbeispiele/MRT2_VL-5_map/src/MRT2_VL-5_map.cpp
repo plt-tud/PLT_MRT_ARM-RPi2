@@ -12,6 +12,8 @@ int main() {
 	std::string word;
 	std::map<std::string, int> wordcnt;
 
+	std::cout << "Enter sentence: ";
+
 	// Scan for words in line until next character is new line character.
 	while (!(std::cin.peek() == '\n')) {
 		// ">>" operator reads all characters until whitespace.
