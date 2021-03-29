@@ -11,7 +11,7 @@ CalcAsFSM_reduziert ist so voreingestellt, dass die "automaton" Bibliothek aus M
 2. Die Build Configuration auf "Debug (x86)" umschalten: Neben dem Build Symbol (Hammer Icon) ist eine Drop-Down-Liste, in der die gewünschte Build Configuration ausgewählt werden kann. Mit Auswahl eines Eintrags kompiliert Eclipse die Bibliothek für die entsprechend Zielplatform automatisch.
 3. Die kompilierte Bibliothek befindet sich unter "Debug (x86)/libautomaton.a". Unter Umständen muss zuerst der Project Explorer aktualisiert werden (Rechtsklick >> Refresh (F5)).
 
-### CalcAsFSM_reduziert unter arm ausführen
+### CalcAsFSM_reduziert unter x86 ausführen
 
 1. Im Debug Configurations Dialog (Dropdown neben Debug Button >> Debug Configurations...) befindet sich mit Import von CalcAsFSM_reduziert unter "C/C++ Application" der Eintrag "MRT2_VL-4_CalcAsFSM_reduziert Debug (x86)". 
 2. "MRT2_VL-4_CalcAsFSM_reduziert Debug (x86)" wählen und mit "Debug..." ausführen.
@@ -24,7 +24,7 @@ CalcAsFSM_reduziert ist so voreingestellt, dass die "automaton" Bibliothek aus M
 2. Die Build Configuration auf "Debug (arm)" umschalten: Neben dem Build Symbol (Hammer Icon) ist eine Drop-Down-Liste, in der die gewünschte Build Configuration ausgewählt werden kann. Mit Auswahl eines Eintrags kompiliert Eclipse die Bibliothek für die entsprechend Zielplatform automatisch.
 3. Die kompilierte Bibliothek befindet sich unter "Debug (arm)/libautomaton.a". Unter Umständen muss zuerst der Project Explorer aktualisiert werden (Rechtsklick >> Refresh (F5)).
 
-### CalsAsFSM unter x86 ausführen
+### CalsAsFSM unter arm ausführen
 
 1. Im Debug Configurations Dialog (Dropdown neben Debug Button >> Debug Configurations...) befindet sich mit Import von CalcAsFSM_reduziert unter "C/C++ Remote Application" der Eintrag "MRT2_VL-4_CalcAsFSM_reduziert Debug (arm)". 
 2. "MRT2_VL-4_CalcAsFSM_reduziert Debug (arm)" wählen und mit "Debug..." ausführen.
