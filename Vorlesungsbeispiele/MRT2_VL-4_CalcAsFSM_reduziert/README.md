@@ -1,5 +1,5 @@
 # CalcAsFSM_reduziert
-CalcAsFSM_reduziert implementiert den in Vorlesung 4 vorgestellten Taschenrechner als Zustandsmaschine. Das Projekt benötigt die Automaton_Lib Bibliothek.
+CalcAsFSM_reduziert implementiert den reduzierten Taschenrechner aus der Übungsaufgabe in Vorlesung 4. Das Projekt benötigt die Automaton_Lib Bibliothek.
 
 CalcAsFSM_reduziert ist so voreingestellt, dass die "automaton" Bibliothek aus MRT2_VL-3_Automaton_Lib automatisch eingebunden wird. Dazu muss sich das Projekt MRT2_VL-3_Automaton_Lib allerdings im Workspace befinden und bereits für die gewünschte Zielplatform kompiliert sein.
 
