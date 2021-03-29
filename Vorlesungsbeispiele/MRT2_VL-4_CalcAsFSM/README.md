@@ -28,3 +28,7 @@ CalcAsFSM ist so voreingestellt, dass die "automaton" Bibliothek aus MRT2_VL-3_A
 
 1. Im Debug Configurations Dialog (Dropdown neben Debug Button >> Debug Configurations...) befindet sich mit Import von CalcAsFSM unter "C/C++ Remote Application" der Eintrag "MRT2_VL-4_CalcAsFSM_reduziert Debug (arm)". 
 2. "MRT2_VL-4_CalcAsFSM_reduziert Debug (arm)" wählen und mit "Debug..." ausführen.
+
+## FAQ
+
+1. **Die Konsole zeigt "/usr/bin/ld: cannot find -lautomaton":** Das Projekt "MRT2_VL-3_Automaton_Lib" ist entweder noch nicht importiert oder die Bibliothek ist noch nicht für die gewünschte Zielplatform kompiliert worden. Die Zielplatform kann mit dem Dropdown neben dem Hammer Symbol geändert werden.
