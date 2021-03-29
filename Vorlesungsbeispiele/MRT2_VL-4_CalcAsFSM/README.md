@@ -1,14 +1,14 @@
 # CalcAsFSM
 CalcAsFSM implementiert den in Vorlesung 4 vorgestellten Taschenrechner als Zustandsmaschine. Das Projekt benötigt die Automaton_Lib Bibliothek.
 
-CalcAsFSM ist so voreingestellt, dass die "automaton" Bibliothek aus MRT2_VL-3_Automaton_Lib automatisch eingebunden wird. Dazu muss sich das Projekt MRT2_VL-3_Automaton_Lib allerdings im Workspace befinden und bereits für die gewünschte Zielplatform kompiliert sein.
+CalcAsFSM ist so voreingestellt, dass die "automaton" Bibliothek aus MRT2_VL-3_Automaton_Lib automatisch eingebunden wird. Dazu muss sich das Projekt MRT2_VL-3_Automaton_Lib allerdings im Workspace befinden und bereits für die gewünschte Zielplattform kompiliert sein.
 
 ## CalcAsFSM in der Virtual Machine ausführen (x86)
 
 ### "automaton" Bibliothek für x86 konfigurieren
 
 1. Beispielprojekt MRT2_VL-3_Automaton_Lib aus dem Repository importieren.
-2. Die Build Configuration auf "Debug (x86)" umschalten: Neben dem Build Symbol (Hammer Icon) ist eine Drop-Down-Liste, in der die gewünschte Build Configuration ausgewählt werden kann. Mit Auswahl eines Eintrags kompiliert Eclipse die Bibliothek für die entsprechend Zielplatform automatisch.
+2. Die Build Configuration auf "Debug (x86)" umschalten: Neben dem Build Symbol (Hammer Icon) ist eine Drop-Down-Liste, in der die gewünschte Build Configuration ausgewählt werden kann. Mit Auswahl eines Eintrags kompiliert Eclipse die Bibliothek für die entsprechend Zielplattform automatisch.
 3. Die kompilierte Bibliothek befindet sich unter "Debug (x86)/libautomaton.a". Unter Umständen muss zuerst der Project Explorer aktualisiert werden (Rechtsklick >> Refresh (F5)), um die Datei sichtbar zu machen.
 
 ### CalsAsFSM unter x86 ausführen
@@ -21,7 +21,7 @@ CalcAsFSM ist so voreingestellt, dass die "automaton" Bibliothek aus MRT2_VL-3_A
 ### "automaton" Bibliothek für arm konfigurieren
 
 1. Beispielprojekt MRT2_VL-3_Automaton_Lib aus dem Repository importieren.
-2. Die Build Configuration auf "Debug (arm)" umschalten: Neben dem Build Symbol (Hammer Icon) ist eine Drop-Down-Liste, in der die gewünschte Build Configuration ausgewählt werden kann. Mit Auswahl eines Eintrags kompiliert Eclipse die Bibliothek für die entsprechend Zielplatform automatisch.
+2. Die Build Configuration auf "Debug (arm)" umschalten: Neben dem Build Symbol (Hammer Icon) ist eine Drop-Down-Liste, in der die gewünschte Build Configuration ausgewählt werden kann. Mit Auswahl eines Eintrags kompiliert Eclipse die Bibliothek für die entsprechend Zielplattform automatisch.
 3. Die kompilierte Bibliothek befindet sich unter "Debug (arm)/libautomaton.a". Unter Umständen muss zuerst der Project Explorer aktualisiert werden (Rechtsklick >> Refresh (F5)), um die Datei sichtbar zu machen.
 
 ### CalsAsFSM unter arm ausführen
@@ -31,4 +31,4 @@ CalcAsFSM ist so voreingestellt, dass die "automaton" Bibliothek aus MRT2_VL-3_A
 
 ## FAQ
 
-1. **Die Konsole zeigt "/usr/bin/ld: cannot find -lautomaton":** Das Projekt "MRT2_VL-3_Automaton_Lib" ist entweder noch nicht importiert oder die Bibliothek ist noch nicht für die gewünschte Zielplatform kompiliert worden. Die Zielplatform kann mit dem Dropdown neben dem Hammer Symbol geändert werden.
+1. **Die Konsole zeigt "/usr/bin/ld: cannot find -lautomaton":** Das Projekt "MRT2_VL-3_Automaton_Lib" ist entweder noch nicht importiert oder die Bibliothek ist noch nicht für die gewünschte Zielplattform kompiliert worden. Die Zielplattform kann mit dem Dropdown neben dem Hammer Symbol geändert werden.
