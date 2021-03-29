@@ -1,7 +1,7 @@
 # CalcAsFSM
-CalcAsFSM implementiert den in Vorlesung 4 vorgestellten Taschenrechner als Zustandsmaschine. Dazu wird die Automaton_Lib Bibliothek benötigt.
+CalcAsFSM implementiert den in Vorlesung 4 vorgestellten Taschenrechner als Zustandsmaschine. Das Projekt benötigt die Automaton_Lib Bibliothek.
 
-Damit CalcAsFSM is so voreingestellt, dass die "automaton" Bibliothek aus MRT2_VL-3_Automaton_Lib automatisch eingebunden wird. Dazu muss sich das Projekt MRT2_VL-3_Automaton_Lib im Workspace befinden und für die gewünschte Zielplatform kompiliert sein.
+CalcAsFSM ist so voreingestellt, dass die "automaton" Bibliothek aus MRT2_VL-3_Automaton_Lib automatisch eingebunden wird. Dazu muss sich das Projekt MRT2_VL-3_Automaton_Lib allerdings im Workspace befinden und bereits für die gewünschte Zielplatform kompiliert sein.
 
 ## CalcAsFSM in der Virtual Machine ausführen (x86)
 
