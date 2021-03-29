@@ -9,7 +9,7 @@ CalcAsFSM_reduziert ist so voreingestellt, dass die "automaton" Bibliothek aus M
 
 1. Beispielprojekt MRT2_VL-3_Automaton_Lib aus dem Repository importieren.
 2. Die Build Configuration auf "Debug (x86)" umschalten: Neben dem Build Symbol (Hammer Icon) ist eine Drop-Down-Liste, in der die gewünschte Build Configuration ausgewählt werden kann. Mit Auswahl eines Eintrags kompiliert Eclipse die Bibliothek für die entsprechend Zielplatform automatisch.
-3. Die kompilierte Bibliothek befindet sich unter "Debug (x86)/libautomaton.a". Unter Umständen muss zuerst der Project Explorer aktualisiert werden (Rechtsklick >> Refresh (F5)).
+3. Die kompilierte Bibliothek befindet sich unter "Debug (x86)/libautomaton.a". Unter Umständen muss zuerst der Project Explorer aktualisiert werden (Rechtsklick >> Refresh (F5)), um die Datei sichtbar zu machen.
 
 ### CalcAsFSM_reduziert unter x86 ausführen
 
@@ -22,7 +22,7 @@ CalcAsFSM_reduziert ist so voreingestellt, dass die "automaton" Bibliothek aus M
 
 1. Beispielprojekt MRT2_VL-3_Automaton_Lib aus dem Repository importieren.
 2. Die Build Configuration auf "Debug (arm)" umschalten: Neben dem Build Symbol (Hammer Icon) ist eine Drop-Down-Liste, in der die gewünschte Build Configuration ausgewählt werden kann. Mit Auswahl eines Eintrags kompiliert Eclipse die Bibliothek für die entsprechend Zielplatform automatisch.
-3. Die kompilierte Bibliothek befindet sich unter "Debug (arm)/libautomaton.a". Unter Umständen muss zuerst der Project Explorer aktualisiert werden (Rechtsklick >> Refresh (F5)).
+3. Die kompilierte Bibliothek befindet sich unter "Debug (arm)/libautomaton.a". Unter Umständen muss zuerst der Project Explorer aktualisiert werden (Rechtsklick >> Refresh (F5)), um die Datei sichtbar zu machen.
 
 ### CalsAsFSM unter arm ausführen
 
