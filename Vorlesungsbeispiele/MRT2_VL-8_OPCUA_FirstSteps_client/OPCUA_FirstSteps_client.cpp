@@ -35,6 +35,12 @@ int main(void) {
     signal(SIGTERM, stopHandler);
 
     UA_Client *client    = UA_Client_new(UA_ClientConfig_default);
+
+
+    /* Verbindung mit einem lokal laufenden Ampel Server: */
+    //UA_StatusCode retval = UA_Client_connect(client, "opc.tcp://127.0.0.1:4840");
+
+    /* Verbindung mit einem Ampel Server auf dem Raspberry Pi: */
     UA_StatusCode retval = UA_Client_connect(client, "opc.tcp://192.168.0.240:4840");
 
     if(retval != UA_STATUSCODE_GOOD) {
