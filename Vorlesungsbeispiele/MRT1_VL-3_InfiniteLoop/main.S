@@ -16,8 +16,8 @@ msg: .asciz "Hello, MRT"
 
 main:
 
-  ldr r0, =msg	@ load pointer to string
-loop:	bl puts		@ put string at address r0 to console
-	b loop		@ repeat loop unconditionally
+  ldr r0, =msg		// load pointer to string
+loop:	bl puts		// put string at address r0 to console
+	b loop			// repeat loop unconditionally
 
 .endfunc
