@@ -74,7 +74,7 @@ MATRIX: .skip P_MATRIX_DIM_I*P_MATRIX_DIM_J*P_MATRIX_ELEMENT_SIZE, 0
   // Template: Sektion
   matrix_example_calc2daddress:
 /*
-     Berechne die offset: number of columns*row number to be accessed * type_size + column to be accessed * type_size
+     offset = number of columns * row number to be accessed * type_size + column to be accessed * type_size
     				i.e. in a dimI*dimJ matrix : dimJ*i*type_size + j*type_size
         P_MATRIX_ELEMENT_SIZE*P_MATRIX_DIM_J*P_ACCESS_I + P_MATRIX_ELEMENT_SIZE*P_ACCESS_J
                  =  4*3*i + 4*j
@@ -97,7 +97,7 @@ MATRIX: .skip P_MATRIX_DIM_I*P_MATRIX_DIM_J*P_MATRIX_ELEMENT_SIZE, 0
   // Zugriff auf Feld[2,1]
   matrix_example_accessdata:
     ldr r0, [r1]
-    add r0, #42 // Veraendere Wert
+    add r0, #42 			// modify value
     str r0, [r1]
   matrix_example_accessdata_end:
 
