@@ -98,26 +98,28 @@ main:
   stmfd sp!,{r4-r11,lr}
   mov   fp, ip
 
+  // open(const char *pathname, int flags, mode_t mode);
   // r9 = open(/dev/mem,  O_RDWR|O_SYNC, 0)
-  ldr r0, =dev_mem_filename
-  ldr r1, =OPEN_PARAMETER_SYNC_RDWR
-  mov r2, #0
+  ldr r0, =dev_mem_filename			// path of file that is to be opened is "/dev/mem"
+  ldr r1, =OPEN_PARAMETER_SYNC_RDWR	// RDWD: open for read and write access
+  									// SYNC: write operations will only return after writing has finsished
+  mov r2, #0						// file modes are ignored since there no file will be created
   mov r7, #SYSCALL_OPEN
   swi #0
-  mov r9, r0
+  mov r9, r0						// open returns a file descriptor that is used to refer to the opened file
 
   // mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
   // r8 = mmap(NULL, gpio_speicherbereich, PROT_READ|PROT_WRITE, MAP_SHARED)
-  mov r0, #0
-  mov r1, #BCM2836_GPIO_MEMSIZE
-  mov r2, #MMAP_PARAMETER_PROT_READ_WRITE
-  mov r3, #MMAP_PARAMETER_MAP_SHARED
-  mov r4, r9						// file handle from open /dev/mem
-  ldr r5, =BCM2836_GPIO_BASE        // mmap benutzt 4k bloecke und multipliziert unsere adresse intern; wir muessen etwas schieben
-  lsr r5, r5, #12                   // aus 0x3f200000 sollte 0x3f200 werden...
+  mov r0, #0						// we do not define an address of mapping, so it will be chosen by the kernel
+  mov r1, #BCM2836_GPIO_MEMSIZE		// mapping's length
+  mov r2, #MMAP_PARAMETER_PROT_READ_WRITE	// mapped pages will be written and read
+  mov r3, #MMAP_PARAMETER_MAP_SHARED		// updates to the mapping are visible to other processes
+  mov r4, r9						// file handle to "/dev/mem" from previous syscall open
+  ldr r5, =BCM2836_GPIO_BASE        // offset must be multiple of 4k (page size), so we have to shift the address
+  lsr r5, r5, #12                   // shift address from the manual (0x3f200000) to 0x3f200 (divide by 2^12 = 4k)
   mov r7, #SYSCALL_MMAP2
   swi #0
-  mov r8, r0                       // Von mmap bestimmte Basisadresse der Abbildung in unserem Speicher
+  mov r8, r0                       	// addr_base of memory mapping is returned to r0 and moved to r8
 
   /* Ab hier:
      - r8 ist Basisadresse der GPIO register
@@ -127,34 +129,34 @@ main:
 
   // ---- Anfang des GPIO-Codes
   .if (USE_BOARDLEDS == 0)
-    // GPIO 27 als Output deklarieren
+    // 1. set pin mode of GPIO 27 to OUTPUT (set corresponding bits in GPFSEL2 register to 001)
     // Copy-Modify-Update!
-    ldr r0, [r8, #8] // copy: R0 <- GPIO-Register GPFSEL2
-    and r0, r0, #0b11111111000111111111111111111111	//modify: clear the bits
-    orr r0, r0, #0b00000000001000000000000000000000 //update
-    str r0, [r8, #8] // R0 -> GPIO-Register GPFSEL2 : store it back
+    ldr r0, [r8, #8] // copy: r0 = mem(addr_base + 8) : GPIO-Register GPFSEL2
+    and r0, r0, #0b11111111000111111111111111111111	// clear bits 23-21		 (correspond to GPIO 27, see datasheet)
+    orr r0, r0, #0b00000000001000000000000000000000 // set bits 23-21 tp 001 (output mode)
+    str r0, [r8, #8] // R0 -> GPIO-Register GPFSEL2 : store back modified function select register
 
-    // GPIO 27 setzen
+    // 2. set GPIO 27 by setting bit 27 and writing word in r0 to GPSET0 register (GPSET0 manages pins 0-31)
     mov r0, #0b00001000000000000000000000000000
     str r0, [r8, #28] // R0 -> GPIO-Register GPSET0, it is on offset 28 from r8
 
-    // GPIO 27 rücksetzen
+    // 3. clear GPIO 27 by setting bit 27 and writing word in r0 to GPCLR0 register
     mov r0, #0b00001000000000000000000000000000
     str r0, [r8, #40] // R0 -> GPIO-Register GPCLR0
   .else
-    // GPIO 47 als Output deklarieren
+    // 1. set pin mode of GPIO 47 to OUTPUT (set corresponding bits in GPFSEL4 register to 001)
     // Copy-Modify-Update!
-    ldr r0, [r8, #16] // R0 <- GPIO-Register GPFSEL3 it is on offset 16
+    ldr r0, [r8, #16] // R0 <- GPIO-Register GPFSEL4 it is on offset 16
     and r0, r0, #0b11111111111000111111111111111111
     orr r0, r0, #0b00000000000001000000000000000000
-    str r0, [r8, #16] // R0 -> GPIO-Register GPFSEL3
+    str r0, [r8, #16] // R0 -> GPIO-Register GPFSEL4
 
 
-    // GPIO 47 setzen
+    // 2. set GPIO 47 by setting bit 47 and writing word in r0 to GPSET1 register (GPSET1 manages pins 32-53)
     mov r0, #0b00000000000000001000000000000000
     str r0, [r8, #32] // R0 -> GPIO-Register GPSET1
 
-    // GPIO 47 rücksetzen
+    // 3. clear GPIO 47 by setting bit 47 and writing word in r0 to GPCLR1 register
     mov r0, #0b00000000000000001000000000000000
     str r0, [r8, #44] // R0 -> GPIO-Register GPCLR1
   .endif
@@ -164,14 +166,15 @@ main:
   // ---- Ende des GPIO-Codes
 
 
-  // munmap
-  mov r0, r8
-  mov r1, #BCM2836_GPIO_MEMSIZE
+  // int munmap(void *addr, size_t length);
+  // munmap(addr_base, gpio_speicherbereich)
+  mov r0, r8						// base address for memory unmapping
+  mov r1, #BCM2836_GPIO_MEMSIZE		// length of memory block that is to be deleted
   mov r7, #SYSCALL_MUNMAP
   swi #0
 
-  // close
-  mov r0, r9
+  // int close(int fd);
+  mov r0, r9						// file descriptor that has been returned by open()
   mov r7, #SYSCALL_CLOSE
   swi #0
 
