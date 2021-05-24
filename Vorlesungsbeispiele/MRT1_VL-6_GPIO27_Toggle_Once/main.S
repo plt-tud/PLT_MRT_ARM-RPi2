@@ -103,7 +103,7 @@ main:
   ldr r0, =dev_mem_filename			// path of file that is to be opened is "/dev/mem"
   ldr r1, =OPEN_PARAMETER_SYNC_RDWR	// RDWD: open for read and write access
   									// SYNC: write operations will only return after writing has finsished
-  mov r2, #0						// file modes are ignored since there no file will be created
+  mov r2, #0						// file modes are ignored since no file will be created
   mov r7, #SYSCALL_OPEN
   swi #0
   mov r9, r0						// open returns a file descriptor that is used to refer to the opened file
