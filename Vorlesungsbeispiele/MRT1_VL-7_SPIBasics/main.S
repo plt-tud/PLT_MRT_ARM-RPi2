@@ -75,7 +75,7 @@ main:
     mov r1,#BCM2836_GPFSEL_ALT0
     bl BCM2836_GPIO_PinSelFun
 
-    // initialize CS
+    // initialize CS (see BCM2835 datasheet page 153)
     mov r0, #0
     str r0,[r4,#BCM2836_SPI0_CS_OFFSET]
 
