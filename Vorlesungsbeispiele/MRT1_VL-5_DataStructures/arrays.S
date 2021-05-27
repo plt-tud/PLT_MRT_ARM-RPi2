@@ -82,7 +82,7 @@ FIELD:      .skip ARRAY_SIZE*FIELD_TYPE_SIZE, 0
   .equ FIELD_INDEX, 3
     mov r2, #FIELD_INDEX                  	// r2: index = 3
     ldr r3, =FIELD   						// r3 = addr_base
-    ldr r0, [r3, r2, LSL #FIELD_TYPE_LSL] 	// r0: element = mem(addr_base + index << 3)  (LSL - left shift logical)
+    ldr r0, [r3, r2, LSL #FIELD_TYPE_LSL] 	// r0: element = mem(addr_base + index << 2)  (LSL - left shift logical)
     										//   		   = mem(addr_base + index * 4)
     										// ldr Rt, [Rn, Rm, LSL n] : load with register offset and shift n bits
     add r0, r0, #FIELD_INDEX              	// r0: element = element + 3
