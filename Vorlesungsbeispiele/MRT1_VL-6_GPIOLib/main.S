@@ -51,7 +51,8 @@
 .if (USE_BOARDLEDS == 0)
   /* These LEDs can be connected to the LK Linker Kit
    */
-  .equ GPIO_RED,    26
+  //.equ GPIO_RED,    26
+  .equ GPIO_RED,	17
   .equ GPIO_GREEN,  22
   //.equ GPIO_YELLOW, 27 // unused in this application
 .else
