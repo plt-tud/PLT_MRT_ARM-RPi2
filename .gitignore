@@ -2,8 +2,6 @@
 *.m4
 *.o
 *.la
-*.so*
-*.pyc
 *.gcno
 *.gcda
 *.lst
