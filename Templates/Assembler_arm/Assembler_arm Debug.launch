@@ -5,7 +5,10 @@
     <stringAttribute key="org.eclipse.cdt.dsf.gdb.DEBUG_NAME" value="arm-linux-gnueabihf-gdb"/>
     <booleanAttribute key="org.eclipse.cdt.dsf.gdb.DEBUG_ON_FORK" value="false"/>
     <stringAttribute key="org.eclipse.cdt.dsf.gdb.GDB_INIT" value=".gdbinit"/>
+    <stringAttribute key="org.eclipse.cdt.dsf.gdb.HOST" value="192.168.0.240"/>
     <booleanAttribute key="org.eclipse.cdt.dsf.gdb.NON_STOP" value="false"/>
+    <stringAttribute key="org.eclipse.cdt.dsf.gdb.PORT" value="2345"/>
+    <booleanAttribute key="org.eclipse.cdt.dsf.gdb.REMOTE_TCP" value="true"/>
     <booleanAttribute key="org.eclipse.cdt.dsf.gdb.REMOTE_TIMEOUT_ENABLED" value="false"/>
     <stringAttribute key="org.eclipse.cdt.dsf.gdb.REMOTE_TIMEOUT_VALUE" value=""/>
     <booleanAttribute key="org.eclipse.cdt.dsf.gdb.REVERSE" value="false"/>
@@ -37,4 +40,6 @@
         <listEntry value="4"/>
     </listAttribute>
     <stringAttribute key="org.eclipse.debug.core.REMOTE_TCP" value="Raspberry Pi"/>
+    <stringAttribute key="org.eclipse.dsf.launch.MEMORY_BLOCKS" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;memoryBlockExpressionList context=&quot;reserved-for-future-use&quot;/&gt;&#10;"/>
+    <stringAttribute key="process_factory_id" value="org.eclipse.cdt.dsf.gdb.GdbProcessFactory"/>
 </launchConfiguration>
