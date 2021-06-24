@@ -15,24 +15,24 @@ main:
 // WHILE ( A < B) {A++}
 loop0_start:
   /*Setup & Test loop expression*/
-  // Ergebniss aus Ausdruck A in r0
   ldr r0, =var_a  // load pointer to a
   ldr r0, [r0]    // load value of a
-  // Ergebniss aus Ausdruck B in r0
+
   ldr r1, =var_b  // load pointer to b
   ldr r1, [r1]    // load value of b
 
   cmp r0, r1      // compare a and b
-  bge loop0_end   // skip IF section if a >= b
+  bge loop0_end   // if a >= b then jump to loop0_end
 
   /*Loop Body*/
   ldr r1, =var_a  // load pointer to a
   ldr r0, [r1]    // load value of a
-  add r0, r0, #1
+
+  add r0, r0, #1  // a++
   str r0, [r1]
 
   /*Loop End*/
-  b loop0_start
+  b loop0_start   // unconditional jump to loop0_start
 loop0_end:
   ldmfd sp!,{r4-r11,lr}
   bx lr

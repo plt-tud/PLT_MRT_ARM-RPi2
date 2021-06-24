@@ -46,7 +46,7 @@
   /* These LEDs can be connected to the LK Linker Kit
    */
   //.equ GPIO_RED,    26 //unsued in this application
-  .equ GPIO_GREEN,  22
+  .equ GPIO_GREEN,  27
   //.equ GPIO_YELLOW, 27 // unused in this application
 .else
   /* The following two leds are the system LEDs at the rear of the Pi Board
@@ -75,9 +75,16 @@
 
 .data
 .align
-spi_msg:   .byte 0x01, 0x80, 0x00
+
+// define SPI message for fetching data (see MCP3008 datasheet page 19)
+spi_msg:	.byte 0x01		// 0b0000 0001	B0: start bit
+			.byte 0x80		// 0b1000 0000	B7:	single ended mode
+							//				B6-4: use channel 0
+							//				B3-2: wait for sample
+							//				B1-0: shift out measurement
+			.byte 0x00		// 0b0000 0000	B7-0: shift out measurement
 .align
-spi_reply: .byte 0x00, 0x00, 0x00
+spi_reply: .byte 0x00, 0x00, 0x00	// placeholder for response
 
 .text
 .align
@@ -89,45 +96,45 @@ main:
   mov   fp, ip
 
   main_io_init:     // Template: Sektion
-    bl BCM2836_Open
+    bl BCM2836_Open					// init BCM2837 library
     cmp r0,#0
-    bne main_exit
+    bne main_exit					// exit on error
 
     mov r0,#GPIO_GREEN
     mov r1,#BCM2836_GPFSEL_OUTPUT
-    bl BCM2836_GPIO_PinSelFun
+    bl BCM2836_GPIO_PinSelFun		// init GPIO_GREEN as output
 
     mov r0,#GPIO_GREEN
-    bl BCM2836_GPIO_PinClr
+    bl BCM2836_GPIO_PinClr			// clear GPIO_GREEN
 
-    bl BCM2836_SPI0_Init
+    bl BCM2836_SPI0_Init			// init SPI0 interface
   main_io_init_done:
 
-  mov r5, #1024  // r5:Ambienttemperature=0
-  mov r6, #0     // r6:currentTemp
-  mov r7, #0     // r7:pwmCount
+  mov r5, #1024  // r5: Ambienttemperature=0
+  mov r6, #0     // r6: currentTemp
+  mov r7, #0     // r7: pwmCount
 
   main_loop_forever: // Template: Endlossschleife
     // send()
     mov r0, #3
-    ldr r1, =spi_msg
-    ldr r2, =spi_reply
+    ldr r1, =spi_msg				// address of message to MCP3008
+    ldr r2, =spi_reply				// address of memory location for response
     bl BCM2836_SPI0_Send
 
     ldr r0, =spi_reply
     // RX Buffer will appear reversed:
-    //   LSB is first byte received, which to the MCP3008 is an MSP
+    //   LSB is first byte received, which to the MCP3008 is an MSB
     //   to create a propper 10bit int, place in order #0,#0,[1],[2]
     ldrb r1, [r0, #1]
     lsl  r1, #8
     ldrb r0, [r0, #2]
-    orr  r6, r0, r1 // currentTemp:r6 = r0
+    orr  r6, r0, r1 // r6: currentTemp = r0 | r1 = r0 + r1
 
     // Update ambient temperate if it is drifting downwards
     // Template: Selektion
-    main_loop_forever_updateAmbient:      // if (ambientTemp:r5 > currentTemp:r6) {
+    main_loop_forever_updateAmbient:      // if (r5: ambientTemp > r6: currentTemp) {
       cmp   r6, r5
-      movlt r5, r6 //ambientTemp:r5 = r6:currentTemp
+      movlt r5, r6 //r5: ambientTemp = r6: currentTemp
     main_loop_forever_updateAmbient_done: //}
 
     add   r7, r7,#1   // pwmCnt++

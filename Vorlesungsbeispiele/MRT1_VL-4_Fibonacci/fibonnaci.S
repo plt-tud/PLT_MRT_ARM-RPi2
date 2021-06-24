@@ -34,41 +34,41 @@
 .func fib_iterative
 // uint32_t fib(uint32_t n)
 fib_iterative:
-  // EABI: Wir muessen die Register des Aufrufers sichern!
-  mov   ip, sp      // Move our sp to scratch (parents FP still active)
-  stmfd sp!,{r4-r11,lr} // r0-r4 duerfen veraendert werden
-  mov   fp, ip      // Setup our own FP
+  // EABI: Save caller's registers
+  mov   ip, sp      	// Move our sp to scratch (parents FP still active)
+  stmfd sp!,{r4-r11,lr} // r0-r4 can be used without saving
+  mov   fp, ip      	// Setup our own FP
 
-  cmp   r0, #0 // if (n==0)
-  moveq r0, #0 // ... optimierbar
+  cmp   r0, #0 			// if (n==0)
+  moveq r0, #0 			// 	then r0 = 0
   beq   fib_iterative_done
 
-  cmp   r0, #1 // if (n==1)
-  moveq r0, #1 // ... optimierbar
+  cmp   r0, #1 			// if (n==1)
+  moveq r0, #1 			// 	then r0 = 1
   beq   fib_iterative_done
 
-  mov r1, #1 // r1 := temp_n-1; initial = fib(1) = 1
-  mov r2, #0 // r2 := temp_n-2; initial = fib(0) = 0
-  mov r3, #2 // r3 := k; iterator
-  mov r4, r0 // r4 := n
+  mov r1, #1 			// r1 := x1 = temp_n-1; initial = fib(1) = 1
+  mov r2, #0 			// r2 := x2 = temp_n-2; initial = fib(0) = 0
+  mov r3, #2 			// r3 := k; iterator
+  mov r4, r0 			// r4 := n
 
 fib_iterative_loop_test:
   cmp r4, r3
   blt fib_iterative_done	 // while (k <= n) continue else jump to done
 
-fib_iterative_loop_do:
+fib_iterative_loop_do:	// result = x1 + x2
   add r0, r1, r2
-  mov r2, r1
-  mov r1, r0
+  mov r2, r1			// x2 = x1
+  mov r1, r0			// x1 = result
 
 fib_iterative_loop_increment:
-  add r3, r3, #1           // k=k+1
+  add r3, r3, #1        // k = k + 1
   b fib_iterative_loop_test
 
 fib_iterative_done:
 
   // R0=return value
-  // EABI: Wir muessen die Register des Aufrufers wiederherstellen!
+  // EABI: Restore caller's registers
   ldmfd sp!,{r4-r10,r11,lr}
   bx lr
 .endfunc
@@ -76,37 +76,41 @@ fib_iterative_done:
 .func fib_recursive
 // uint32_t fib(uint32_t n)
 fib_recursive:
-  // EABI: Wir muessen die Register des Aufrufers sichern!
+  // EABI: Save caller's registers
   mov   ip, sp          // Move our sp to scratch (parents FP still active)
-  stmfd sp!,{r4-r11,lr} // r0-r4 duerfen veraendert werden
+  stmfd sp!,{r4-r11,lr} // r0-r4 can be used without saving
   mov   fp, ip          // Setup our own FP
 
-  // r0 = Parameter
-  // if (n==0) { (optimierte Selektion)
-  CMP   r0, #0
-  MOVEQ r0, #0
-  BEQ   fib_recursive_done
-  //}
+  /* fib_recursive calls itself to calculate the two fibonacci numbers fib(n-1) and fib(n-2) and then adds the
+   * results up to calculate fib(n).
+   * In case n is 0 or 1 the functions does not call itself and simply returns 0 or 1 respectively.
+   */
 
-  // if (n==1) {  (optimierte Selektion)
-  CMP   r0, #1
-  MOVEQ r0, #1
-  BEQ   fib_recursive_done
-  //}
+  // r0 = n
+  // check if n = 0
+  CMP   r0, #0				// if (n == 0)
+  MOVEQ r0, #0				//	then n = 0
+  BEQ   fib_recursive_done	//  and break
 
-  SUB   R0, #1
-  MOV   R4, R0     		//  R4 = n-1
-  BL    fib_recursive
-  MOV   R5, R0     		// R5=fib(n-1)
+  // check if n = 1
+  CMP   r0, #1				// if (n == 1)
+  MOVEQ r0, #1				// 	then n = 1
+  BEQ   fib_recursive_done	//  and break
 
-  SUB   R0, R4, #1 		// r0=n-2
-  BL    fib_recursive	//R0 = fib(n-2)
+  SUB   R0, #1				// n--
+  MOV   R4, R0     			// r4 = n - 1
+  BL    fib_recursive		// call fib(n-1) recursively
+  MOV   R5, R0     			// r5 = fib(n-1)
 
-  ADD   R0, R0, R5  // temp = fib(n-2) + fib(n-1)
+  SUB   R0, R4, #1 			// r0=n-2
+  BL    fib_recursive		// call fib(n-1) recursively
+  							// r0 = fib(n-2)
+
+  ADD   R0, R0, R5  		// result = fib(n-2) + fib(n-1)
 
  fib_recursive_done:
-  // R0=return value
-  // EABI: Wir muessen die Register des Aufrufers wiederherstellen!
+  // r0: return value
+  // EABI: Restore caller's registers
   ldmfd sp!,{r4-r11,lr}
   bx lr
 .endfunc

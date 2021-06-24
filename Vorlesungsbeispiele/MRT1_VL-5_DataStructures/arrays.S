@@ -51,66 +51,66 @@ FIELD:      .skip ARRAY_SIZE*FIELD_TYPE_SIZE, 0
   stmfd sp!,{r4-r11,lr}
   mov   fp, ip
 
-  // Zugriff auf zur Laufzeit bekanntes Feldelement, e.g. R0 <- FIELD[4]
-  //using immediate offset
+  // Access array element at predefined index, e.g. FIELD[4] = FIELD[4] + 4
+  // using ldr with immediate offset
   array_example_staticAddress:
   .equ FIELD_INDEX, 4
-  ldr r3, =FIELD                              // r3 <- base address
-  ldr r0, [r3, #(FIELD_INDEX*FIELD_TYPE_SIZE)]  // r0 <- [base + index * 4]
-  add r0,  r0, #FIELD_INDEX                   // r0 <- r0 + 4
-  str r0, [r3, #(FIELD_INDEX*FIELD_TYPE_SIZE)]  // r0 -> [base + index * 4]
+  ldr r3, =FIELD                              	// r3: addr_base
+  ldr r0, [r3, #(FIELD_INDEX*FIELD_TYPE_SIZE)]  // r0: element = mem(base + index * 4)
+  												// ldr Rt, [Rn, #n] : load with immediate offset n
+  add r0,  r0, #FIELD_INDEX                   	// r0: element = element + 4
+  str r0, [r3, #(FIELD_INDEX*FIELD_TYPE_SIZE)]  // mem(base + index * 4) = element
 
-  // Zugriff auf zur Laufzeit unbekanntes Feldelement
-  //   mit Feldelementen arbitraerer Groesse
-  //using multiplication
+  // Access element at dynamic index in array of abritary size using multiplication.
+  // E.g. FIELD[i] = FIELD[i] + 3
   .equ FIELD_INDEX, 3
   mov r2, #FIELD_INDEX                  // r2 <- 3 (index)
   array_example_dynamicAddress_general:
     ldr r0, =FIELD_TYPE_SIZE
-    mul r0, r2, r0							//r0 <- index * type_size
-    ldr r1, =FIELD							//r1 <- base
-    add r1, r0, r1							//r1 <- r0 + r1 i.e (index * type_size) + base
+    mul r0, r2, r0							// r0 <- addr_relative = index * type_size
+    ldr r1, =FIELD							// r1 <- addr_base
+    add r1, r0, r1							// r1 <- r0 + r1
+    										// r1 <- addr_element = addr_relative + addr_base
 
-    ldr r0, [r1]     // r0 <- [base + index * 4]  : load the value
-    add r0, r0, #42  // r0 <- r0 + 3 // r0 <- r0 + 42 : work on the value
-    str r0, [r1]     // r0 -> [base + index * 4] : storet he changed value back in memory
+    ldr r0, [r1]     // r0 <- [addr_element]     : load the value
+    add r0, r0, #42  // r0 <- r0 + 42 : modify the value
+    str r0, [r1]     // r0 -> [base + index * 4] : store the changed value back in memory
   array_example_dynamicAddress_general_end:
 
-  // Zugriff auf zur Laufzeit unbekanntes Feldelement
-  //   mit Feldelementgroesse %2
-  //using shift
+  // Access element at dynamic index in array of size 2^x using bit shifting.
   array_example_dynamicAddress_optimal:
   .equ FIELD_INDEX, 3
-    mov r2, #FIELD_INDEX                  // r2 <- 3 (index)
-    ldr r3, =FIELD   					// r3 <- base
-    ldr r0, [r3, r2, LSL #FIELD_TYPE_LSL] // r0 <- [base + index * 4]
-    add r0, r0, #FIELD_INDEX              // r0 <- r0 + 3
-    str r0, [r3, r2, LSL #FIELD_TYPE_LSL] // r0 -> [base + index * 4]
+    mov r2, #FIELD_INDEX                  	// r2: index = 3
+    ldr r3, =FIELD   						// r3 = addr_base
+    ldr r0, [r3, r2, LSL #FIELD_TYPE_LSL] 	// r0: element = mem(addr_base + index << 2)  (LSL - left shift logical)
+    										//   		   = mem(addr_base + index * 4)
+    										// ldr Rt, [Rn, Rm, LSL n] : load with register offset and shift n bits
+    add r0, r0, #FIELD_INDEX              	// r0: element = element + 3
+    str r0, [r3, r2, LSL #FIELD_TYPE_LSL] 	// mem(addr_base + index * 4) = element
   array_example_dynamicAddress_optimal_end:
 
-  // Iteriere über ein Feld mit immediate post-indexed
-  // Template: for-Schleife
-  // for (r2=BASEADDR, r3=0, r3<FIELDELEMENTS, r3+=1)
+  // Iterate over array with immediate post-indexed loading
+  // for (r2=addr_base, r3=0; r3<FIELDELEMENTS, r3+=1)
   array_example_dynamicAddress_iterate_init:
-    ldr r2, =FIELD
-    mov r3, #0				//counter or the index to be accessed
+    ldr r2, =FIELD			// r2: addr_base
+    mov r3, #0				// r3: i = 0	(counter of for loop and index for accessing array)s
   array_example_dynamicAddress_iterate_condition:
     cmp r3,#ARRAY_SIZE
     bge array_example_dynamicAddress_iterate_end
 
-    // Berechne Element-Addresse
+    // calculate array element's address
     ldr r0, =FIELD_TYPE_SIZE
-    mul r1, r0, r3
-    ldr r0, =FIELD
-    add r1, r1, r0  // r1 = FIELD_TYPE_SIZE*i + BASE_ADDR
+    mul r1, r0, r3			// r1 = i * FIELD_TYPE_SIZE
+    ldr r0, =FIELD			// r0 = addr_base
+    add r1, r1, r0  		// r1: addr_element = i * FIELD_TYPE_SIZE + addr_base
 
-    // Greife auf Element zu
-    ldr r0,[r1]             // r0 -> [r3] then r3 <- r3+4
-    add r0, r0, r3          // Wert aendern
-    str r0,[r1]             // r0 -> [r3] then r3 <- r3+4
+    // access and modify element
+    ldr r0,[r1]             // r0: element = mem(addr_element)
+    add r0, r0, r3          // r0: element += i
+    str r0,[r1]             // mem(addre_element) = element
 
   array_example_dynamicAddress_iterate_update:
-    add r3, r3, #1
+    add r3, r3, #1			// i++
     b array_example_dynamicAddress_iterate_condition
   array_example_dynamicAddress_iterate_end:
 
