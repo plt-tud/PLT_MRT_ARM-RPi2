@@ -4,6 +4,8 @@ Dieses Programm startet den open62541 OPC UA Server auf dem Raspberry Pi. Der Se
 Variablen oder Interaktionsmöglichkeiten - er dient als erster Schritt, um sich mit UA Expert und dem
 nachfolgenden Client-Beispiel mit dem Pi verbinden zu können.
 
+Das Programm kann wahlweise auf dem Pi oder in der VM laufen. Dafür muss die Zieladresse in OPCUA_FirstSteps_client.cpp im Client Projekt aber entsprechend angepasst werden. Die Projekte sind standardmäßig so eingestellt, dass der Server auf dem Pi läuft.
+
 **NOTE:** This project only contains the used API header and sources. For the complete project, please check out the `Ampel_mit_IoT`-project.
 
 # Projeteinstellungen für  ARM/Raspberry Pi

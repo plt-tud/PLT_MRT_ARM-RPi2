@@ -4,6 +4,16 @@ Die Ampel ohne IoT-Schnittstelle (VL-6) als Eclipse-Projekt. Das Projekt impleme
 
 Das Programm besitzt einen Preprocessor-Schalter (BUILD_PI), um die Peripherie-Funktionen des Raspberry Pis zu de-/aktivieren.
 
+Die GPIO Belegung für Lampen und Sensor wird in main.cpp definiert. Die standardmäßige Belegung ist in folgender Tabelle aufgelistet:
+
+| Funktion     | BCM Pin    | Board Pin  |
+| ------------ | ---------- | ---------- |
+| Sensor       | 24         | 18         |
+| Grün         | 17         | 11         |
+| Gelb         | 27         | 13         |
+| Rot          | 22         | 15         |
+
+
 # Einstellungen für Eclipse
 
 Die Nachfolgenden Einstellungen sind zur Vollständigkeit dokumentiert. Einige der Einstellungen (etwa der C/C++ Dialekt) gehen beim umschalten der Toolchains verlohren.

@@ -3,6 +3,7 @@
 	<name>MRT2_VL-4_CalcAsFSM_reduziert</name>
 	<comment></comment>
 	<projects>
+		<project>MRT2_VL-3_Automaton_Lib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

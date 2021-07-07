@@ -18,13 +18,12 @@
 <stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_START_MODE" value="run"/>
 <booleanAttribute key="org.eclipse.cdt.launch.DEBUGGER_STOP_AT_MAIN" value="true"/>
 <stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_STOP_AT_MAIN_SYMBOL" value="main"/>
-<stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="Debug (x86)/MRT2_VL-5_list"/>
-<stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="MRT2_VL-5_list"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="Debug (x86)/MRT1_VL-11_Object_Orientation"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="MRT1_VL-11_Object_Orientation"/>
 <booleanAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_AUTO_ATTR" value="false"/>
-<stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value="cdt.managedbuild.config.gnu.exe.debug.1760368555"/>
-<booleanAttribute key="org.eclipse.cdt.launch.use_terminal" value="true"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value="cdt.managedbuild.config.gnu.cross.exe.debug.1971445382.1918721187"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/MRT2_VL-5_list"/>
+<listEntry value="/MRT1_VL-11_Object_Orientation"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="4"/>

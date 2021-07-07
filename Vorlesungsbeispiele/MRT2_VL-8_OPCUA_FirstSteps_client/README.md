@@ -4,7 +4,7 @@ Dieses Program erstellt einen neuen Client mit dem open62541 Stack und verbindet
 
 Der Client macht nichts, außer mit dem Stack verbunden zu bleiben. Er dient als erster Schritt für weitere Interaktionen, wenn wir einmal verbunden sind.
 
-Der CLient kann wahlweise local oder auf dem Pi laufen.
+Der Client kann wahlweise lokal oder auf dem Pi laufen. Sollte der Server jedoch in der VM laufen, muss die Ziel Adressse in OPCUA_FirstSteps_client.cpp aber entsprechend eingestellt werden.
 
 **NOTE:** This project only contains the used API header and sources. For the complete project, please check out the `Ampel_mit_IoT`-project.
 

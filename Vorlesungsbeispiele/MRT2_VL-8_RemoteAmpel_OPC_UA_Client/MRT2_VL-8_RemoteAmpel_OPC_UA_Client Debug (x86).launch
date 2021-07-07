@@ -18,9 +18,9 @@
 <stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_START_MODE" value="run"/>
 <booleanAttribute key="org.eclipse.cdt.launch.DEBUGGER_STOP_AT_MAIN" value="true"/>
 <stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_STOP_AT_MAIN_SYMBOL" value="main"/>
-<stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="Debug/MRT2_VL-8_RemoteAmpel_OPC_UA_Client"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="Debug (x86)/MRT2_VL-8_RemoteAmpel_OPC_UA_Client"/>
 <stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="MRT2_VL-8_RemoteAmpel_OPC_UA_Client"/>
-<booleanAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_AUTO_ATTR" value="true"/>
+<booleanAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_AUTO_ATTR" value="false"/>
 <stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value="cdt.managedbuild.config.gnu.exe.debug.804144417"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/MRT2_VL-8_RemoteAmpel_OPC_UA_Client"/>
