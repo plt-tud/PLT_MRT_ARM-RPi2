@@ -70,11 +70,11 @@ main:
 test_fib_zero:
   /* bool test_fib_zero
    *
-   * Teste wie folgt:
+   * Test algorithm:
    *  r4 = fib_recursive(0)
    *  r0 = fib_iterative(0)
-   * falls r4 != r0: fail: return 1
-   * falls r4 != 0:  fail: return 1
+   * if r4 != r0: fail: return 1
+   * if r4 != 0:  fail: return 1
    * return 0
    */
   // small test wrapper: Return 0 if fib(0)==0

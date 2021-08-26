@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2018 Leon Urbas <leon.urbas@tu-dresden.de>
- * Copyright (c) 2019 Chris Iatrou <chris_paul.iatrou@tu-dresden.de>
+ * Copyright (c) 2018 Leon Urbas <leon.urbas//tu-dresden.de>
+ * Copyright (c) 2019 Chris Iatrou <chris_paul.iatrou//tu-dresden.de>
  *
  * Hiermit wird unentgeltlich jeder Person, die eine Kopie der
  * Software und der zugehörigen Dokumentationen (die "Software")
@@ -34,26 +34,28 @@
  */
 	.data
 		.balign 4
-countD: .word 0x000003		//number of loops
+countD: .word 0x000003		// number of loops
 
 		.text
 		.func main
 		.globl main
 		.balign 4		    // instructions must be word-alignd
 main:
-		stmfd sp!,{lr}  	@ safe return address (as prepared by linux)
+		stmfd sp!,{lr}  	// save return address (as prepared by linux)
 main_loop_start:
 		mov r0, #0
 		ldr r1, countD_addr // load our repetition count; this is a single-step form of
-		ldr r10, [r1]     	@   what ldr r10,=countD would do
+		ldr r10, [r1]     	//   what ldr r10,=countD would do
 		sub r10, r10, #1    // decrement our counter variable
 		cmp r0, r10
 		str r10, [r1] 	    // persist our repetition count
 		beq main_loop_end
-		/* Hier koennte Ihr Code stehe */
+
+			// Do program excution here
+
 		b   main_loop_start
 main_loop_end:
-		ldmfd sp!,{pc} 		@ pop return address to pc
+		ldmfd sp!,{pc} 		// pop return address to pc
 		.endfunc
 
 countD_addr: .word countD
