@@ -51,8 +51,8 @@ BCM2836_Open:
   mov r0, #0							// we do not define an address of mapping, so it will be chosen by the kernel
   mov r1, #BCM2836_PERI_MAPSIZE			// mapping's length
   mov r2, #MMAP_PARAMETER_PROT_READ_WRITE	// mapped pages will be written and read
-  mov r3, #MMAP_PARAMETER_MAP_SHARED		// updates to the mapping are visible to other processes
-  ldr r5, =BCM2836_GPIO_BASE         	// offset must be multiple of 4k (page size), so we have to shift the address
+  mov r3, #MMAP_PARAMETER_MAP_SHARED	// updates to the mapping are visible to other processes
+  ldr r5, =BCM2836_GPIO_BASE        	// offset must be multiple of 4k (page size), so we have to shift the address
   lsr r5, r5, #12                   	// shift address from the manual (0x3f200000) to 0x3f200 (divide by 2^12 = 4k)
   mov r7, #SYSCALL_MMAP2
   swi #0
@@ -76,10 +76,34 @@ BCM2836_Open_error:
   bal BCM2836_Open_exit
 .endfunc
 
+.func BCM2836_Close
+BCM2836_Close:
+  // EABI first
+  mov   ip, sp
+  stmfd sp!,{r4-r11,lr}
+  mov   fp, ip
+
+    // munmap
+  ldr r0,=dev_mem_gpio_base_addr
+  ldr r0,[r0]
+  mov r1,#BCM2836_PERI_MAPSIZE
+  mov r7,#SYSCALL_MUNMAP
+  swi #0
+
+  // close
+  ldr r0,=dev_mem_gpio_fd
+  ldr r0,[r0]
+  mov r7, #SYSCALL_CLOSE
+  swi #0
+
+  ldmfd sp!,{r4-r10,r11,lr}
+  bx lr
+.endfunc
+
 /*********************
  * GPIO Functions
  *********************/
-// BCM2836_GPIO_PinSelFun(pin_target, FunctionSelection)
+// BCM2836_GPIO_PinSelFun(GPIO-Pin, FunctionSelection)
 .func BCM2836_GPIO_PinSelFun
 BCM2836_GPIO_PinSelFun:
   // EABI first
@@ -96,8 +120,8 @@ BCM2836_GPIO_PinSelFun:
   // We do not calculate bitpos_target and index_register using the formulas above but by using a loop.
 
   BCM2836_GPIO_PinSelFun_divloop_init:
-  // while (r9: div=0, r0: mod=27); r0 = value --> value%10; r9=value/10
-  mov r9, #0		// r9: index_fsel = 0
+  /// while (r9: div=0, r0: mod=27); r0 = value --> value%10; r9=value/10
+  mov r9, #0
   BCM2836_GPIO_PinSelFun_divloop_test:
     // Subtrahiere, solange r0 positiv ist
     subs r0, r0, #10							// r0: pin_target = pin_target - 10
@@ -105,28 +129,28 @@ BCM2836_GPIO_PinSelFun:
     add  r9, r9, #1								// r9: index_fsel++
     b    BCM2836_GPIO_PinSelFun_divloop_test	// continue loop
   BCM2836_GPIO_PinSelFun_divloop_done:
-  add r10, r0, #10 			// pin_target mistakenly became negative, so we correct that
-  add r10, r10, r10, lsl #1 // r10: bitpos_target = pin_target + pin_target*2
-  							//	   			      = pin_target * 3
+  add r10, r0, #10 								// pin_target mistakenly became negative, so we correct that
+  add r10, r10, r10, lsl #1 					// r10: bitpos_target = pin_target + pin_target*2
+  												//	   			      = pin_target * 3
 
   // r10: bitpos_target		- target bit position in gpfsel register
   // r9:  index_register	- fsel register's index
 
   /* Copy - ... */
-  ldr r3,=dev_mem_gpio_base_addr 	// we have stored the base address from mmap at this address in GPIO_Open call
-  ldr r3,[r3]   					// r3: addr_base = mem(dev_mem_gpio_base_addr)
+  ldr r3,=dev_mem_gpio_base_addr				// we have stored the base address from mmap at this address in GPIO_Open call
+  ldr r3,[r3]   								// r3: addr_base = mem(dev_mem_gpio_base_addr)
 
-  ldr r4,[r3,r9,LSL #2]   	// r4: content_gpfsel = mem(GPFSEL<index_register>)
-  							// 					  = mem(addr_base + index_register * 4]
+  ldr r4,[r3,r9,LSL #2]  						// r4: content_gpfsel = mem(GPFSEL<index_register>)
+  												// 					  = mem(addr_base + index_register * 4]
 
   /* ... - Modify - ...*/
-  mov r5,#0b111				// generate bitmask for clearing fsel register at bitpos_target
-  bic r4,r4,r5,LSL R10  	// r4: content_gpfsel = content_gpfsel NAND ( 0b111 << bitpos_target)
-  orr r4,r4,r1,LSL R10 		// r4: content_gpfsel = content_gpfsel OR 	( 0b111 << bitpos_target)
+  mov r5,#0b111									// generate bitmask for clearing fsel register at bitpos_target
+  bic r4,r4,r5,LSL R10  						// r4: content_gpfsel = content_gpfsel NAND ( 0b111 << bitpos_target)
+  orr r4,r4,r1,LSL R10 							// r4: content_gpfsel = content_gpfsel OR 	( 0b111 << bitpos_target)
 
   /* ... - Update*/
-  str r4,[r3,r9,LSL #2] 	//   mem(addr_base + index_register * 4]
-  							// = mem(GPFSEL<index_register>)		 = content_gpfsel
+  str r4,[r3,r9,LSL #2] 						//   mem(addr_base + index_register * 4]
+												// = mem(GPFSEL<index_register>)		 = content_gpfsel
 
   ldmfd sp!,{r4-r10,r11,lr}
   bx lr
@@ -190,30 +214,6 @@ BCM2836_GPIO_PinClr:
   bx lr
 .endfunc
 
-.func BCM2836_Close
-BCM2836_Close:
-  // EABI first
-  mov   ip, sp
-  stmfd sp!,{r4-r11,lr}
-  mov   fp, ip
-
-    // munmap
-  ldr r0,=dev_mem_gpio_base_addr
-  ldr r0,[r0]
-  mov r1,#BCM2836_PERI_MAPSIZE
-  mov r7,#SYSCALL_MUNMAP
-  swi #0
-
-  // close
-  ldr r0,=dev_mem_gpio_fd
-  ldr r0,[r0]
-  mov r7, #SYSCALL_CLOSE
-  swi #0
-
-  ldmfd sp!,{r4-r10,r11,lr}
-  bx lr
-.endfunc
-
 /*********************
  * SPI Functions
  *
@@ -255,50 +255,50 @@ BCM2836_SPI0_Init:
   bl BCM2836_SPI0_GetBase
   mov r4, r0 // r4 = SPI Base
 
-  // set functions of pins 7-11 to alternate 0 mode, which enables SPI mode (see BCM2835 datasheet page 102)
-  mov r0,#7 // CE1				// pin 7: CE1 - chip enable 1
+  // set pin functions to alternate0
+  mov r0,#7 // CE1
   mov r1,#BCM2836_GPFSEL_ALT0
   bl BCM2836_GPIO_PinSelFun
 
-  mov r0,#8 					// pin 8: CE0 - chip enable 0
+  mov r0,#8 // CE0
   mov r1,#BCM2836_GPFSEL_ALT0
   bl BCM2836_GPIO_PinSelFun
 
-  mov r0,#9 					// pin 9: MISO - Master In Slave Out
+  mov r0,#9 // MISO
   mov r1,#BCM2836_GPFSEL_ALT0
   bl BCM2836_GPIO_PinSelFun
 
-  mov r0,#10 					// pin 10: MOSI - Master Out Slave In
+  mov r0,#10 // MOSI
   mov r1,#BCM2836_GPFSEL_ALT0
   bl BCM2836_GPIO_PinSelFun
 
-  mov r0,#11 					// pin 11: CLK - Clock
+  mov r0,#11 // CLK
   mov r1,#BCM2836_GPFSEL_ALT0
   bl BCM2836_GPIO_PinSelFun
 
-  // initialize CS (see BCM2835 datasheet page 153)
+  // initialize CS
   mov r0, #0
   str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 
   // clear fifos
-  mov r0,    #BCM2835_SPI0_CS_CLEAR		// bits 5-4 = 11:	clear rx and tx fifos
+  mov r0,    #BCM2835_SPI0_CS_CLEAR
   str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 
   // set CS-Polarity of cs0 and cs1 to 0
   ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-  bic r0,r0,#BCM2835_SPI0_CS_CSPOL0		// bit 21 = 0:		set chip select 0 to active low
-  bic r0,r0,#BCM2835_SPI0_CS_CSPOL1		// bit 22 = 0:		set chip select 1 to active low
+  bic r0,r0,#BCM2835_SPI0_CS_CSPOL0
+  bic r0,r0,#BCM2835_SPI0_CS_CSPOL1
   str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 
   // set data mode to mode 0 (cpol=0, cpha=0) and select CS0 (CS=0)
   ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-  bic r0,r0,#BCM2835_SPI0_CS_CPOL		// bit 3 = 0:		rest state of clock is LOW
-  bic r0,r0,#BCM2835_SPI0_CS_CPHA		// bit 2 = 0:		first CLK transition is in middle of data bit
-  bic r0,r0,#BCM2835_SPI0_CS_CS			// bit 0-1 = 00:	use chip select 0
+  bic r0,r0,#BCM2835_SPI0_CS_CPOL
+  bic r0,r0,#BCM2835_SPI0_CS_CPHA
+  bic r0,r0,#BCM2835_SPI0_CS_CS
   str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 
   // set clock divider
-  mov r0,#128 							// 1.9 MhZ on RPi2
+  mov r0,#128 // 1.9 MhZ on RPi2
   str r0,[r4,#BCM2835_SPI0_CLK_OFFSET]
 
   ldmfd sp!,{r4-r10,r11,lr}
@@ -333,19 +333,19 @@ BCM2836_SPI0_Init:
   stmfd sp!,{r4-r11,lr}
   mov   fp, ip
 
-  mov r7, r0  // r7: dataSz = r0: dataSz
+  mov r7, r0  // dataSz:r7 = r0:dataSz
   bl BCM2836_SPI0_GetBase
   mov r4, r0  // r4 = BCM2836_SPI0_GetBase()
-  mov r5, #0  // r5: rxData = 0
-  mov r6, #0  // r6: txData = r0: dataSz
+  mov r5, #0  // rxData:r5 = 0
+  mov r6, #0  // txData:r6 = r0:dataSz
   mov r8, r1  // r8 = *txdata_ptr
   mov r9, r2  // r9 = *rxdata_ptr
 
   // clear fifos and set TA
   // CS = CS | (CLEAR|TA)
   ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-  orr r0,r0, #BCM2835_SPI0_CS_CLEAR		// bit 4-5 = 11:	clear rx and tx FIFO
-  orr r0,r0, #BCM2835_SPI0_CS_TA		// bit 7 = 1:		transfer is now active
+  orr r0,r0, #BCM2835_SPI0_CS_CLEAR
+  orr r0,r0, #BCM2835_SPI0_CS_TA
   str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 
   // Template Ablehnende Schleife
@@ -358,33 +358,31 @@ BCM2836_SPI0_Init:
     BCM2836_SPI0_Send_rxtxloop_rx:
       // if (rxBuffer != Empty) {
       ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-      tst r0, #BCM2835_SPI0_CS_RXD_FIFO_NOTEMPTY	// Check if RXD (bit 17) is set (tst - test if bits are set).
-      beq BCM2836_SPI0_Send_rxtxloop_rx_end			// "eq" condition tests for Z == 1, so if bit 17 is set, then
-													// tst returns 1, which is not 0, which means that RX FIFO is
-													// not empty.
+      tst r0, #BCM2835_SPI0_CS_RXD_FIFO_NOTEMPTY
+      beq BCM2836_SPI0_Send_rxtxloop_rx_end
 
       // copy(SPI RX Buffer to rxdata[rxData++])
-      ldr r0,[r4,#BCM2835_SPI0_FIFO_OFFSET] 		// read FIFO register
-      and r0,r0,#0xFF								// discard everything except the first byte
-      strb r0,[r9, r5]								// store read byte at rxdata_ptr
-      add r5, r5, #1 // rxData++					// increment rxdata_ptr
+      ldr r0,[r4,#BCM2835_SPI0_FIFO_OFFSET] // read
+      and r0,r0,#0xFF
+      strb r0,[r9, r5]
+      add r5, r5, #1 // rxData++
     BCM2836_SPI0_Send_rxtxloop_rx_end: // }
 
     // Template Selektion
     BCM2836_SPI0_Send_rxtxloop_tx:
       // if (txdata:r6 < dataSz:r7 ...
-      cmp r6, r7									// if (txDataCount >= dataSz)
-      bge BCM2836_SPI0_Send_rxtxloop_tx_end			// 	then jump to main_SPI0_Send_rxtxloop_tx_end
+      cmp r6, r7
+      bge BCM2836_SPI0_Send_rxtxloop_tx_end
       //  && txBuffer != Full ....
-      ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]			// load CS register
-      tst r0, #BCM2835_SPI0_CS_TXD_FIFO_FULL		// Test if TXD (bit 18) is set to 0 (= FIFO full) and jump to
-      beq BCM2836_SPI0_Send_rxtxloop_tx_end			// main_SPI0_Send_rxtxloop_tx_end if that is the case.
+      ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
+      tst r0, #BCM2835_SPI0_CS_TXD_FIFO_FULL
+      beq BCM2836_SPI0_Send_rxtxloop_tx_end
       // ... ) {
 
       // copy(txdata[txData++] to SPI TX Buffer);
-      ldrb r0, [r8, r6]								// load byte from mem(txData_ptr + txDataCount)
-      str  r0, [r4, #BCM2835_SPI0_FIFO_OFFSET]		// store byte onto FIFO
-      add  r6, r6, #1  // txData++					// intcrement txData_ptr
+      ldrb r0, [r8, r6]
+      str  r0, [r4, #BCM2835_SPI0_FIFO_OFFSET]
+      add  r6, r6, #1  // txData++
     BCM2836_SPI0_Send_rxtxloop_tx_end: //}
 
     b BCM2836_SPI0_Send_rxtxloop_start
@@ -392,14 +390,13 @@ BCM2836_SPI0_Init:
 
   // while (!DONE) { wait }
   BCM2836_SPI0_Send_wait_for_done:
-  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET] 				// wait for done
-  tst r0,#BCM2835_SPI0_CS_DONE						// load CS register
-  beq BCM2836_SPI0_Send_wait_for_done				// Test if DONE (bit 16) is not yet set to 1 and
-  													// continue waiting when Z is 1 (-> DONE is 0).
+  ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET] // wait for done
+  tst r0,#BCM2835_SPI0_CS_DONE
+  beq BCM2836_SPI0_Send_wait_for_done
 
   // Set transmission active to 0 (disables output lines)
   ldr r0,[r4,#BCM2835_SPI0_CS_OFFSET]
-  bic r0,r0,#BCM2835_SPI0_CS_TA						// bit 7 = 0:	transfer is complete and not active anymore
+  bic r0,r0,#BCM2835_SPI0_CS_TA
   str r0,[r4,#BCM2835_SPI0_CS_OFFSET]
 
   ldmfd sp!,{r4-r10,r11,lr}
