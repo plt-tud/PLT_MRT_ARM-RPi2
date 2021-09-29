@@ -16,6 +16,12 @@ int main(int argc, char **argv) {
     /* Unsere lokale IoT Ampel, die sich per OPC UA
 	   mit dem Pi verbinden wird:
 	 */
+
+	/* Verbindung mit einem lokal laufenden Ampel Server: */
+	//RemoteAmpel b("opc.tcp://127.0.0.1:4840");
+
+
+	/* Verbindung mit einem Ampel Server auf dem Raspberry Pi: */
 	RemoteAmpel b("opc.tcp://192.168.0.240:4840");
     
     runAmpel = true;

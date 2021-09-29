@@ -4,6 +4,8 @@ Der IoT Ampel-Controller (VL-8) als Eclipse-Projekt.
 
 Der Ampel-Controller ist ein OPC UA Client, der als API lokal die gleichen Schnittstellen anbietet wie unsere Ampel. Der Client verbindet sich mit einer IoT-Ampel per OPC UA und erlaubt so die "Fernsteuerung".
 
+Der Raspberry Pi ist standardmäßig über die Addresse "192.168.0.240" erreichbar. Sollten Steurung und Ampel auf der selben Maschine laufen, so ist die Ampel auch über "127.0.0.1" (localhost) erreichbar. Die Zieladresse kann in ampel_controller.cpp geändert werden.
+
 Das Programm erfüllt die selbe Funktion wie dies Vorlesungsbeispiele vorangegangener Vorlesungen: Es prüft, ob der Sensor ausgelöst wurde und wechselt die Ampelphasen von Rot auf Grün und zurück. 
 
 **NOTE:** This project only contains the used API header and sources. For the complete project, please check out the `Ampel_mit_IoT`-project.

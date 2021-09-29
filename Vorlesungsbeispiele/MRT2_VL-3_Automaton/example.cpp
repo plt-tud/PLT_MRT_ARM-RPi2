@@ -16,8 +16,6 @@
 
 using namespace std;
 
-// Remove definition when building on x86!!
-#define BUILD_RPI
 #define RPI_GPIO_GREEN  5
 #define RPI_GPIO_YELLOW 4
 #define RPI_GPIO_RED    2
